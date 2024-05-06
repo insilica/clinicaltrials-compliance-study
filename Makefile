@@ -77,7 +77,7 @@ docker-compose-down:
 		down
 
 docker-load-data:
-	D=./data/aact/db-dump; \
+	D=./download/aact/db-dump; \
 	find $$D -type f -name '*.zip' -print \
 		| xargs -I{} realpath --relative-to=$$D {} \
 		| xargs -I{} docker compose \
