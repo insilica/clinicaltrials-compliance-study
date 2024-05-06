@@ -21,6 +21,13 @@ stages:
     cmd: stages/02_build-anderson2015.sh
     deps:
       - stages/02_build-anderson2015.sh
-      - data/anderson2015
+      - download/anderson2015
     outs:
       - brick/anderson2015
+  download-ctgov-data:
+    outs:
+      - brick/ctgov/historical
+    deps:
+      - stages/01_download_cts.R
+      - download/aact/db-dump/20240430_clinical_trials.zip
+    cmd: make docker-compose-up; Rscript stages/01_download_cts.R
