@@ -1,54 +1,51 @@
 SELECT
-	NCT_ID,
-	STUDY_FIRST_SUBMITTED_DATE,
-	STUDY_FIRST_POSTED_DATE_TYPE,
-	VERIFICATION_DATE,
-	COMPLETION_DATE,
-	PRIMARY_COMPLETION_MONTH_YEAR,
-	PRIMARY_COMPLETION_DATE_TYPE,
-	PRIMARY_COMPLETION_DATE,
-	STUDY_TYPE,
-	OVERALL_STATUS,
-	PHASE,
-	ENROLLMENT
+	*
 FROM
-	CTGOV.STUDIES
+	(
+		SELECT
+			nct_id,
+			TO_DATE(verification_month_year, 'Month YYYY') AS verification_date,
+			TO_DATE(completion_month_year, 'Month YYYY') AS completion_date,
+			TO_DATE(primary_completion_month_year, 'Month YYYY') AS primary_completion_date,
+			study_type,
+			overall_status,
+			phase,
+			enrollment
+		FROM
+			public.studies
+	) AS uncomputed
 WHERE
 	(
-		NCT_ID IN ('NCT00000120', 'NCT00000125')
-		AND
+		-- nct_id IN ('NCT00000120', 'NCT00000125')AND
 		overall_status != 'Withdrawn'
-		-- AND
-		-- 	-- STUDY_FIRST_SUBMITTED_DATE < '2013-09-27'::DATE
-		-- (
-		-- 	PRIMARY_COMPLETION_DATE >= '2008-01-01'::DATE
-		-- 	OR (
-		-- 		PRIMARY_COMPLETION_DATE IS NULL
-		-- 		AND (
-		-- 			COMPLETION_DATE >= '2008-01-01'::DATE
-		-- 			OR COMPLETION_DATE IS NULL
-		-- 		)
-		-- 	)
-		-- )
-		-- AND STUDY_TYPE = 'Interventional'
-		-- AND (
-		-- 	PHASE != 'Phase 1'
-		-- 	OR PHASE != 'Early Phase 1'
-		-- )
-		-- AND (
-		-- 	OVERALL_STATUS = 'Terminated'
-		-- 	OR OVERALL_STATUS = 'Completed'
-		-- )
-		-- 	AND (
-		-- 			PRIMARY_COMPLETION_DATE < '2012-09-01'::DATE
-		-- 			OR PRIMARY_COMPLETION_DATE IS NULL
-		-- 		)
-		-- 	AND (
-		-- 			-- COMPLETION_DATE IS NULL
-		-- 			PRIMARY_COMPLETION_DATE IS NULL
-		-- 			AND VERIFICATION_DATE < '2012-09-01'::DATE
-		-- 			AND VERIFICATION_DATE > '2008-01-01'::DATE
-		-- 		)
+		AND (
+			primary_completion_date >= '2008-01-01'::DATE
+			OR (
+				primary_completion_date IS NULL
+				AND (
+					completion_date >= '2008-01-01'::DATE
+					OR completion_date IS NULL
+				)
+			)
+		)
+		AND study_type = 'Interventional'
+		AND (
+			phase != 'Phase 1'
+			OR phase != 'Early Phase 1'
+		)
+		AND (
+			overall_status = 'Terminated'
+			OR overall_status = 'Completed'
+)
+		AND (
+			primary_completion_date < '2012-09-01'::DATE
+			OR primary_completion_date IS NULL
+		)
+		AND (
+			-- completion_date IS NULL
+			primary_completion_date IS NULL
+			AND verification_date < '2012-09-01'::DATE
+			AND verification_date > '2008-01-01'::DATE
+		)
 	)
-ORDER BY
-	NCT_ID
+ORDER BY nct_id
