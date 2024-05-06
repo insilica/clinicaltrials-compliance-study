@@ -17,3 +17,10 @@ stages:
       - stages/01_download_paper_data.sh
     outs:
       - download/anderson2015
+  build-paper-data:
+    cmd: stages/02_build-anderson2015.sh
+    deps:
+      - stages/02_build-anderson2015.sh
+      - data/anderson2015
+    outs:
+      - brick/anderson2015

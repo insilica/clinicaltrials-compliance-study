@@ -37,3 +37,21 @@ stages:
       md5: 0f627e15c08e5ec23c2eabe0ad574d25.dir
       size: 4199399
       nfiles: 2
+  build-paper-data:
+    cmd: stages/02_build-anderson2015.sh
+    deps:
+    - path: data/anderson2015
+      hash: md5
+      md5: 0f627e15c08e5ec23c2eabe0ad574d25.dir
+      size: 4199399
+      nfiles: 2
+    - path: stages/02_build-anderson2015.sh
+      hash: md5
+      md5: 0942894b0d5b0d180db7a7deecc38f64
+      size: 464
+    outs:
+    - path: brick/anderson2015
+      hash: md5
+      md5: 1395cc31b50eca34bf0a57f5a4ed9d0f.dir
+      size: 1387361
+      nfiles: 4
