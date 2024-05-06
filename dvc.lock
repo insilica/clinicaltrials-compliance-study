@@ -17,3 +17,14 @@ stages:
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
       size: 1831128430
+  download-paper-data:
+    cmd: "# From <https://aact.ctti-clinicaltrials.org/shared_data/proj_results_reporting>.\n
+      mkdir -p data/anderson2015\nwget --content-disposition -P data/anderson2015
+      \"https://aact.ctti-clinicaltrials.org/datasets/40\" \"https://aact.ctti-clinicaltrials.org/attachments/21\"\
+      \n"
+    outs:
+    - path: data/anderson2015
+      hash: md5
+      md5: 0f627e15c08e5ec23c2eabe0ad574d25.dir
+      size: 4199399
+      nfiles: 2

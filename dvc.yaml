@@ -12,3 +12,10 @@ stages:
       wget "https://ctti-aact.nyc3.digitaloceanspaces.com/b3eaknxyv33k9ah4hckm4igb1ozq" -O data/aact/db-dump/20240430_clinical_trials.zip
     outs:
       - data/aact/db-dump/20240430_clinical_trials.zip
+  download-paper-data:
+    cmd: |
+      # From <https://aact.ctti-clinicaltrials.org/shared_data/proj_results_reporting>.
+      mkdir -p data/anderson2015
+      wget --content-disposition -P data/anderson2015 "https://aact.ctti-clinicaltrials.org/datasets/40" "https://aact.ctti-clinicaltrials.org/attachments/21"
+    outs:
+      - data/anderson2015
