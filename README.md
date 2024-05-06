@@ -9,7 +9,11 @@ Steps towards reproducing results of:
 > [PMID: 25760355](https://pubmed.ncbi.nlm.nih.gov/25760355/);
 > [PMCID: PMC4508873](http://www.ncbi.nlm.nih.gov/pmc/articles/pmc4508873/).
 
-## Filtering
+## Selection of Clinical Trials to Include
+
+Diagram from original paper:
+
+[![Figure 1: Clinical Trials Included in the Study.](https://www.nejm.org/cms/10.1056/NEJMsa1409364/asset/bad8a8de-730f-4b12-b225-a7b8671ba351/assets/images/large/nejmsa1409364_f1.jpg)](https://www.nejm.org/doi/10.1056/NEJMsa1409364#f01)
 
 ```shell
 
