@@ -1,0 +1,19 @@
+schema: '2.0'
+stages:
+  download-20170105:
+    cmd: "# Oldest database dump available from <https://aact.ctti-clinicaltrials.org/snapshots>.\n
+      mkdir -p data/aact/db-dump\nwget \"https://ctti-aact.nyc3.digitaloceanspaces.com/zyxb0icr0b8tbx62lp0qo4u8kkns\"\
+      \ -O data/aact/db-dump/20170105_clinical_trials.zip\n"
+    outs:
+    - path: data/aact/db-dump/20170105_clinical_trials.zip
+      hash: md5
+      md5: 54550221d6d2f728b5df64ea40078b2b
+      size: 639987071
+  download-20240430:
+    cmd: "mkdir -p data/aact/db-dump\nwget \"https://ctti-aact.nyc3.digitaloceanspaces.com/b3eaknxyv33k9ah4hckm4igb1ozq\"\
+      \ -O data/aact/db-dump/20240430_clinical_trials.zip\n"
+    outs:
+    - path: data/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430

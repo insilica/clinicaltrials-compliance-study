@@ -1,0 +1,14 @@
+stages:
+  download-20170105:
+    cmd: |
+      # Oldest database dump available from <https://aact.ctti-clinicaltrials.org/snapshots>.
+      mkdir -p data/aact/db-dump
+      wget "https://ctti-aact.nyc3.digitaloceanspaces.com/zyxb0icr0b8tbx62lp0qo4u8kkns" -O data/aact/db-dump/20170105_clinical_trials.zip
+    outs:
+      - data/aact/db-dump/20170105_clinical_trials.zip
+  download-20240430:
+    cmd: |
+      mkdir -p data/aact/db-dump
+      wget "https://ctti-aact.nyc3.digitaloceanspaces.com/b3eaknxyv33k9ah4hckm4igb1ozq" -O data/aact/db-dump/20240430_clinical_trials.zip
+    outs:
+      - data/aact/db-dump/20240430_clinical_trials.zip
