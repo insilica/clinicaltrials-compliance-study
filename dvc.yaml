@@ -1,21 +1,19 @@
 stages:
   download-20170105:
-    cmd: |
-      # Oldest database dump available from <https://aact.ctti-clinicaltrials.org/snapshots>.
-      mkdir -p data/aact/db-dump
-      wget "https://ctti-aact.nyc3.digitaloceanspaces.com/zyxb0icr0b8tbx62lp0qo4u8kkns" -O data/aact/db-dump/20170105_clinical_trials.zip
+    cmd: stages/01_download_db_20170105.sh
+    deps:
+      - stages/01_download_db_20170105.sh
     outs:
-      - data/aact/db-dump/20170105_clinical_trials.zip
+      - download/aact/db-dump/20170105_clinical_trials.zip
   download-20240430:
-    cmd: |
-      mkdir -p data/aact/db-dump
-      wget "https://ctti-aact.nyc3.digitaloceanspaces.com/b3eaknxyv33k9ah4hckm4igb1ozq" -O data/aact/db-dump/20240430_clinical_trials.zip
+    cmd: stages/01_download_db_20240430.sh
+    deps:
+      - stages/01_download_db_20240430.sh
     outs:
-      - data/aact/db-dump/20240430_clinical_trials.zip
+      - download/aact/db-dump/20240430_clinical_trials.zip
   download-paper-data:
-    cmd: |
-      # From <https://aact.ctti-clinicaltrials.org/shared_data/proj_results_reporting>.
-      mkdir -p data/anderson2015
-      wget --content-disposition -P data/anderson2015 "https://aact.ctti-clinicaltrials.org/datasets/40" "https://aact.ctti-clinicaltrials.org/attachments/21"
+    cmd: stages/01_download_paper_data.sh
+    deps:
+      - stages/01_download_paper_data.sh
     outs:
-      - data/anderson2015
+      - download/anderson2015

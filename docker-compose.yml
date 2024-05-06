@@ -12,7 +12,7 @@ services:
     shm_size: 128mb
     # or set shared memory limit when deploy via swarm stack
     volumes:
-      - ./data/aact/db-dump:/aact-data
+      - ./download/aact/db-dump:/aact-data
       - ${DOCKER_POSTGRES_DATA_DIR}:/var/lib/postgresql/data
       - ./script:/script
       - type: tmpfs

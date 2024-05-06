@@ -1,29 +1,38 @@
 schema: '2.0'
 stages:
   download-20170105:
-    cmd: "# Oldest database dump available from <https://aact.ctti-clinicaltrials.org/snapshots>.\n
-      mkdir -p data/aact/db-dump\nwget \"https://ctti-aact.nyc3.digitaloceanspaces.com/zyxb0icr0b8tbx62lp0qo4u8kkns\"\
-      \ -O data/aact/db-dump/20170105_clinical_trials.zip\n"
+    cmd: stages/01_download_db_20170105.sh
+    deps:
+    - path: stages/01_download_db_20170105.sh
+      hash: md5
+      md5: 6369e51a35200af74e8359122d1afa11
+      size: 500
     outs:
-    - path: data/aact/db-dump/20170105_clinical_trials.zip
+    - path: download/aact/db-dump/20170105_clinical_trials.zip
       hash: md5
       md5: 54550221d6d2f728b5df64ea40078b2b
       size: 639987071
   download-20240430:
-    cmd: "mkdir -p data/aact/db-dump\nwget \"https://ctti-aact.nyc3.digitaloceanspaces.com/b3eaknxyv33k9ah4hckm4igb1ozq\"\
-      \ -O data/aact/db-dump/20240430_clinical_trials.zip\n"
+    cmd: stages/01_download_db_20240430.sh
+    deps:
+    - path: stages/01_download_db_20240430.sh
+      hash: md5
+      md5: 0f380d067cb2eeab31c97253811e9fb5
+      size: 412
     outs:
-    - path: data/aact/db-dump/20240430_clinical_trials.zip
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
       size: 1831128430
   download-paper-data:
-    cmd: "# From <https://aact.ctti-clinicaltrials.org/shared_data/proj_results_reporting>.\n
-      mkdir -p data/anderson2015\nwget --content-disposition -P data/anderson2015
-      \"https://aact.ctti-clinicaltrials.org/datasets/40\" \"https://aact.ctti-clinicaltrials.org/attachments/21\"\
-      \n"
+    cmd: stages/01_download_paper_data.sh
+    deps:
+    - path: stages/01_download_paper_data.sh
+      hash: md5
+      md5: 9cbfcb140a15b9b54101639dff6653e0
+      size: 524
     outs:
-    - path: data/anderson2015
+    - path: download/anderson2015
       hash: md5
       md5: 0f627e15c08e5ec23c2eabe0ad574d25.dir
       size: 4199399

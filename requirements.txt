@@ -1,0 +1,4 @@
+pandas>=2.2.2
+python-calamine
+pyarrow
+fastparquet
