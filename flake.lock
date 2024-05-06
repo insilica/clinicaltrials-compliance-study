@@ -1,0 +1,236 @@
+{
+  "nodes": {
+    "biobricks-R": {
+      "inputs": {
+        "flake-utils": [
+          "dev-shell",
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "dev-shell",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1695748726,
+        "narHash": "sha256-+PyXIuejK2ck4HlZzoJQQ/Ucu/7HonEfB4wuhcsBjKU=",
+        "owner": "biobricks-ai",
+        "repo": "biobricks-R",
+        "rev": "c22e6b225d11a4cbd472b70fdc5b6c6f4acf5a53",
+        "type": "github"
+      },
+      "original": {
+        "owner": "biobricks-ai",
+        "repo": "biobricks-R",
+        "type": "github"
+      }
+    },
+    "dev-shell": {
+      "inputs": {
+        "biobricks-R": "biobricks-R",
+        "flake-utils": "flake-utils",
+        "hdt-cpp": "hdt-cpp",
+        "morph-kgc": "morph-kgc",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1703714825,
+        "narHash": "sha256-SyPwt3vSGqCEPHQshNYMnwf/CxXWDFyo1c6UD3G4KIs=",
+        "owner": "biobricks-ai",
+        "repo": "dev-shell",
+        "rev": "33659c58a17b3650c0c23b882fffe54d4c5f19c2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "biobricks-ai",
+        "repo": "dev-shell",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "inputs": {
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1694529238,
+        "narHash": "sha256-zsNZZGTGnMOf9YpHKJqMSsa0dXbfmxeoJ7xHlrt+xmY=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "ff7b65b44d01cf9ba6a71320833626af21126384",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_2": {
+      "inputs": {
+        "systems": "systems_2"
+      },
+      "locked": {
+        "lastModified": 1710146030,
+        "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "b1d9ab70662946ef0850d488da1c9019f3a9752a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "hdt-cpp": {
+      "inputs": {
+        "flake-utils": [
+          "dev-shell",
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "dev-shell",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1695663107,
+        "narHash": "sha256-uYHG4+WvYykdWWU2LjmirgenMKpZ6+E1otmztIdQBPc=",
+        "owner": "insilica",
+        "repo": "nix-hdt",
+        "rev": "5451dd285423e5a2c386dc05b1bf10d93654df56",
+        "type": "github"
+      },
+      "original": {
+        "owner": "insilica",
+        "repo": "nix-hdt",
+        "type": "github"
+      }
+    },
+    "morph-kgc": {
+      "inputs": {
+        "flake-utils": [
+          "dev-shell",
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "dev-shell",
+          "nixpkgs"
+        ],
+        "poetry2nix": "poetry2nix"
+      },
+      "locked": {
+        "lastModified": 1695678755,
+        "narHash": "sha256-x8Vw79qjOVtK5FPUe3q0vBUpbuPBPVZ/FEupiMN+6R4=",
+        "owner": "insilica",
+        "repo": "nix-morph-kgc",
+        "rev": "884a9570682288dbd770523f031fa38bdd38e4f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "insilica",
+        "repo": "nix-morph-kgc",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1697226376,
+        "narHash": "sha256-cumLLb1QOUtWieUnLGqo+ylNt3+fU8Lcv5Zl+tYbRUE=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "898cb2064b6e98b8c5499f37e81adbdf2925f7c5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-23.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1704290814,
+        "narHash": "sha256-LWvKHp7kGxk/GEtlrGYV68qIvPHkU9iToomNFGagixU=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "70bdadeb94ffc8806c0570eb5c2695ad29f0e421",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-23.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "poetry2nix": {
+      "inputs": {
+        "flake-utils": [
+          "dev-shell",
+          "morph-kgc",
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "dev-shell",
+          "morph-kgc",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1674537260,
+        "narHash": "sha256-DTki81bWzHHRka0ZLayYS5La3t+npRVZvfDH8mx/Las=",
+        "owner": "nix-community",
+        "repo": "poetry2nix",
+        "rev": "a20e27e0555621d35de171270cd041631fc7cb23",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "poetry2nix",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "dev-shell": "dev-shell",
+        "flake-utils": "flake-utils_2",
+        "nixpkgs": "nixpkgs_2"
+      }
+    },
+    "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_2": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
