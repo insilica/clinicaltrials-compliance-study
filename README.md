@@ -19,6 +19,10 @@ Diagram from original paper:
 
 make run-psql PGDATABASE=aact_20240430 FILE=aact2024_init.sql
 
+make run-psql PGDATABASE=aact_20240430 FILE=aact2024_init.sql | sed  's/|/\t/g' | awk 'NR != 2' | head -n -2 | vd -f tsv
+
+vd ./brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet
+
 make run-psql PGDATABASE=aact_20170105 FILE=aact2017_init.sql
 
 
