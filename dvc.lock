@@ -52,6 +52,6 @@ stages:
     outs:
     - path: brick/anderson2015
       hash: md5
-      md5: 99742e2600ee9308773f38a910e9b07d.dir
+      md5: 1395cc31b50eca34bf0a57f5a4ed9d0f.dir
       size: 1387361
       nfiles: 4
