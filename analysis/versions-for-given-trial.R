@@ -1,3 +1,6 @@
+# DESCRIPTION
+#
+# Retrieve the Study Record versions for a given Clinical Trial by NCT ID.
 library(arrow)
 library(dplyr)
 library(cthist)
