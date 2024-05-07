@@ -86,4 +86,4 @@ docker-load-data:
 run-psql: \
 	env-guard-FILE \
 	env-guard-PGDATABASE
-	if [ -f "${FILE}" ]; then psql < "${FILE}"; fi
+	@if [ -f "${FILE}" ]; then psql < "${FILE}"; fi
