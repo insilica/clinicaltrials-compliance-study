@@ -17,7 +17,7 @@ dotenv::load_dot_env(".env")
 
 ## Data from database
 
-query_file <- 'aact2024_init.sql'
+query_file <- 'sql/aact2024_init.sql'
 
 conn <- dbConnect(RPostgres::Postgres(),
   dbname = "aact_20240430",

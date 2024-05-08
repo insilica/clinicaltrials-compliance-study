@@ -40,14 +40,14 @@ Diagram from original paper:
 
 ```shell
 
-make run-psql PGDATABASE=aact_20240430 FILE=aact2024_init.sql
+make run-psql PGDATABASE=aact_20240430 FILE=sql/aact2024_init.sql
 
 # NOTE: `vd` is VisiData
-make run-psql-csv PGDATABASE=aact_20240430 FILE=aact2024_init.sql | vd -f csv
+make run-psql-csv PGDATABASE=aact_20240430 FILE=sql/aact2024_init.sql | vd -f csv
 
 vd ./brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet
 
-make run-psql PGDATABASE=aact_20170105 FILE=aact2017_init.sql
+make run-psql PGDATABASE=aact_20170105 FILE=sql/aact2017_init.sql
 
 
 ```
