@@ -20,6 +20,7 @@ endif
 .PHONY: help \
 	_env-guard \
 	run-psql \
+	run-psql-csv \
 	psql-list-aact-databases
 
 define MESSAGE
@@ -94,6 +95,11 @@ run-psql: \
 	env-guard-FILE \
 	env-guard-PGDATABASE
 	@if [ -f "${FILE}" ]; then psql < "${FILE}"; fi
+
+run-psql-csv: \
+	env-guard-FILE \
+	env-guard-PGDATABASE
+	@if [ -f "${FILE}" ]; then psql --csv < "${FILE}"; fi
 
 DOLLARDOLLAR:=$$$$
 
