@@ -50,3 +50,13 @@ make run-psql PGDATABASE=aact_20170105 FILE=aact2017_init.sql
 
 
 ```
+
+---
+
+FDAAA 801 violations using the `studies.fdaaa801_violation` column:
+
+```shell
+
+make run-psql PGDATABASE=aact_20240430 FILE=sql/fdaaa801-violation.sql
+
+```
