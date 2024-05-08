@@ -19,7 +19,8 @@ endif
 
 .PHONY: help \
 	_env-guard \
-	run-psql
+	run-psql \
+	psql-list-aact-databases
 
 define MESSAGE
 Targets for $(MAKE):
@@ -43,6 +44,12 @@ Targets for $(MAKE):
 
   - `PGDATABASE`: name of database to connect to
   - `FILE`: path to SQL file
+
+  NOTE: Runs on the host. Requires `psql`.
+
+- psql-list-aact-databases
+
+  Lists AACT database names that have been loaded.
 
   NOTE: Runs on the host. Requires `psql`.
 endef
@@ -87,3 +94,18 @@ run-psql: \
 	env-guard-FILE \
 	env-guard-PGDATABASE
 	@if [ -f "${FILE}" ]; then psql < "${FILE}"; fi
+
+DOLLARDOLLAR:=$$$$
+
+define AACT_DB_SQL
+SELECT
+	datname
+FROM pg_database
+WHERE
+	datistemplate = false
+	AND
+	datname LIKE $(DOLLARDOLLAR)aact_%${DOLLARDOLLAR}
+;
+endef
+psql-list-aact-databases:
+	psql -c "$${AACT_DB_SQL}"
