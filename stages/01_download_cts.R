@@ -25,9 +25,9 @@ download_ct_data <- function(ctid) {
 }
 
 conn <- dbConnect(RPostgres::Postgres(),
-  dbname = "aact_20240430",
-  host = Sys.getenv("PGHOST"),
-  port = Sys.getenv("PGPORT"))
+                  dbname = "aact_20240430",
+                  host = Sys.getenv("PGHOST"),
+                  port = Sys.getenv("PGPORT"))
 
 df <- tbl(conn, I("ctgov.studies"))
 
