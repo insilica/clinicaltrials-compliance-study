@@ -14,7 +14,10 @@
           (oldAttrs: {
             buildInputs = oldAttrs.buildInputs ++ [
               (python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet ]))
-            ] ++ (with rPackages; [ arrow cthist ]);
+            ] ++ (with rPackages; [
+			    arrow cthist DBI RPostgres dotenv dplyr readr vroom
+			    ggplot2 ComplexUpset
+		    ]);
           });
       });
 }
