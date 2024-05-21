@@ -1,6 +1,6 @@
 INSTALL postgres;
 
-ATTACH 'postgresql://postgres:postgres@localhost:6432/aact_20240430' AS pg (TYPE postgres);
+ATTACH 'dbname=aact_20240430' AS pg (TYPE postgres);
 
 CREATE TABLE
     pg.ctgov.relevant_studies (

@@ -1,3 +1,5 @@
+ATTACH 'dbname=aact_20240430' AS pg (TYPE postgres);
+
 SELECT
 	-- COUNT(nct_id)
 	rs.nctid,
