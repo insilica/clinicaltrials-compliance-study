@@ -21,6 +21,7 @@ stages:
     cmd: stages/02_build-anderson2015.sh
     deps:
       - stages/02_build-anderson2015.sh
+      - stages/csv2parquet.py
       - download/anderson2015
     outs:
       - brick/anderson2015
