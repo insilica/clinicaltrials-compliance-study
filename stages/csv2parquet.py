@@ -22,11 +22,11 @@ for file_download in l_files_download:
     file_ext = file_path.suffix
     file_name = file_path.stem
     if file_ext == ".xlsx":
-        xlsx = pd.ExcelFile(in_file, engine="calamine")
+        xlsx = pd.ExcelFile(in_file, engine="openpyxl")
         l_sheet = xlsx.sheet_names
         for sheet in l_sheet:
             out_file = os.path.join(OutDirName, f"{file_path.stem}_{sheet.replace(' ', '_')}.parquet")
-            df = pd.read_excel(in_file, sheet_name=sheet, dtype=str, engine="calamine")
+            df = pd.read_excel(in_file, sheet_name=sheet, dtype=str, engine="openpyxl")
             df.to_parquet(out_file)
     elif file_ext == ".txt":
         out_file = os.path.join(OutDirName, file_path.with_suffix(".parquet"))

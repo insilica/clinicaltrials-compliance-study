@@ -12,12 +12,12 @@
       with import nixpkgs { inherit system; }; {
         devShells.default = dev-shell.devShells.${system}.default.overrideAttrs
           (oldAttrs: {
-            buildInputs = oldAttrs.buildInputs ++ [
-              (python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet ]))
-            ] ++ (with rPackages; [
-			    arrow cthist DBI RPostgres dotenv dplyr readr vroom
-			    ggplot2 ComplexUpset
-		    ]);
+            buildInputs = oldAttrs.buildInputs
+            ++ [ (python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
+            ++ (with rPackages; [
+                            arrow cthist DBI RPostgres dotenv dplyr readr vroom
+                            ggplot2 ComplexUpset
+                    ]);
           });
       });
 }
