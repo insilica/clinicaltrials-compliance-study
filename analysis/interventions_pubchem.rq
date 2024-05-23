@@ -7,3 +7,14 @@ PREFIX cheminf:    <http://semanticscience.org/resource/>
 PREFIX pubchem:    <http://rdf.ncbi.nlm.nih.gov/pubchem/>
 PREFIX pccompound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>
 PREFIX pcsynonym:  <http://rdf.ncbi.nlm.nih.gov/pubchem/synonym/>
+
+SELECT ?name ?compound ?synonym
+WHERE {
+  BIND( replaceMe AS ?name )
+
+  GRAPH pubchem:synonym {
+    ?synonym sio:SIO_000300 ?name     ;
+             sio:SIO_000011 ?compound .
+  }
+}
+LIMIT 1
