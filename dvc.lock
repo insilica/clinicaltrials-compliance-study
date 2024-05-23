@@ -49,6 +49,10 @@ stages:
       hash: md5
       md5: 0942894b0d5b0d180db7a7deecc38f64
       size: 464
+    - path: stages/csv2parquet.py
+      hash: md5
+      md5: 7569a78c6b0836e53a95f6b9df82e4fa
+      size: 1260
     outs:
     - path: brick/anderson2015
       hash: md5
