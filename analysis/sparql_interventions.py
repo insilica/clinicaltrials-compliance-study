@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from SPARQLWrapper import SPARQLWrapper, CSV
 import os
 from pathlib import Path
@@ -32,20 +33,57 @@ class Interventions:
                     if isinstance(name, tuple) and len(name) == 1
                 )
             )
-    
+
     def __del__(self):
         self.db_conn.close()
 
+
 interventions = Interventions()
 
-test_query = query_file.read_text().replace("replaceMe", f"\'{interventions.intervention_names[0]}\'")
 
-sparql.setQuery(test_query)
+@dataclass
+class SparqlRunner:
+    query_template: str = query_file.read_text()
+    sparql: SPARQLWrapper = SPARQLWrapper(endpoint)
+    out_file = open("analysis/query_out.csv", "w")
 
-ret = sparql.queryAndConvert()
+    def make_query(self, int_list: list):
+        self.out_file.write("name,compound,synonym")
+        for val in int_list:
+            query = self.query_template.replace("replaceMe", f"'{val}'")
+            print(f"Running SPARQL query for {val}.")
+            try:
+                ret = self.set_and_run_query(query).decode("utf-8")
+                if ret != r"\"name\",\"compound\",\"synonym\"":
+                    written = self.out_file.write(ret)
+                    print(f"wrote {written} bytes to {self.out_file}")
+            except Exception:
+                continue
+        self.out_file.close()
+        
 
-outfile = Path("analysis/query_out.csv")
-outfile.touch(exist_ok=True)
+    def set_and_run_query(self, query):
+        self.sparql.setQuery(query)
+        self.sparql.setReturnFormat(CSV)
+        ret = None
+        try:
+            ret = self.sparql.queryAndConvert()
+            return ret
+        except Exception:
+            raise Exception(f"Query error running {query}.")
 
-with open(outfile, "wb") as f:
-    f.write(ret)
+    def process(self):
+        interventions = Interventions()
+        self.make_query(interventions.intervention_names)
+
+    def __call__(self):
+        self.process()
+
+
+if __name__ == "__main__":
+    sparql = SparqlRunner()
+    print("running all SPARQL queries.")
+    try:
+        sparql()
+    except RuntimeError as e:
+        print(e)
