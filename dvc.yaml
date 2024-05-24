@@ -31,3 +31,10 @@ stages:
       - stages/01_download_cts.R
       - download/aact/db-dump/20240430_clinical_trials.zip
     cmd: make docker-compose-up; Rscript stages/01_download_cts.R
+  sparql-interventions:
+    outs:
+      - analysis/query_out.jsonl
+      - analysis/interventions.parquet
+    deps:
+      - analysis/sparql_interventions.py
+    cmd: python3 analysis/sparql_interventions.py
