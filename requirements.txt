@@ -4,3 +4,4 @@ pyarrow
 fastparquet
 psycopg
 sparqlwrapper
+jsonlines

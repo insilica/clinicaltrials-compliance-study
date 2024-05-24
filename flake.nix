@@ -13,7 +13,7 @@
         devShells.default = dev-shell.devShells.${system}.default.overrideAttrs
           (oldAttrs: {
             buildInputs = oldAttrs.buildInputs ++ [
-              (python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet ]))
+              (python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet jsonlines sparqlwrapper ]))
             ] ++ (with rPackages; [ arrow cthist ]);
           });
       });
