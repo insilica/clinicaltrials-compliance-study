@@ -6,11 +6,13 @@ import pandas as pd
 from pathlib import Path
 import psycopg
 from SPARQLWrapper import SPARQLWrapper, JSON
+import urllib
+
+intervention_names: list = []
 
 
 class Interventions:
     db_conn: psycopg.Connection = None
-    intervention_names: list = []
 
     def __init__(self):
         # assumes DB is running on localhost port 5432
@@ -19,9 +21,11 @@ class Interventions:
         ) as conn:
             self.db_conn = conn
             res = conn.execute(
-                "select id, name from ctgov.interventions where intervention_type = 'Drug'"
+                """SELECT min(id) as id, name
+	                     FROM ctgov.interventions 
+                         WHERE intervention_type = 'Drug' GROUP BY name"""
             )
-            self.intervention_names.extend(
+            intervention_names.extend(
                 ({"name": name, "id": id} for (id, name) in res.fetchall())
             )
 
@@ -35,12 +39,13 @@ class SparqlRunner:
     query_file = Path("analysis/interventions_pubchem.rq")
     query_template: str = query_file.read_text()
     sparql: SPARQLWrapper = SPARQLWrapper(endpoint, returnFormat=JSON)
-    out_file = open("analysis/query_out.csv", "w")
+    out_file = jsonlines.open("analysis/query_out.jsonl", "w", flush=True)  # make sure it's flushing to disk every line
     df_list: list = field(default_factory=lambda: [])
 
     def format_query(self):
         interventions = Interventions()
-        self.make_query(interventions.intervention_names)
+        self.make_query(intervention_names)
+        del interventions  # clean up this class' resources b/c they are no longer needed...
 
     def process_result(self, result):
         return [
@@ -49,7 +54,7 @@ class SparqlRunner:
                 "compound": res["compound"]["value"],
                 "synonym": res["synonym"]["value"],
             }
-            for res in result['results']['bindings']
+            for res in result["results"]["bindings"]
         ]
 
     def make_query(self, int_list: list[dict]):
@@ -60,14 +65,19 @@ class SparqlRunner:
             try:
                 ret = self.set_and_run_query(query)
                 processed = self.process_result(ret)
-                for m in processed:
-                    m['id'] = val['id']
-                print(processed)
-                self.df_list.extend(processed)
-                written = self.out_file.write(json.dumps(processed))
-                print(f"wrote {written} bytes to {self.out_file}")
-            except Exception:
-                continue
+                if processed != []:
+                    for m in processed:
+                        m["id"] = val["id"]
+                    print(processed)
+                    self.df_list.extend(processed)
+                    written = self.out_file.write(json.dumps(processed))
+                    print(f"wrote {written} bytes to {self.out_file}")
+            except Exception as e:
+                if isinstance(e, urllib.error.URLError):
+                    # connection gets closed, process results so far...
+                    self.process()
+                    break
+                else: continue
         self.out_file.close()
 
     def set_and_run_query(self, query):
@@ -79,7 +89,7 @@ class SparqlRunner:
         except Exception as e:
             print(e)
             raise Exception(f"Query error running {query}.")
-        
+
     def jsonl_df(self, jsonl):
         lines = [obj for obj in jsonl]
         pd.DataFrame.from_records(lines).to_parquet("analysis/interventions.parquet")
@@ -92,6 +102,7 @@ class SparqlRunner:
         else:
             jsonl = jsonlines.open("analysis/query_out.jsonl")
             self.jsonl_df(jsonl)
+            jsonl.close()
 
     def __call__(self):
         print("running all SPARQL queries.")
