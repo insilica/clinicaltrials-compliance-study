@@ -57,13 +57,13 @@ my $json = Cpanel::JSON::XS->new->utf8;
 =head2 path_for_nctid
 
 Uses prefix of NCT ID to partition data so that there is not one large
-directory of JSON files.
+directory of JSON Lines files.
 
 =cut
 signature_for path_for_nctid => (
 	pos => [ NCT_ID ] );
 sub path_for_nctid($nctid) {
-	return DOWNLOAD_PATH->child(substr($nctid, 0, 6), "${nctid}.json");
+	return DOWNLOAD_PATH->child(substr($nctid, 0, 6), "${nctid}.jsonl");
 }
 
 sub _fetch_json_or_die($url) {
