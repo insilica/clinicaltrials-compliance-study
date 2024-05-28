@@ -63,7 +63,7 @@ sub _do_versions_match {
 
 subtest "NCT04243421" => sub {
 	my $nctid = 'NCT04243421';
-	my $file = $tmp_dir->child('download/ctgov/historical/NCT042/NCT04243421.json');
+	my $file = $tmp_dir->child('download/ctgov/historical/NCT042/NCT04243421.jsonl');
 	note "Output will be in file: $file";
 
 	like _run_fetch($nctid),
@@ -91,7 +91,7 @@ subtest "NCT04243421" => sub {
 
 subtest "NCT00000125" => sub {
 	my $nctid = 'NCT00000125';
-	my $file = $tmp_dir->child('download/ctgov/historical/NCT000/NCT00000125.json');
+	my $file = $tmp_dir->child('download/ctgov/historical/NCT000/NCT00000125.jsonl');
 	note "Output will be in file: $file";
 
 	subtest "NCT00000125 as usual (no cut-off)" => sub {
