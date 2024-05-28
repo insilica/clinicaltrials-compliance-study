@@ -7,6 +7,10 @@ use warnings;
 use feature qw(say signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
+BEGIN {
+	require Env::Dot;
+	Env::Dot->import unless $ENV{HARNESS_ACTIVE};
+}
 use Path::Tiny 0.144 qw(path);
 use LWP::UserAgent ();
 use LWP::Protocol::https ();
