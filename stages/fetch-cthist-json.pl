@@ -17,9 +17,8 @@ use LWP::Protocol::https ();
 use Cpanel::JSON::XS ();
 use List::Util qw(pairs unpairs any);
 use List::UtilsBy qw(nmax_by nsort_by);
-use Types::Standard 2.000 qw(StrMatch Dict Slurpy HashRef ArrayRef);
-use Types::Common::Numeric qw(PositiveOrZeroInt);
-use Type::Params qw(signature_for);
+use Type::Params 2.000 qw(signature_for);
+use Types::Common qw(StrMatch Dict Slurpy HashRef ArrayRef PositiveOrZeroInt);
 use Return::Type;
 
 use constant DOWNLOAD_PATH => do {
