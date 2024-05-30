@@ -39,7 +39,7 @@ sub _count_study_records {
 		SELECT
 			COUNT(DISTINCT studyRecord.studyVersion)
 				AS answer
-		FROM read_ndjson('$file');
+		FROM read_ndjson_auto('$file');
 	SQL
 
 	my $line_count = path($file)->lines_raw;
@@ -56,7 +56,7 @@ sub _do_versions_match {
 		SELECT ALL(
 			SELECT
 				studyRecord.studyVersion == change.version
-			FROM read_ndjson('$file')
+			FROM read_ndjson_auto('$file')
 		) AS answer;
 	SQL
 }
@@ -83,7 +83,7 @@ subtest "NCT04243421" => sub {
 				.study.protocolSection
 				.contactsLocationsModule.locations[1].city
 			AS answer
-		FROM read_ndjson('$file');
+		FROM read_ndjson_auto('$file');
 	SQL
 		, qr/\A"Białystok"\z/s,
 		'location contains expected Unicode';
@@ -149,7 +149,7 @@ subtest "NCT00000125" => sub {
 
 		my $change_versions =  _run_duckdb(<<~SQL);
 			SELECT change.version
-			FROM read_ndjson('$file');
+			FROM read_ndjson_auto('$file');
 		SQL
 		my @change_versions =  split(/\n/, $change_versions);
 
