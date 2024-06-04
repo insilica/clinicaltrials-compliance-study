@@ -2,3 +2,4 @@
 /brick
 /work
 *.parquet
+*.code-workspace
