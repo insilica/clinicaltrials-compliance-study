@@ -16,11 +16,12 @@ delete $ENV{CTHIST_DOWNLOAD_CUTOFF_DATE};
 
 sub _run_fetch {
 	my ($nctid) = @_;
-	my ($stdout) = capture_stderr {
-		0 == system( './stages/fetch-cthist-json.pl', $nctid ) or die;
+	my ($stderr, $exit) = capture_stderr {
+		system( './stages/fetch-cthist-json.pl', $nctid )
 	};
-	diag $stdout =~ s/^/|> /gmr;
-	return $stdout;
+	$exit == 0 or die $stderr;
+	diag $stderr =~ s/^/|> /gmr;
+	return $stderr;
 }
 
 sub _run_duckdb {
