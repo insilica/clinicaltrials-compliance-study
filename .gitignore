@@ -4,3 +4,4 @@
 *.parquet
 *.code-workspace
 /log
+*.code-workspace
