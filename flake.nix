@@ -20,19 +20,17 @@
       };
     } //
     flake-utils.lib.eachDefaultSystem (system:
-      with import nixpkgs {
-        inherit system;
-        overlays = [ self.overlays.default ];
-      }; {
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ self.overlays.default ];
+        };
+      in {
         devShells.default = dev-shell.devShells.${system}.default.overrideAttrs
-          (oldAttrs: {
-            buildInputs = oldAttrs.buildInputs
-            ++ [ (python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
-            ++ (with rPackages; [
-                            arrow cthist DBI RPostgres dotenv dplyr readr vroom
-                            ggplot2 ComplexUpset
-                    ])
-            ++ [ (with perlPackages; [
+          (oldAttrs:
+            let
+              inherit (pkgs.perlPackages) makePerlPath;
+              extraPerlPackages = with pkgs.perlPackages; [
                     Moo
                     PathTiny
                     LWP
@@ -43,7 +41,30 @@
                     ReturnType
                     CaptureTiny
                     EnvDot
-               ]) ];
+                ];
+              parallelWithPerlEnv = pkgs.stdenv.mkDerivation {
+                name = "parallel-with-perl-env";
+                buildInputs = [ pkgs.parallel pkgs.makeWrapper ];
+                propagatedBuildInputs = [ extraPerlPackages ];
+                unpackPhase = "true";
+                installPhase = ''
+                  mkdir -p $out/bin
+                  makeWrapper ${pkgs.parallel}/bin/parallel $out/bin/parallel \
+                    --set PERL5LIB "${with pkgs.perlPackages; makeFullPerlPath (extraPerlPackages)}"
+                '';
+              };
+                in {
+            buildInputs =
+              [ parallelWithPerlEnv ]
+              ++ oldAttrs.buildInputs
+              ++ [ (pkgs.python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
+              ++ (with pkgs.rPackages; [
+                            arrow cthist DBI RPostgres dotenv dplyr readr vroom
+                            ggplot2 ComplexUpset
+                    ]);
+            env = oldAttrs.env // {
+              LC_ALL = "C";
+            };
           });
       });
 }
