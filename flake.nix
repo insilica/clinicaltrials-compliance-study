@@ -33,6 +33,7 @@
                             ggplot2 ComplexUpset
                     ])
             ++ [ (with perlPackages; [
+                    Moo
                     PathTiny
                     LWP
                     LWPProtocolhttps
