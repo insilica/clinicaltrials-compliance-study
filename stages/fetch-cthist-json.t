@@ -30,7 +30,7 @@ sub _run_duckdb {
 		0 == system('duckdb', qw(-noheader -csv -c), $sql) or die;
 	};
 	chomp $output;
-	return $output;
+	return Encode::decode_utf8($output);
 }
 
 sub _count_study_records {
@@ -83,7 +83,7 @@ subtest "NCT04243421" => sub {
 
 	ok _do_versions_match($file), 'studyVersion.studyVersion matches change.version';
 
-	like Encode::decode_utf8( _run_duckdb(<<~SQL) ),
+	like _run_duckdb(<<~SQL),
 		SELECT
 			DISTINCT
 				studyRecord
