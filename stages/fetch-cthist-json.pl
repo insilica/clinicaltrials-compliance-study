@@ -21,7 +21,8 @@ use Type::Params 2.000 qw(signature_for);
 use Types::Common qw(InstanceOf);
 use Return::Type;
 
-my $json = Cpanel::JSON::XS->new->utf8;
+# Output must but canonical for hashing.
+my $json = Cpanel::JSON::XS->new->utf8->canonical;
 
 sub _log { say STDERR @_; }
 
