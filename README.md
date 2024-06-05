@@ -9,6 +9,7 @@ Steps towards reproducing results of:
 > [PMID: 25760355](https://pubmed.ncbi.nlm.nih.gov/25760355/);
 > [PMCID: PMC4508873](http://www.ncbi.nlm.nih.gov/pmc/articles/pmc4508873/).
 
+Report slides at: https://docs.google.com/presentation/d/1q_pNKA4MwdY39k_b7HetAq3R2V9vRUzMT_9Pc98CN9I
 
 ## Requirements
 
