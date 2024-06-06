@@ -4,8 +4,8 @@
 
 use strict;
 use warnings;
-use feature qw(say signatures postderef);
-no warnings qw(experimental::signatures experimental::postderef);
+use feature qw(say signatures postderef try);
+no warnings qw(experimental::signatures experimental::postderef experimental::try);
 
 BEGIN {
 	require Env::Dot;
@@ -37,13 +37,19 @@ package CTTypes {
 			CTVersionsData_Change
 
 			CTVersionsData
-			CTStudyRecordData
+			CTStudyRecordDataUnversioned
+			CTStudyRecordDataVersioned
 
-			StudyRecord_JSONL
+			StudyRecord_JSONL_Collection_Versioned
+			StudyRecord_JSONL_Collection_Unversioned
 			StudyRecord_JSONL_Collection
 		)],
 	};
-	use Types::Common qw(StrMatch Dict Slurpy HashRef ArrayRef PositiveOrZeroInt Maybe);
+	use Types::Common qw(
+		StrMatch Dict Slurpy HashRef ArrayRef
+		PositiveOrZeroInt Maybe
+		Undef
+	);
 
 	## Basic types
 	use constant {
@@ -53,16 +59,37 @@ package CTTypes {
 
 	## From API
 	use constant CTVersionsData_Change         => Dict[version => VersionNumber, Slurpy[HashRef] ];
-	use constant {
-		CTStudyRecordData => Dict[studyVersion => VersionNumber, study => HashRef],
-		CTVersionsData    => Dict[changes => ArrayRef[CTVersionsData_Change]],
-	};
+	use constant CTStudyRecordData_Study =>
+		HashRef;
+		# Keep this generic for now instead of:
+		#Dict[
+		#	protocolSection => HashRef,
+		#	Optional[ derivedSection  => HashRef ],
+		#	Optional[ resultsSection  => HashRef ],
+		#	hasResults      => Bool,
+		#];
+	use constant CTStudyRecordDataUnversioned =>
+		Dict[ study => CTStudyRecordData_Study ];
+	use constant CTStudyRecordDataVersioned =>
+		Dict[studyVersion => VersionNumber, study => CTStudyRecordData_Study ];
+	use constant CTVersionsData =>
+		Dict[changes => ArrayRef[CTVersionsData_Change]];
 
 	## Serialization
 	# Individual line of JSON Lines
-	use constant StudyRecord_JSONL => Dict[ change => CTVersionsData_Change, studyRecord => Maybe[CTStudyRecordData] ];
-	# Type for collection of JSON Lines
-	use constant StudyRecord_JSONL_Collection => ArrayRef[StudyRecord_JSONL];
+	use constant StudyRecord_JSONL_Versioned =>
+		Dict[ change => CTVersionsData_Change, studyRecord => Maybe[CTStudyRecordDataVersioned] ];
+	use constant StudyRecord_JSONL_Unversioned =>
+		Dict[ change => Undef, studyRecord => CTStudyRecordDataUnversioned ];
+	# Types for collection of JSON Lines
+	use constant StudyRecord_JSONL_Collection_Versioned =>
+		ArrayRef[StudyRecord_JSONL_Versioned, 1];
+	use constant StudyRecord_JSONL_Collection_Unversioned =>
+		ArrayRef[StudyRecord_JSONL_Unversioned,1,1];
+	use constant StudyRecord_JSONL_Collection =>
+		( StudyRecord_JSONL_Collection_Versioned
+		| StudyRecord_JSONL_Collection_Unversioned
+		);
 }
 
 package StudyRecords {
@@ -70,27 +97,62 @@ package StudyRecords {
 	use List::Util 1.44 qw(uniqnum);
 	use List::UtilsBy qw(nsort_by);
 	use Type::Params 2.000 qw(signature_for);
-	use Types::Common qw(Str Map InstanceOf);
+	use Types::Common qw(Str Map InstanceOf Bool PositiveOrZeroInt);
 	use Return::Type;
 	use CTTypes qw(
 		StudyRecord_JSONL_Collection
-		VersionNumber
-		CTVersionsData_Change
+		StudyRecord_JSONL_Collection_Versioned
+		StudyRecord_JSONL_Collection_Unversioned
 
-		CTVersionsData CTStudyRecordData
+		VersionNumber
+
+		CTVersionsData_Change
+		CTVersionsData
+
+		CTStudyRecordDataUnversioned
+		CTStudyRecordDataVersioned
 	);
 
-	has change_map => ( is => 'rw', isa => Map[VersionNumber, CTVersionsData_Change], default => sub { +{} }, );
-	has study_map  => ( is => 'rw', isa => Map[VersionNumber, CTStudyRecordData    ], default => sub { +{} }, );
+	has history_available => ( is => 'rw', isa => Bool, default => sub { !!0 } );
 
-	sub change_count($self) { 0 + keys $self->change_map->%* }
+	# When history_available is false
+	has single_study_record => ( is => 'rw',
+		predicate => 1,
+		trigger => 1,
+		isa => CTStudyRecordDataUnversioned );
+
+	sub _trigger_single_study_record($self, $value) {
+		$self->history_available(!!0);
+	}
+
+	# When history_available is true
+	has change_map => ( is => 'rw',
+		isa => Map[VersionNumber, CTVersionsData_Change],
+		default => sub { +{} }, );
+	has study_map  => ( is => 'rw',
+		isa => Map[VersionNumber, CTStudyRecordDataVersioned],
+		default => sub { +{} }, );
+
+	sub _change_count($self) { 0 + keys $self->change_map->%* }
 	sub change_versions($self) { [ sort { $a <=> $b } keys $self->change_map->%* ] }
 	sub study_versions($self) { [ sort { $a <=> $b } map { $_->{studyVersion} } values $self->study_map->%* ] }
+
+	signature_for number_of_studies => ( method => 1, pos => []);
+	sub number_of_studies :ReturnType(PositiveOrZeroInt) ($self) {
+		if( ! $self->history_available && $self->has_single_study_record ) {
+			return 1;
+		} elsif(  $self->history_available )  {
+			return $self->_change_count;
+		}
+
+		return 0;
+	}
 
 	signature_for add_change => (
 		method => 1,
 		pos => [ CTVersionsData_Change ]);
 	sub add_change($self, $change) {
+		$self->history_available(!!1);
 		$self->change_map->{ $change->{version} } = $change;
 	}
 
@@ -101,10 +163,11 @@ package StudyRecords {
 		$self->add_change($_) for $versions->{changes}->@*;
 	}
 
-	signature_for add_study_record => (
+	signature_for add_study_record_versioned => (
 		method => 1,
-		pos => [ CTStudyRecordData ]);
-	sub add_study_record($self, $study_record) {
+		pos => [ CTStudyRecordDataVersioned ]);
+	sub add_study_record_versioned($self, $study_record) {
+		die "Change data not set" unless $self->history_available;
 		$self->study_map->{ $study_record->{studyVersion} } = $study_record;
 	}
 
@@ -112,36 +175,54 @@ package StudyRecords {
 		method => Str,
 		pos => [ StudyRecord_JSONL_Collection ]);
 	sub FROM_JSON_LINES :ReturnType(InstanceOf['StudyRecords']) ($class, $data) {
-		my %change_map = map {
-				$_->{change}{version} => $_->{change}
-			} @$data;
-		my %study_map  = map {
-				defined $_->{studyRecord}
-				? (
-					$_->{studyRecord}{studyVersion} => $_->{studyRecord}
-				) : ()
-			} @$data;
-		return $class->new(
-			change_map => \%change_map,
-			study_map  => \%study_map,
-		);
+		if( StudyRecord_JSONL_Collection_Versioned->check($data) ) {
+			my %change_map = map {
+					$_->{change}{version} => $_->{change}
+				} @$data;
+			my %study_map  = map {
+					defined $_->{studyRecord}
+					? (
+						$_->{studyRecord}{studyVersion} => $_->{studyRecord}
+					) : ()
+				} @$data;
+			return $class->new(
+				history_available => !!1,
+				change_map => \%change_map,
+				study_map  => \%study_map,
+			);
+		} elsif( StudyRecord_JSONL_Collection_Unversioned->check($data) ) {
+			return $class->new(
+				history_available => !!0,
+				single_study_record => $data->[0]{studyRecord},
+			)
+		}
 	}
 
 	signature_for TO_JSON_LINES => ( method => 1, pos => []);
 	sub TO_JSON_LINES :ReturnType(StudyRecord_JSONL_Collection) ($self) {
-		my @versions = uniqnum sort { $a <=> $b } (
-			keys $self->change_map->%*,
-			keys $self->study_map->%*
-		);
-		return [ map { +{
-				change      => $self->change_map->{$_},
-				studyRecord =>
-					# make the undef explicit
-					( exists $self->study_map->{$_}
-					? $self->study_map->{$_}
-					: undef
-					),
-			} } @versions ];
+		if( $self->history_available ) {
+			my @versions = uniqnum sort { $a <=> $b } (
+				keys $self->change_map->%*,
+				keys $self->study_map->%*
+			);
+			# StudyRecord_JSONL_Collection_Versioned
+			return [ map { +{
+					change      => $self->change_map->{$_},
+					studyRecord =>
+						# make the undef explicit
+						( exists $self->study_map->{$_}
+						? $self->study_map->{$_}
+						: undef
+						),
+				} } @versions ];
+		} else {
+			# StudyRecord_JSONL_Collection_Unversioned
+			return [ +{
+					change      => undef,
+					studyRecord => $self->single_study_record,
+				} ];
+
+		}
 	};
 }
 
@@ -209,7 +290,9 @@ package CTGovAPI {
 	use Types::Common qw(Str);
 	use CTTypes qw(
 		NCT_ID VersionNumber
-		CTVersionsData CTStudyRecordData
+		CTVersionsData
+		CTStudyRecordDataVersioned
+		CTStudyRecordDataUnversioned
 	);
 
 	my $ua = LWP::UserAgent->new;
@@ -231,10 +314,16 @@ package CTGovAPI {
 		return "https://clinicaltrials.gov/api/int/studies/${nctid}/history";
 	}
 
-	signature_for _get_study_record_url => (
+	signature_for _get_study_record_version_url => (
 		pos => [ NCT_ID, VersionNumber ] );
-	sub _get_study_record_url($nctid, $version) {
+	sub _get_study_record_version_url($nctid, $version) {
 		return "https://clinicaltrials.gov/api/int/studies/${nctid}/history/${version}";
+	}
+
+	signature_for _get_study_record_latest_url => (
+		pos => [ NCT_ID ] );
+	sub _get_study_record_latest_url($nctid) {
+		return "https://clinicaltrials.gov/api/int/studies/${nctid}";
 	}
 
 	signature_for get_versions => (
@@ -244,11 +333,18 @@ package CTGovAPI {
 		return _fetch_json_or_die(_get_versions_url($nctid));
 	}
 
-	signature_for get_study_record => (
+	signature_for get_study_record_version => (
 		method => Str,
 		pos => [ NCT_ID, VersionNumber ]);
-	sub get_study_record :ReturnType(CTStudyRecordData) ($class, $nctid, $version) {
-		return _fetch_json_or_die(_get_study_record_url($nctid, $version));
+	sub get_study_record_version :ReturnType(CTStudyRecordDataVersioned) ($class, $nctid, $version) {
+		return _fetch_json_or_die(_get_study_record_version_url($nctid, $version));
+	}
+
+	signature_for get_study_record_latest => (
+		method => Str,
+		pos => [ NCT_ID ]);
+	sub get_study_record_latest :ReturnType(CTStudyRecordDataUnversioned) ($class, $nctid) {
+		return _fetch_json_or_die(_get_study_record_latest_url($nctid));
 	}
 }
 
@@ -281,19 +377,41 @@ sub main {
 	my $nctid = shift @ARGV;
 	my $store = StudyRecords::Store->new( nctid => $nctid);
 	my $study_records = $store->load;
-	if( $study_records->change_count == 0 ) {
+	if( $study_records->number_of_studies == 0 ) {
 		main::_log("Fetching versions");
-		$study_records->add_versions_data( CTGovAPI->get_versions($nctid) );
+		my $versions_data = do {
+			try {
+				CTGovAPI->get_versions($nctid);
+			} catch( $e ) {
+				chomp $e;
+				main::_log("No version history for NCT ID $nctid: $e");
+				undef;
+			}
+		};
+		if( defined $versions_data ) {
+			$study_records->add_versions_data($versions_data);
+		} else {
+		}
 	}
-	main::_log("$nctid: number of versions: @{[ $study_records->change_count ]}");
-	my $filtered = filtered_version_numbers($study_records);
-	main::_log("$nctid: number of versions after filtering: @{[ scalar @$filtered ]}");
-	for my $version (@$filtered) {
-		next if defined $study_records->study_map->{$version};
+	if( $study_records->history_available ) {
+		main::_log("$nctid: using historical data");
+		main::_log("$nctid: number of versions: @{[ $study_records->number_of_studies ]}");
+		my $filtered = filtered_version_numbers($study_records);
+		main::_log("$nctid: number of versions after filtering: @{[ scalar @$filtered ]}");
+		for my $version (@$filtered) {
+			next if defined $study_records->study_map->{$version};
 
-		my $study_record = CTGovAPI->get_study_record($nctid, $version );
-		$study_records->add_study_record($study_record);
-		$store->store($study_records);
+			my $study_record = CTGovAPI->get_study_record_version($nctid, $version );
+			$study_records->add_study_record_versioned($study_record);
+			$store->store($study_records);
+		}
+	} else {
+		main::_log("$nctid: using latest data");
+		if( ! $study_records->has_single_study_record ) {
+			my $latest_study = CTGovAPI->get_study_record_latest($nctid);
+			$study_records->single_study_record($latest_study);
+			$store->store($study_records);
+		}
 	}
 }
 
