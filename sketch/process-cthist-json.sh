@@ -22,7 +22,7 @@ EOF
 ## e.g.,
 ##
 ## "Failed to download https://clinicaltrials.gov/api/int/studies/NCT00000141/history: Not Found"
-duckdb -csv -c "$(cat <<'EOF'
+duckdb -c "$(cat <<'EOF'
 SELECT
 	V1, ExitVal, Stderr
 FROM 'log/01_download_cthist_json.anderson2015.par-results.csv'

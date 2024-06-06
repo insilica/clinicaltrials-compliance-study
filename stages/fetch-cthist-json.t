@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use Path::Tiny qw(path);
 use Capture::Tiny qw(capture_stdout capture_stderr tee_stderr);
@@ -57,6 +57,16 @@ sub _do_versions_match {
 	SQL
 }
 
+sub _matches_nctid {
+	my ($file, $nctid) = @_;
+	is _run_duckdb(<<~SQL), $nctid,  'matches NCT ID';
+		SELECT DISTINCT
+			studyRecord->>'\$.study.protocolSection.identificationModule.nctId' AS nctid
+		FROM read_ndjson_auto('$file')
+		WHERE studyRecord IS NOT NULL;
+	SQL
+}
+
 sub _did_fetch_versions {
 	my ($output) = @_;
 	like $output, qr/\QFetching versions\E$/m, 'did fetch versions';
@@ -66,6 +76,26 @@ sub _did_not_fetch_versions {
 	unlike $output, qr/\QFetching versions\E$/m, 'did not fetch versions';
 }
 
+sub _is_using_historical_data {
+	my ($output) = @_;
+	like $output,
+		qr/\Qusing historical data\E/m,
+		'historical data';
+	unlike $output,
+		qr/\Qusing latest data\E/m,
+		'and not latest data';
+}
+
+sub _is_using_latest_data {
+	my ($output) = @_;
+	unlike $output,
+		qr/\Qusing historical data\E/m,
+		'not using historical data';
+	like $output,
+		qr/\Qusing latest data\E/m,
+		'but the latest data';
+}
+
 subtest "NCT04243421" => sub {
 	my $nctid = 'NCT04243421';
 	my $file = $tmp_dir->child('download/ctgov/historical/NCT042/NCT04243421.jsonl');
@@ -73,6 +103,7 @@ subtest "NCT04243421" => sub {
 
 	my $output = _run_fetch($nctid);
 	_did_fetch_versions($output);
+	_is_using_historical_data($output);
 	like $output,
 		qr/\Qnumber of versions after filtering: 5\E$/m,
 		'expected output';
@@ -104,6 +135,7 @@ subtest "NCT00000125" => sub {
 	subtest "NCT00000125 as usual (no cut-off)" => sub {
 		my $output = _run_fetch($nctid);
 		_did_fetch_versions($output);
+		_is_using_historical_data($output);
 		like $output,
 			qr/\Qnumber of versions after filtering: 16\E$/m,
 			'expected output';
@@ -111,6 +143,7 @@ subtest "NCT00000125" => sub {
 		ok -r $file, 'has file output';
 
 		is _count_study_records($file), 16, '16 study records';
+		_matches_nctid($file, $nctid);
 
 		ok _do_versions_match($file),
 			'studyVersion.studyVersion matches change.version';
@@ -135,6 +168,7 @@ subtest "NCT00000125" => sub {
 
 		my $output = _run_fetch($nctid);
 		_did_not_fetch_versions($output);
+		_is_using_historical_data($output);
 		like $output,
 			qr/\Qnumber of versions after filtering: 1\E$/m,
 			'expected output';
@@ -145,12 +179,14 @@ subtest "NCT00000125" => sub {
 
 		is _count_study_records($file), 16,
 			'still 16 study records (existing not removed)';
+		_matches_nctid($file, $nctid);
 
 		note "but now remove the file $file";
 		path($file)->remove;
 
 		$output = _run_fetch($nctid);
 		_did_fetch_versions($output);
+		_is_using_historical_data($output);
 
 		$_did_download_cutoff_version->($output);
 
@@ -158,6 +194,7 @@ subtest "NCT00000125" => sub {
 
 		is _count_study_records($file), 1,
 			'only 1 study records fetch when given cut-off';
+		_matches_nctid($file, $nctid);
 	};
 
 	subtest "NCT00000125 again, no cut-off, grab rest of data" => sub {
@@ -165,6 +202,7 @@ subtest "NCT00000125" => sub {
 
 		my $output = _run_fetch($nctid);
 		_did_not_fetch_versions($output);
+		_is_using_historical_data($output);
 		like $output,
 			qr/\Qnumber of versions after filtering: 16\E$/m,
 			'expected output';
@@ -175,6 +213,7 @@ subtest "NCT00000125" => sub {
 
 		is _count_study_records($file), 16,
 			'now has 16 study records (rest have been added)';
+		_matches_nctid($file, $nctid);
 
 		ok _do_versions_match($file),
 			'studyVersion.studyVersion matches change.version';
@@ -191,5 +230,58 @@ subtest "NCT00000125" => sub {
 	};
 };
 
+subtest "NCT00000141" => sub {
+	my $nctid = 'NCT00000141'; # this will appear in the aliases
+	my $updated_nctid = 'NCT01203436';
+	my $file = $tmp_dir->child('download/ctgov/historical/NCT000/NCT00000141.jsonl');
+	note "Output will be in file: $file";
+
+	subtest "$nctid: first time" => sub {
+		my $output = _run_fetch($nctid);
+		_did_fetch_versions($output);
+		_is_using_latest_data($output);
+		like $output,
+			qr/\QNo version history for NCT ID\E/m,
+			'version history does not exist';
+
+		ok -r $file, 'has file output';
+	};
+
+	subtest "$nctid: second time" => sub {
+		ok -r $file, 'has file output already';
+
+		my $output = _run_fetch($nctid);
+		_did_not_fetch_versions($output);
+
+		is _run_duckdb(<<~SQL), 1, 'is single study';
+			SELECT COUNT(*)
+			FROM read_ndjson_auto('$file');
+		SQL
+
+		is _run_duckdb(<<~SQL), 1, 'where .change value is null';
+			SELECT COUNT(*)
+			FROM read_ndjson_auto('$file')
+			WHERE change IS NULL;
+		SQL
+
+		is _run_duckdb(<<~SQL), 1, 'where .studyRecord value is not null';
+			SELECT COUNT(*)
+			FROM read_ndjson_auto('$file')
+			WHERE studyRecord IS NOT NULL;
+		SQL
+
+		is _run_duckdb(<<~SQL), $updated_nctid, "has the correct updated NCT ID: $updated_nctid";
+			SELECT
+				studyRecord->>'\$.study.protocolSection.identificationModule.nctId' AS nctid
+			FROM read_ndjson_auto('$file')
+		SQL
+
+		is _run_duckdb(<<~SQL), $nctid, "has the correct obsolete NCT ID: $nctid";
+			SELECT
+				studyRecord->>'\$.study.protocolSection.identificationModule.nctIdAliases[0]' AS nctid
+			FROM read_ndjson_auto('$file')
+		SQL
+	};
+};
 
 done_testing;
