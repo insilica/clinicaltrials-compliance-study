@@ -73,15 +73,15 @@ stages:
       size: 1831128430
     - path: stages/01_download_cthist_json.sh
       hash: md5
-      md5: ca9e23e83ff266058fd866f01ea7007b
-      size: 377
+      md5: 9f5652fe6d6aba5235a48d0453dcc52a
+      size: 824
     - path: stages/fetch-cthist-json.pl
       hash: md5
-      md5: adfdae7bbb1298067dbd64466a69fce2
-      size: 11819
+      md5: e9cc9af2851ee15b912f6658d4d38752
+      size: 12768
     outs:
     - path: download/ctgov/historical
       hash: md5
-      md5: 437828082c82df973ea6268b8e56612e.dir
-      size: 382240189
-      nfiles: 13327
+      md5: 9c8ee6341ae827ba661a6d0c40553798.dir
+      size: 1922339323
+      nfiles: 152604
