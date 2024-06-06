@@ -1,10 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 set -eu
 
 mkdir -p log
 
 export CTHIST_DOWNLOAD_CUTOFF_DATE=2013-09-27
+export PGDATABASE_LATEST=aact_20240430
+
 duckdb -noheader -csv -c "$(cat <<EOF
 	SELECT NCT_ID
 	FROM 'brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet';
@@ -13,6 +15,19 @@ EOF
 	| parallel \
 		-j1 \
 		--results log/01_download_cthist_json.anderson2015.par-results.csv \
+		--eta --bar \
+		-n1 \
+		'./stages/fetch-cthist-json.pl {}'
+
+(
+	make docker-compose-up >&2;
+	[ -r .env ] && . .env;
+	export PGDATABASE="$PGDATABASE_LATEST";
+	psql --csv -c 'SELECT nct_id FROM ctgov.studies' | awk 'NR > 1'
+) \
+	| parallel \
+		-j3 \
+		--results log/01_download_cthist_json.postgres_aact.par-results.csv \
 		--eta --bar \
 		-n1 \
 		'./stages/fetch-cthist-json.pl {}'
