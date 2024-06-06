@@ -4,6 +4,9 @@ set -eu
 
 mkdir -p log
 
+JOB_PROCFILE=./log/job-procfile
+echo 3 > $JOB_PROCFILE
+
 export CTHIST_DOWNLOAD_CUTOFF_DATE=2013-09-27
 export PGDATABASE_LATEST=aact_20240430
 
@@ -13,7 +16,7 @@ duckdb -noheader -csv -c "$(cat <<EOF
 EOF
 )" \
 	| parallel \
-		-j1 \
+		-j"$JOB_PROCFILE" \
 		--results log/01_download_cthist_json.anderson2015.par-results.csv \
 		--eta --bar \
 		-n1 \
@@ -26,7 +29,7 @@ EOF
 	psql --csv -c 'SELECT nct_id FROM ctgov.studies' | awk 'NR > 1'
 ) \
 	| parallel \
-		-j3 \
+		-j"$JOB_PROCFILE" \
 		--results log/01_download_cthist_json.postgres_aact.par-results.csv \
 		--eta --bar \
 		-n1 \
