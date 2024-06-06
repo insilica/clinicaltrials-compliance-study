@@ -137,7 +137,13 @@ package StudyRecords {
 
 	sub _change_count($self) { 0 + keys $self->change_map->%* }
 	sub change_versions($self) { [ sort { $a <=> $b } keys $self->change_map->%* ] }
-	sub study_versions($self) { [ sort { $a <=> $b } map { $_->{studyVersion} } values $self->study_map->%* ] }
+	sub study_versions($self) {
+		if( ! $self->history_available && $self->has_single_study_record ) {
+			return [ 'latest' ];
+		} else {
+			[ sort { $a <=> $b } map { $_->{studyVersion} } values $self->study_map->%* ]
+		}
+	}
 
 	signature_for number_of_studies => ( method => 1, pos => []);
 	sub number_of_studies :ReturnType(PositiveOrZeroInt) ($self) {
@@ -404,7 +410,8 @@ sub main {
 				CTGovAPI->get_versions($nctid);
 			} catch( $e ) {
 				if( $e->$_isa('failure::ctgov::no_history') ) {
-					main::_log("No version history for NCT ID $nctid: $e");
+					chomp(my $msg = "$e");
+					main::_log("No version history for NCT ID $nctid: $msg");
 					undef;
 				} else {
 					die $e;

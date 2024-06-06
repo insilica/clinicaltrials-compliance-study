@@ -53,3 +53,14 @@ ORDER BY nctid
 ;
 EOF
 )"
+
+## Find records without history
+duckdb -csv -noheader -c "$(cat <<'EOF'
+SELECT filename
+FROM read_ndjson_auto('download/ctgov/historical/**/*.jsonl', filename=true)
+WHERE change IS NULL
+;
+EOF
+)" > no-history-files.lst
+< no-history-files.lst grep -oP 'NCT\d{8}'  >  no-history-nctids.lst
+wc -l no-history-files.lst no-history-nctids.lst
