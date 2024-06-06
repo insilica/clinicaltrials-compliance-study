@@ -267,6 +267,9 @@ directory of JSON Lines files.
 		return DOWNLOAD_PATH->child(substr($self->nctid, 0, 6), "@{[ $self->nctid ]}.jsonl");
 	}
 
+	signature_for exists => ( method => 1, pos => []);
+	sub exists($self)  { -r  $self->store_path }
+
 	signature_for load => ( method => 1, pos => []);
 	sub load :ReturnType(InstanceOf['StudyRecords']) ($self) {
 		my $record_file = $self->store_path;
@@ -374,7 +377,11 @@ package CTGovAPI {
 	}
 }
 
-use Env qw(CTHIST_DOWNLOAD_CUTOFF_DATE);
+
+use Env qw(
+	CTHIST_DOWNLOAD_CUTOFF_DATE
+	CTHIST_DOWNLOAD_ONLY_CHECK_FOR_FILE
+);
 
 sub _has_opt_cutoff_date {
 	return exists $ENV{CTHIST_DOWNLOAD_CUTOFF_DATE}
@@ -402,6 +409,7 @@ sub filtered_version_numbers($study_records) {
 sub main {
 	my $nctid = shift @ARGV;
 	my $store = StudyRecords::Store->new( nctid => $nctid);
+	exit 0 if $CTHIST_DOWNLOAD_ONLY_CHECK_FOR_FILE && $store->exists;
 	my $study_records = $store->load;
 	if( $study_records->number_of_studies == 0 ) {
 		main::_log("Fetching versions");
