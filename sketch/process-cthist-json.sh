@@ -10,7 +10,11 @@ FROM 'brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet'
 WHERE
 	NCT_ID NOT IN (
 		SELECT
-			DISTINCT studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS nctid
+			unnest(list_distinct(list_concat(
+				[ studyRecord->>'$.study.protocolSection.identificationModule.nctId' ],
+				coalesce(studyRecord->'$.study.protocolSection.identificationModule.nctIdAliases',
+					[])::VARCHAR[]
+			))) AS nctid
 		FROM read_ndjson_auto('download/ctgov/historical/**/*.jsonl')
 		WHERE studyRecord IS NOT NULL
 	)
