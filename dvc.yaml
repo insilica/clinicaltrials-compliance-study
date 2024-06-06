@@ -35,6 +35,8 @@ stages:
   download-cthist-json:
     cmd: stages/01_download_cthist_json.sh
     deps:
+      - stages/01_download_cthist_json.sh
+      - stages/fetch-cthist-json.pl
       - brick/anderson2015
       - download/aact/db-dump/20240430_clinical_trials.zip
     outs:
