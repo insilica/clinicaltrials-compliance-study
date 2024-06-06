@@ -16,6 +16,9 @@
           PathTiny      = final.callPackage ./maint/nixpkg/perl/path-tiny.nix {};
           ReturnType    = final.callPackage ./maint/nixpkg/perl/return-type.nix {};
           EnvDot        = final.callPackage ./maint/nixpkg/perl/env-dot.nix {};
+          failures      = final.callPackage ./maint/nixpkg/perl/failures.nix {};
+          ObjectUtil    = final.callPackage ./maint/nixpkg/perl/object-util.nix {};
+          MooXTraits    = final.callPackage ./maint/nixpkg/perl/moox-traits.nix {};
         };
       };
     } //
@@ -41,6 +44,8 @@
                     ReturnType
                     CaptureTiny
                     EnvDot
+                    failures
+                    ObjectUtil
                 ];
               parallelWithPerlEnv = pkgs.stdenv.mkDerivation {
                 name = "parallel-with-perl-env";

@@ -20,6 +20,8 @@ use List::UtilsBy qw(nmax_by);
 use Type::Params 2.000 qw(signature_for);
 use Types::Common qw(InstanceOf);
 use Return::Type;
+use failures qw(ctgov::no_history io::network);
+use Object::Util magic => 0;
 
 # Output must but canonical for hashing.
 my $json = Cpanel::JSON::XS->new->utf8->canonical;
@@ -294,6 +296,7 @@ package CTGovAPI {
 		CTStudyRecordDataVersioned
 		CTStudyRecordDataUnversioned
 	);
+	use Object::Util magic => 0;
 
 	my $ua = LWP::UserAgent->new;
 
@@ -302,7 +305,10 @@ package CTGovAPI {
 		my $res = $ua->get($url);
 
 		if( ! $res->is_success ) {
-			die "Failed to download $url: @{[ $res->message ]}";
+			failure::io::network->throw({
+				msg => "Failed to download $url: @{[ $res->message ]}",
+				payload => { response => $res },
+			});
 		}
 
 		return $json->decode( $res->decoded_content );
@@ -330,7 +336,21 @@ package CTGovAPI {
 		method => Str,
 		pos => [ NCT_ID ] );
 	sub get_versions :ReturnType(CTVersionsData) ($class, $nctid) {
-		return _fetch_json_or_die(_get_versions_url($nctid));
+		try {
+			return _fetch_json_or_die(_get_versions_url($nctid));
+		} catch($e) {
+			if( $e->$_isa('failure::io::network')
+				&& exists $e->payload->{response}
+				&& $e->payload->{response}->content =~ /\ANo study \w+ history summary\z/
+			) {
+				failure::ctgov::no_history->throw({
+					msg => "No study history for $nctid",
+					payload => { nctid => $nctid },
+				});
+			}
+
+			die $e;
+		}
 	}
 
 	signature_for get_study_record_version => (
@@ -383,9 +403,12 @@ sub main {
 			try {
 				CTGovAPI->get_versions($nctid);
 			} catch( $e ) {
-				chomp $e;
-				main::_log("No version history for NCT ID $nctid: $e");
-				undef;
+				if( $e->$_isa('failure::ctgov::no_history') ) {
+					main::_log("No version history for NCT ID $nctid: $e");
+					undef;
+				} else {
+					die $e;
+				}
 			}
 		};
 		if( defined $versions_data ) {
