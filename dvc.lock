@@ -59,3 +59,29 @@ stages:
       md5: 1395cc31b50eca34bf0a57f5a4ed9d0f.dir
       size: 1387361
       nfiles: 4
+  download-cthist-json:
+    cmd: stages/01_download_cthist_json.sh
+    deps:
+    - path: brick/anderson2015
+      hash: md5
+      md5: 1395cc31b50eca34bf0a57f5a4ed9d0f.dir
+      size: 1387361
+      nfiles: 4
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: stages/01_download_cthist_json.sh
+      hash: md5
+      md5: ca9e23e83ff266058fd866f01ea7007b
+      size: 377
+    - path: stages/fetch-cthist-json.pl
+      hash: md5
+      md5: adfdae7bbb1298067dbd64466a69fce2
+      size: 11819
+    outs:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: 437828082c82df973ea6268b8e56612e.dir
+      size: 382240189
+      nfiles: 13327
