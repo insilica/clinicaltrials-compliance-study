@@ -36,3 +36,20 @@ ORDER BY V1
 ;
 EOF
 )"
+
+## Find records to reflex to
+duckdb -c "$(cat <<'EOF'
+SELECT DISTINCT unnest(nctids) AS nctid FROM (
+	SELECT
+		list_distinct(list_concat(
+			[ studyRecord->>'$.study.protocolSection.identificationModule.nctId' ],
+			(studyRecord->'$.study.protocolSection.identificationModule.nctIdAliases')::VARCHAR[]
+		)) AS nctids
+	FROM read_ndjson_auto('download/ctgov/historical/**/*.jsonl')
+	WHERE studyRecord IS NOT NULL
+)
+WHERE length(nctids) > 1
+ORDER BY nctid
+;
+EOF
+)"
