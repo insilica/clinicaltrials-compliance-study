@@ -32,16 +32,16 @@ with _all as (
         )
 ),
 aact as (
-    select *
+    select f.nct_id,
+        any_value(v.has_us_facility) as has_us_facility,
+        any_value(f.country) as country
     from pg.ctgov.calculated_values v
         join pg.ctgov.facilities f on v.nct_id = f.nct_id
     where v.has_us_facility IS NOT NULL
-        and v.has_single_facility = false
+    group by f.nct_id
 )
-select ct.has_us_facility as ct_usa,
-    ct.country,
-    a.has_us_facility as a_usa,
-    a.location_country
+select *
 from _all a
-    join aact ct on ct.nct_id = a.nct_id,
-    where ct.has_us_facility <> a.has_us_facility
+    join aact ct on ct.nct_id = a.nct_id
+where a.has_us_facility = true
+    OR ct.has_us_facility = true
