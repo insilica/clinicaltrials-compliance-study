@@ -12,11 +12,7 @@ COPY (
                     studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS nct_id,
                     TRY_CAST(
                         studyRecord->>'$.study.protocolSection.oversightModule.oversightHasDmc' AS BOOLEAN
-                    ) AS has_dmc,
-                    list_distinct(
-                        studyRecord->>'$.study.protocolSection.contactsLocationsModule.locations[*].country'
-                    ) AS location_countries,
-                    TRY_CAST(
+                    ) AS has_dmc TRY_CAST(
                         studyRecord->>'$.study.protocolSection.oversightModule.isFdaRegulatedDevice' AS BOOLEAN
                     ) AS is_fda_regulated_device,
                     TRY_CAST(
@@ -36,7 +32,7 @@ COPY (
                         (
                             studyRecord->'$.study.protocolSection.designModule.phases'
                         )::VARCHAR [],
-                        (acc, val)->concat(acc, ', ', val)
+                        (acc, val)->concat(acc, '; ', val)
                     ) AS phase,
                     studyRecord->>'$.study.protocolSection.statusModule.primaryCompletionDateStruct.date' AS primary_completion_date,
                     -- TODO Partial date type
@@ -50,7 +46,6 @@ COPY (
                         studyRecord->>'$.study.protocolSection.armsInterventionsModule.interventions[*].type'
                     ) AS intervention_type,
                     studyRecord->>'$.study.hasResults' as has_results
-
                 FROM read_ndjson_auto (
                         'download/ctgov/historical/NCT*/*.jsonl',
                         maximum_sample_files = 32768,
@@ -60,7 +55,9 @@ COPY (
                     AND change IS NOT NULL
             )
             SELECT CASE
-                    WHEN list_contains(location_country, 'United States') THEN true
+                    WHEN list_contains(location_country, 'United States')
+                    OR list_contains(location_country, 'Puerto Rico')
+                    OR list_contains(location_country, 'American Samoa') THEN true
                     WHEN location_country [1] IS NULL THEN NULL
                     ELSE false
                 END AS has_us_facility,
