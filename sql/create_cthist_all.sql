@@ -64,4 +64,4 @@ COPY (
                 *
             FROM country
         )
-) TO 'brick/ctgov/processed_with_results.parquet' (FORMAT PARQUET)
+) TO 'brick/analysis-20130927/ctgov-studies-all.parquet.parquet' (FORMAT PARQUET)
