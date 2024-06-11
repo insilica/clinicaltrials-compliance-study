@@ -12,7 +12,8 @@ COPY (
                     studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS nct_id,
                     TRY_CAST(
                         studyRecord->>'$.study.protocolSection.oversightModule.oversightHasDmc' AS BOOLEAN
-                    ) AS has_dmc TRY_CAST(
+                    ) AS has_dmc,
+                    TRY_CAST(
                         studyRecord->>'$.study.protocolSection.oversightModule.isFdaRegulatedDevice' AS BOOLEAN
                     ) AS is_fda_regulated_device,
                     TRY_CAST(
@@ -45,7 +46,8 @@ COPY (
                     list_distinct(
                         studyRecord->>'$.study.protocolSection.armsInterventionsModule.interventions[*].type'
                     ) AS intervention_type,
-                    studyRecord->>'$.study.hasResults' as has_results
+                    studyRecord->>'$.study.hasResults' as has_results,
+                    studyRecord->>'$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.class' AS funding_source
                 FROM read_ndjson_auto (
                         'download/ctgov/historical/NCT*/*.jsonl',
                         maximum_sample_files = 32768,
@@ -64,4 +66,4 @@ COPY (
                 *
             FROM country
         )
-) TO 'brick/analysis-20130927/ctgov-studies-all.parquet.parquet' (FORMAT PARQUET)
+) TO 'brick/analysis-20130927/ctgov-studies-all.parquet' (FORMAT PARQUET)

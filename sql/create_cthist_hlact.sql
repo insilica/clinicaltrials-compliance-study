@@ -1,10 +1,11 @@
--- ATTACH 'postgresql://postgres:postgres@localhost:6432/aact_20240430' as pg (TYPE postgres);
+INSTALL postgres;
+ATTACH 'postgresql://postgres:postgres@localhost:6432/aact_20240430' as pg (TYPE postgres);
 COPY (
     SELECT *
     FROM (
             with _all as (
                 SELECT *
-                FROM read_parquet('brick/ctgov/processed_with_results.parquet')
+                FROM read_parquet('brick/analysis-20130927/ctgov-studies-all.parquet')
                 WHERE overall_status != 'WITHDRAWN'
                     AND (
                         primary_completion_date >= '2008-01-01'
