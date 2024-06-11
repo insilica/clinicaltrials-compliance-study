@@ -1,0 +1,193 @@
+---
+title: "Clinical Trials Compliance Study"
+output: github_document
+---
+
+## Highly-Likely Applicable Clinical Trials Analysis
+
+Table 1 of the [original article](https://www.nejm.org/doi/full/10.1056/NEJMsa1409364#sec-2) groups the 13,327 HLACTs in three categories: all trials, those that reported results in the twelve-month reporting window, and those that reported results in the five-year reporting window.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.kable.NA = '')
+```
+
+### All trials categorized and ranked by purpose
+
+The total set of HLACTs found in the Clinical Trials database (count: 14467) demonstrate a similar spread of `primary_purpose` as the original Anderson 2015 dataset of 13327 HLACTs.
+
+```{r echo=FALSE, message=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(gtsummary)
+library(tinytex)
+
+init <- arrow::read_parquet("../brick/analysis-20130927/ctgov-studies-hlact.parquet")
+purpose <- group_by(init, primary_purpose) %>% count(primary_purpose, name = "primary_purpose_total")
+purpose_total <- sum(purpose$primary_purpose_total)
+purpose <- purpose %>%
+  mutate(primary_purpose_percentage = primary_purpose_total / purpose_total * 100) %>%
+  filter(primary_purpose == "TREATMENT" || primary_purpose == "PREVENTION")
+
+ordered <- purpose[order(purpose$primary_purpose_percentage, decreasing=TRUE),]
+
+ordered %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Intervention type
+
+The main inclusion criterion for the original study was that the trial have an interventional study design if studying a drug. The breakdown of intervention type for the current HLACT dataset is as follows:
+
+```{r echo=FALSE, message=FALSE}
+
+i_type <- group_by(init, intervention_type) %>% count(intervention_type, name = "intervention_type_total")
+i_type_total <- sum(i_type$intervention_type_total)
+i_type <- i_type %>%
+  mutate(intervention_type_percentage = intervention_type_total / i_type_total * 100) %>%
+  filter("DRUG" %in% intervention_type || "DEVICE" %in% intervention_type || "BIOLOGICAL" %in% intervention_type)
+
+intervention_ordered <- i_type[order(i_type$intervention_type_percentage, decreasing=TRUE),]
+
+intervention_ordered %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Trial phases
+
+Trials were considered if they were not in Phase 0, or Early Phase 1.
+
+```{r echo=FALSE, message=FALSE}
+
+phase <- group_by(init, phase) %>% count(phase, name = "phase_total")
+p_total <- sum(phase$phase_total)
+phase <- phase %>%
+  mutate(phase_percentage = phase_total / p_total * 100) %>%
+  filter(phase == "PHASE2" || 
+         phase == "PHASE3" || 
+         phase == "PHASE4" ||
+         phase == "PHASE2; PHASE3" ||
+         phase == "PHASE1; PHASE2" ||
+         phase == "NA")
+
+phase_ordered <- phase[order(phase$phase_percentage, decreasing=TRUE),]
+
+phase_ordered %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Trial site
+
+Many trials in the Clinical Trials dataset were conducted at multiple sites, sometimes across several countries and continents. A major factor in the original analysis was the presence of at least one US site in the trial.
+
+```{r echo=FALSE, message=FALSE}
+
+trial_sites <- group_by(init, has_us_facility) %>% count(has_us_facility, name = "has_us_site")
+total <- sum(trial_sites$has_us_site)
+trial_sites <- trial_sites %>%
+  mutate(US_site_percentage = has_us_site / total * 100)
+
+site_ordered <- trial_sites[order(trial_sites$US_site_percentage, decreasing=TRUE),]
+
+site_ordered %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Funding source
+
+The available data enumerates three sponsor types for clinical trials: National Institutes of Health (NIH), industry, and other government or academic institution. In Anderson, 2015, industry-led trials showed much higher compliance with reporting requirements during the initial twelve-month period than government- or academic-run trials. Over the five-year period, these gaps closed, but total reporting rates were still less than 50%.
+
+```{r echo=FALSE, message=FALSE}
+
+source <- group_by(init, funding_source) %>% count(funding_source, name = "source_totals")
+s_totals <- sum(source$source_totals)
+source <- source %>%
+  mutate(source_percentage = source_totals / s_totals * 100)
+
+ordered_sources <- source[order(source$source_percentage, decreasing=TRUE),]
+
+ordered_sources %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Categorized by completion date
+
+```{r echo=FALSE, message=FALSE}
+
+years <- init %>%
+  mutate(pc_year = year(ym(primary_completion_date))) %>% 
+  group_by(pc_year) %>% count(pc_year, name = "years")
+
+totals <- sum(years$years)
+years <- years %>%
+  mutate(years_percentage = years / totals * 100)
+
+years %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
