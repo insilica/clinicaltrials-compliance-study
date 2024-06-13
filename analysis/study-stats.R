@@ -71,6 +71,19 @@ hlact.studies <- hlact.studies %>%
          fct_na_value_to_level(level = "N/A")
   )
 
+# Normalize by intervention type
+# biological/device/drug/genetic/radiation intervention
+hlact.studies <- hlact.studies %>%
+    mutate(intervention_type =
+           case_when(
+                     device     ~ "Device",
+                     biological ~ "Biological",
+                     drug       ~ "Drug",
+                     .default   = "Other"
+                     ) %>%
+           # match factor level order used in paper
+           factor(levels = c("Device", "Biological", "Drug", "Other"))
+    )
 # }}}
 
 
@@ -89,20 +102,11 @@ hlact.studies <- hlact.studies %>%
 
 # Fit the Kaplan-Meier model
 fit.funding <- survfit2(Surv(time_months, event) ~ funding,
-                       data = hlact.studies, start.time = 0)
+                        data = hlact.studies, start.time = 0)
 fit.phase <- survfit2(Surv(time_months, event) ~ phase.norm,
-                     data = hlact.studies, start.time = 0)
-fit.interventions <- survfit2(Surv(time_months, event) ~
-   behavioral +
-   biological +
-   device     +
-   dietsup    +
-   drug       +
-   genetic    +
-   procedure  +
-   radiation  +
-   otherint   ,
- data = hlact.studies, start.time = 0)
+                      data = hlact.studies, start.time = 0)
+fit.interventions <- survfit2(Surv(time_months, event) ~ intervention_type,
+                              data = hlact.studies, start.time = 0)
 fit.status <- survfit2(Surv(time_months, event) ~ overall_statusc,
                        data = hlact.studies, start.time = 0)
 
@@ -149,7 +153,7 @@ show( fig.surv.phase <- plot_survfit(fit.phase) +
              "Trials Reporting Results versus Months from Primary Completion Date Stratified by Phase"
              ))
 
-# Fig S2 (TODO, merge interventions)
+# Fig S2
 show( fig.surv.interventions <- plot_survfit(fit.interventions) +
      ggtitle(str_wrap(
              "Trials Reporting Results versus Months from Primary Completion Date Stratified by Intervention Type",
