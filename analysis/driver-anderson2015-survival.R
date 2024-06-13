@@ -1,0 +1,54 @@
+if (!require("pacman")) install.packages("pacman")
+library(pacman)
+pacman::p_load(
+  fs
+)
+
+source('analysis/lib-anderson2015.R')
+
+### INPUT
+hlact.studies <- arrow::read_parquet('brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet') |>
+  tibble()
+print(hlact.studies)#DEBUG
+# Censoring date
+censor_date <- as.Date("2013-09-27")
+
+### PREPROCESS
+hlact.studies <- preprocess_data(hlact.studies, censor_date)
+
+### DEFINE BREAKS
+time_months.max <- max(hlact.studies$time_months, na.rm = TRUE)
+breaks.risktable.less_than <- seq(0, time_months.max, by = 12) - 1
+breaks.risktable.less_than[1] <- 0
+breaks.fig <- seq(0, time_months.max, by = 6)
+
+### CREATE MODELS
+fits <- create_survfit_models(hlact.studies)
+
+### PLOT RESULTS
+plot_survfit_with_title <- function(fit, title) {
+  plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
+    ggtitle(str_wrap(title, 72))
+}
+
+dir_create('figtab/anderson2015')
+
+# Fig 2
+show(fig.surv.funding <- plot_survfit_with_title(fits$fit.funding,
+     "Trials Reporting Results versus Months from Primary Completion Date Stratified by Funding"))
+ggsave('figtab/anderson2015/fig_2.survfit.funding.png', width = 10, dpi = 300)
+
+# Fig S1
+show(fig.surv.phase <- plot_survfit_with_title(fits$fit.phase,
+     "Trials Reporting Results versus Months from Primary Completion Date Stratified by Phase"))
+ggsave('figtab/anderson2015/fig_s1.survfit.phase.png', width = 10, dpi = 300)
+
+# Fig S2
+show(fig.surv.interventions <- plot_survfit_with_title(fits$fit.interventions,
+     "Trials Reporting Results versus Months from Primary Completion Date Stratified by Intervention Type"))
+ggsave('figtab/anderson2015/fig_s2.survfit.interventions.png', width = 10, dpi = 300)
+
+# Fig S3
+show(fig.surv.status <- plot_survfit_with_title(fits$fit.status,
+     "Trials Reporting Results versus Months from Primary Completion Date Stratified by Terminated/Completed Status"))
+ggsave('figtab/anderson2015/fig_s2.survfit.status.png', width = 10, dpi = 300)
