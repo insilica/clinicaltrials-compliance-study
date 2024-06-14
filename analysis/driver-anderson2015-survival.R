@@ -1,7 +1,8 @@
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
 pacman::p_load(
-  fs
+  fs,
+  parsedate
 )
 
 source('analysis/lib-anderson2015.R')
@@ -26,9 +27,18 @@ breaks.fig <- seq(0, time_months.max, by = 6)
 fits <- create_survfit_models(hlact.studies)
 
 ### PLOT RESULTS
+
+# Obtain the current git tag and the path to this script
+git_tag <- system("git describe --tags --always", intern = TRUE)
+script_path <- path(sys.frame(1)$ofile)
+output_plot_caption <- sprintf("Prepared on %s %s:%s",
+                               format_iso_8601(Sys.time()),
+                               git_tag, script_path)
+
 plot_survfit_with_title <- function(fit, title) {
   plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
-    ggtitle(str_wrap(title, 72))
+    ggtitle(str_wrap(title, 72)) +
+    labs(caption = output_plot_caption)
 }
 
 dir_create('figtab/anderson2015')
