@@ -1,0 +1,363 @@
+---
+title: "Clinical Trials Compliance Study"
+output: github_document
+always_allow_html: true
+---
+
+## Highly-Likely Applicable Clinical Trials Analysis
+
+Table 1 of the [original article](https://www.nejm.org/doi/full/10.1056/NEJMsa1409364#sec-2) groups the 13,327 HLACTs in three categories: all trials, those that reported results in the twelve-month reporting window, and those that reported results in the five-year reporting window.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.kable.NA = '')
+```
+
+### All trials categorized and ranked by purpose
+
+The total set of HLACTs found in the Clinical Trials database (count: 14467) demonstrate a similar spread of `primary_purpose` as the original Anderson 2015 dataset of 13327 HLACTs.
+
+```{r echo=FALSE, message=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(gtsummary)
+library(tinytex)
+
+init <- arrow::read_parquet("../brick/analysis-20130927/ctgov-studies-hlact.parquet")
+
+twelve <- init %>%  
+  mutate(results_received_12 = months_to_report_results <= 13) %>%
+  filter(results_received_12 == TRUE)
+
+five <- init %>%
+  mutate(results_received_5 = months_to_report_results <= 65) %>%
+  filter(results_received_5 == TRUE)
+
+# all results
+purpose <- group_by(init, primary_purpose) %>% count(primary_purpose, name = "primary_purpose_total")
+purpose_total <- sum(purpose$primary_purpose_total)
+purpose <- purpose %>%
+  mutate(primary_purpose_percentage = round(primary_purpose_total / purpose_total * 100, digits=2)) %>%
+  filter(primary_purpose == "TREATMENT" || primary_purpose == "PREVENTION")
+
+twelve_purpose <- twelve %>%
+  group_by(primary_purpose) %>%
+  count(primary_purpose, name = "primary_purpose_total")
+twelve_purpose_total <- sum(twelve_purpose$primary_purpose_total)
+with_sum <- twelve_purpose %>%
+  mutate(primary_purpose_percentage = round(primary_purpose_total / twelve_purpose_total * 100, digits=2)) %>%
+  filter(primary_purpose == "TREATMENT" || primary_purpose == "PREVENTION")
+  
+five_purpose <- five %>%
+  group_by(primary_purpose) %>%
+  count(primary_purpose, name = "primary_purpose_total")
+five_purpose_total <- sum(five_purpose$primary_purpose_total)
+five_with_sum <- five_purpose %>%
+  mutate(primary_purpose_percentage = round(primary_purpose_total / five_purpose_total * 100, digits=2)) %>%
+  filter(primary_purpose == "TREATMENT" || primary_purpose == "PREVENTION")
+
+
+ordered <- purpose[order(purpose$primary_purpose_percentage, decreasing=TRUE),]
+```
+#### Trial purpose
+```{r echo=FALSE, message=FALSE}
+test_joined <- ordered %>%
+  left_join(with_sum, by="primary_purpose", suffix = c("_all", "_one_year")) %>%
+  left_join(five_with_sum, by="primary_purpose", suffix = c(" (all)", " (five_year)")) %>%
+  select(!contains("total")) %>%
+  rename(All = primary_purpose_percentage_all, "Twelve months" = primary_purpose_percentage_one_year, "Five years" = primary_purpose_percentage)
+
+test_joined %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Intervention type
+
+The main inclusion criterion for the original study was that the trial have an interventional study design if studying a drug. The breakdown of intervention type for the current HLACT dataset is as follows:
+
+```{r echo=FALSE, message=FALSE}
+
+i_type <- group_by(init, intervention_type) %>% count(intervention_type, name = "intervention_type_total")
+i_type_total <- sum(i_type$intervention_type_total)
+i_type <- i_type %>%
+  mutate(intervention_type_percentage = round(intervention_type_total / i_type_total * 100, digits=2)) %>%
+  filter("DRUG" %in% intervention_type || "DEVICE" %in% intervention_type || "BIOLOGICAL" %in% intervention_type)
+
+twelve_i_type <- group_by(twelve, intervention_type) %>% count(intervention_type, name = "intervention_type_total")
+t_total <- sum(twelve_i_type$intervention_type_total)
+twelve_i_type <- twelve_i_type %>%
+  mutate(intervention_type_percentage = round(intervention_type_total / t_total * 100, digits=2)) %>%
+  filter("DRUG" %in% intervention_type || "DEVICE" %in% intervention_type || "BIOLOGICAL" %in% intervention_type)
+
+five_i_type <- group_by(five, intervention_type) %>% count(intervention_type, name = "intervention_type_total")
+ft_total <- sum(five_i_type$intervention_type_total)
+five_i_type <- five_i_type %>%
+  mutate(intervention_type_percentage = round(intervention_type_total / ft_total * 100, digits=2)) %>%
+  filter("DRUG" %in% intervention_type || "DEVICE" %in% intervention_type || "BIOLOGICAL" %in% intervention_type)
+
+intervention_ordered <- i_type[order(i_type$intervention_type_percentage, decreasing=TRUE),]
+
+i_type_joined <- left_join(intervention_ordered, twelve_i_type, by="intervention_type", suffix = c("_all", "_one_year")) %>%
+  left_join(five_i_type, by="intervention_type") %>%
+  select(!contains("total")) %>%
+  rename(All = "intervention_type_percentage_all", "One year" = "intervention_type_percentage_one_year", "Five years" = "intervention_type_percentage")
+
+i_type_joined %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Trial phases
+
+Trials were considered if they were not in Phase 0, or Early Phase 1.
+
+```{r echo=FALSE, message=FALSE}
+
+phase_df <- group_by(init, phase) %>% count(phase, name = "phase_total")
+p_total <- sum(phase_df$phase_total)
+phase_df <- phase_df %>%
+  mutate(phase_percentage = phase_total / p_total * 100) %>%
+  filter(phase == "PHASE2" || 
+         phase == "PHASE3" || 
+         phase == "PHASE4" ||
+         phase == "PHASE2; PHASE3" ||
+         phase == "PHASE1; PHASE2" ||
+         phase == "NA")
+
+twelve_phase <- group_by(twelve, phase) %>% count(phase, name= "phase_total")
+tp_total <- sum(twelve_phase$phase_total)
+twelve_phase <- twelve_phase %>%
+  mutate(phase_percentage = round(phase_total / tp_total * 100, digits=2)) %>%
+  filter(phase == "PHASE2" || 
+         phase == "PHASE3" || 
+         phase == "PHASE4" ||
+         phase == "PHASE2; PHASE3" ||
+         phase == "PHASE1; PHASE2" ||
+         phase == "NA")
+
+five_phase <- group_by(five, phase) %>% count(phase, name= "phase_total")
+fp_total <- sum(five_phase$phase_total)
+five_phase <- five_phase %>%
+  mutate(phase_percentage = round(phase_total / fp_total * 100, digits=2)) %>%
+  filter(phase == "PHASE2" || 
+         phase == "PHASE3" || 
+         phase == "PHASE4" ||
+         phase == "PHASE2; PHASE3" ||
+         phase == "PHASE1; PHASE2" ||
+         phase == "NA")
+
+phase_ordered <- c("PHASE1; PHASE2", "PHASE2", "PHASE2; PHASE3",
+                     "PHASE3", "PHASE4", "NA")
+
+phase_df <- phase_df %>%
+  mutate(phase = factor(phase, levels = phase_ordered)) %>%
+  arrange(phase)
+
+phase_joined <- phase_df %>%
+  left_join(twelve_phase, by = "phase", suffix = c("_all", "_one_year")) %>%
+  left_join(five_phase, by = "phase") %>%
+  select(!contains("total")) %>%
+  rename(All = "phase_percentage_all", "One year" = "phase_percentage_one_year", "Five years" = "phase_percentage")
+
+phase_joined %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Trial site
+
+Many trials in the Clinical Trials dataset were conducted at multiple sites, sometimes across several countries and continents. A major factor in the original analysis was the presence of at least one US site in the trial.
+
+```{r echo=FALSE, message=FALSE}
+
+trial_sites <- group_by(init, has_us_facility) %>% count(has_us_facility, name = "has_us_site")
+total <- sum(trial_sites$has_us_site)
+trial_sites <- trial_sites %>%
+  mutate(us_site_percentage = round(has_us_site / total * 100, digits=2))
+
+twelve_sites <- group_by(twelve, has_us_facility) %>% count(has_us_facility, name = "has_us_site")
+t_site_total <- sum(twelve_sites$has_us_site)
+twelve_sites <- twelve_sites %>%
+  mutate(us_site_percentage = round(has_us_site / t_site_total * 100, digits =2))
+
+five_sites <- group_by(five, has_us_facility) %>% count(has_us_facility, name = "has_us_site")
+f_site_total <- sum(five_sites$has_us_site)
+five_sites <- five_sites %>%
+  mutate(us_site_percentage = round(has_us_site / f_site_total * 100, digits =2))
+
+site_ordered <- trial_sites[order(trial_sites$us_site_percentage, decreasing=TRUE),] %>%
+  left_join(twelve_sites, by="has_us_facility", suffix = c("_all", "_one_year")) %>%
+  left_join(five_sites, by="has_us_facility") %>%
+  select(!contains("has_us_site")) %>%
+  rename(All = "us_site_percentage_all", "One year" = "us_site_percentage_one_year", "Five years" = "us_site_percentage")
+
+site_ordered %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Funding source
+
+The available data enumerates three sponsor types for clinical trials: National Institutes of Health (NIH), industry, and other government or academic institution. In Anderson, 2015, industry-led trials showed much higher compliance with reporting requirements during the initial twelve-month period than government- or academic-run trials. Over the five-year period, these gaps closed, but total reporting rates were still less than 50%.
+
+```{r echo=FALSE, message=FALSE}
+
+source <- group_by(init, funding_source) %>% count(funding_source, name = "source_totals")
+s_totals <- sum(source$source_totals)
+source <- source %>%
+  mutate(source_percentage = round(source_totals / s_totals * 100, digits=2)) %>%
+  filter(funding_source == "OTHER" || funding_source == "INDUSTRY" || funding_source == "NIH")
+
+twelve_source <- group_by(twelve, funding_source) %>% count(funding_source, name ="source_totals")
+t_source_totals <- sum(twelve_source$source_totals)
+twelve_source <- twelve_source %>%
+  mutate(source_percentage = round(source_totals / t_source_totals * 100, digits=2)) %>%
+  filter(funding_source == "OTHER" || funding_source == "INDUSTRY" || funding_source == "NIH")
+
+five_source <- group_by(five, funding_source) %>% count(funding_source, name ="source_totals")
+f_source_totals <- sum(five_source$source_totals)
+five_source <- five_source %>%
+  mutate(source_percentage = round(source_totals / f_source_totals * 100, digits=2)) %>%
+  filter(funding_source == "OTHER" || funding_source == "INDUSTRY" || funding_source == "NIH")
+
+ordered_sources <- source[order(source$source_percentage, decreasing=TRUE),] %>%
+  left_join(twelve_source, by = "funding_source", suffix = c("_all", "_one_year")) %>%
+  left_join(five_source, by = "funding_source") %>%
+  select(!contains("totals")) %>%
+  rename(All = "source_percentage_all", "One year" = "source_percentage_one_year", "Five years" = "source_percentage")
+
+ordered_sources %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
+
+### Categorized by completion date
+
+```{r echo=FALSE, message=FALSE}
+
+dates <- init %>%
+  mutate(primary_completion_date = as.Date(ym(primary_completion_date)),
+         verification_date = as.Date(case_when(
+           !is.na(verification_date) & between(ym(verification_date), ym("2008-01"), ym("2012-09")) ~ ym(verification_date),
+           TRUE ~ NA_Date_
+         )),
+         completion_date = as.Date(ym(completion_date)))
+
+twelve_dates <- twelve %>%
+  mutate(primary_completion_date = as.Date(ym(primary_completion_date)),
+         verification_date = as.Date(case_when(
+           !is.na(verification_date) & between(ym(verification_date), ym("2008-01"), ym("2012-09")) ~ ym(verification_date),
+           TRUE ~ NA_Date_
+         )),
+         completion_date = as.Date(ym(completion_date)))
+
+twelve_years <- twelve_dates %>%
+  mutate(primary_completion_date_imputed = coalesce(
+    primary_completion_date, verification_date, completion_date
+  )) %>% 
+  mutate(primary_completion_date_imputed = year(primary_completion_date_imputed)) %>%
+  group_by(primary_completion_date_imputed) %>% count(primary_completion_date_imputed, name = "count")
+
+five_dates <- five %>%
+  mutate(primary_completion_date = as.Date(ym(primary_completion_date)),
+         verification_date = as.Date(case_when(
+           !is.na(verification_date) & between(ym(verification_date), ym("2008-01"), ym("2012-09")) ~ ym(verification_date),
+           TRUE ~ NA_Date_
+         )),
+         completion_date = as.Date(ym(completion_date)))
+
+five_years <- five_dates %>%
+  mutate(primary_completion_date_imputed = coalesce(
+    primary_completion_date, verification_date, completion_date
+  )) %>% 
+  mutate(primary_completion_date_imputed = year(primary_completion_date_imputed)) %>%
+  group_by(primary_completion_date_imputed) %>% count(primary_completion_date_imputed, name = "count")
+
+years <- dates %>%
+  mutate(primary_completion_date_imputed = coalesce(
+    primary_completion_date, verification_date, completion_date
+  )) %>% 
+  mutate(primary_completion_date_imputed = year(primary_completion_date_imputed)) %>%
+  group_by(primary_completion_date_imputed) %>% count(primary_completion_date_imputed, name = "count")
+
+totals <- sum(years$count)
+twelve_totals <- sum(twelve_years$count)
+five_totals <- sum(five_years$count)
+years <- years %>%
+  mutate(years_percentage = round(count / totals * 100, digits=2))
+twelve_years <- twelve_years %>%
+  mutate(years_percentage = round(count/ twelve_totals * 100, digits =2))
+five_years <- five_years %>%
+  mutate(years_percentage = round(count/ five_totals * 100, digits = 2))
+
+years_joined <- years %>% 
+  left_join(twelve_years, by = "primary_completion_date_imputed", suffix = c("_all", "_one_year")) %>%
+  left_join(five_years, by = "primary_completion_date_imputed") %>%
+  select(!contains("count")) %>%
+  rename(All = "years_percentage_all", "One year" = "years_percentage_one_year", "Five years" = "years_percentage")
+
+years_joined %>%
+  knitr::kable(
+    format = "markdown",
+    align = "l",
+    booktabs = TRUE,
+    longtable = TRUE,
+    linesep = "",
+  )  %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header"),
+      stripe_color = "gray!15"
+    )
+```
