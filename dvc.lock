@@ -73,7 +73,7 @@ stages:
       size: 1831128430
     - path: stages/01_download_cthist_json.sh
       hash: md5
-      md5: 9f5652fe6d6aba5235a48d0453dcc52a
+      md5: 99f8c65538e53bb6c590abf21f823fb5
       size: 824
     - path: stages/fetch-cthist-json.pl
       hash: md5
@@ -82,6 +82,7 @@ stages:
     outs:
     - path: download/ctgov/historical
       hash: md5
+<<<<<<< HEAD
       md5: 9c8ee6341ae827ba661a6d0c40553798.dir
       size: 1922339323
       nfiles: 152604
@@ -162,3 +163,8 @@ stages:
       hash: md5
       md5: 40c229f5201eb47841bd6184b6b36f93
       size: 10772
+=======
+      md5: c920d855e9b65a50f913295329fc9cbb.dir
+      size: 9443877912
+      nfiles: 492953
+>>>>>>> 10d8581 (Update dvc.lock)
