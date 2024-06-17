@@ -39,7 +39,11 @@ output_plot_caption <- sprintf("Prepared on %s %s:%s",
 plot_survfit_with_title <- function(fit, title) {
   plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
     ggtitle(str_wrap(title, 72)) +
-    labs(caption = output_plot_caption)
+    labs(caption = output_plot_caption) +
+    theme(
+          legend.text         = element_text(size = rel(1.0),
+                                             margin = margin(r = 20, unit = "pt"))
+    )
 }
 
 dir_create('figtab/anderson2015')
