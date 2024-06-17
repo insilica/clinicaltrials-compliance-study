@@ -105,9 +105,10 @@ create_survfit_models <- function(data) {
 # Function to plot Kaplan-Meier curves
 plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
   fit |>
-    ggsurvfit() +
+    ggsurvfit(type = 'risk') +
     add_risktable(times = breaks.risktable.less_than,
                   risktable_stats = c("n.risk")) +
-    scale_ggsurvfit(x_scales = list(breaks = breaks.fig)) +
+    scale_ggsurvfit(x_scales = list(breaks = breaks.fig),
+                    y_scales = list(limits = c(0, 1))) +
     xlab("Months after primary completion date")
 }
