@@ -2,7 +2,8 @@ if (!require("pacman")) install.packages("pacman")
 library(pacman)
 pacman::p_load(
   fs,
-  parsedate
+  parsedate,
+  purrr
 )
 
 source('analysis/lib-anderson2015.R')
@@ -42,23 +43,25 @@ plot_survfit_with_title <- function(fit, title) {
 }
 
 dir_create('figtab/anderson2015')
+ggsave.partial <- partial(ggsave, ... = ,
+                          dpi = 300, width = 10 )
 
 # Fig 2
 show(fig.surv.funding <- plot_survfit_with_title(fits$fit.funding,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Funding"))
-ggsave('figtab/anderson2015/fig_2.survfit.funding.png', width = 10, dpi = 300)
+ggsave.partial('figtab/anderson2015/fig_2.survfit.funding.png')
 
 # Fig S1
 show(fig.surv.phase <- plot_survfit_with_title(fits$fit.phase,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Phase"))
-ggsave('figtab/anderson2015/fig_s1.survfit.phase.png', width = 10, dpi = 300)
+ggsave.partial('figtab/anderson2015/fig_s1.survfit.phase.png')
 
 # Fig S2
 show(fig.surv.interventions <- plot_survfit_with_title(fits$fit.interventions,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Intervention Type"))
-ggsave('figtab/anderson2015/fig_s2.survfit.interventions.png', width = 10, dpi = 300)
+ggsave.partial('figtab/anderson2015/fig_s2.survfit.interventions.png')
 
 # Fig S3
 show(fig.surv.status <- plot_survfit_with_title(fits$fit.status,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Terminated/Completed Status"))
-ggsave('figtab/anderson2015/fig_s2.survfit.status.png', width = 10, dpi = 300)
+ggsave.partial('figtab/anderson2015/fig_s2.survfit.status.png')
