@@ -68,4 +68,4 @@ ggsave.partial('figtab/anderson2015/fig_s2.survfit.interventions.png')
 # Fig S3
 show(fig.surv.status <- plot_survfit_with_title(fits$fit.status,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Terminated/Completed Status"))
-ggsave.partial('figtab/anderson2015/fig_s2.survfit.status.png')
+ggsave.partial('figtab/anderson2015/fig_s3.survfit.status.png')
