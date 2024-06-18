@@ -13,7 +13,10 @@ pacman::p_load(
   survminer,
   ggsurvfit,
   forcats,
-  stringr
+  stringr,
+  broom,
+  tidyr,
+  assertthat
 )
 
 # Functions to create date from year and month
@@ -34,13 +37,15 @@ create_date_month_int <- function(year, month) {
 
 # Function to preprocess data
 preprocess_data <- function(data, censor_date) {
-  data %>%
+  data <- data %>%
     rename(nct_id = NCT_ID) %>%
     mutate(
       # These are all factor variables.
       across(c(phase, overall_statusc, funding, primary_purpose, RESPONSIBLE_PARTY_TYPE), as.factor),
       # Interventions are stored as { "Yes",  "No" }
       across(c(behavioral, biological, device, dietsup, drug, genetic, procedure, radiation, otherint), \(x) x == 'Yes'),
+      # results12 is stored as { "Yes",  "No" }
+      across(c(results12), \(x) x == 'Yes'),
     ) %>%
     # Create the primary completion date based on the given priority
     mutate(primary_completion_date_imputed = coalesce(
@@ -85,7 +90,36 @@ preprocess_data <- function(data, censor_date) {
         interval(primary_completion_date_imputed, censor_date) / months(1),
         na.rm = TRUE
       )
+    ) %>%
+    # Define the variables for reporting by a particular time, either by
+    mutate(
+      # - 12 months or
+      results_reported_12mo =
+        ( interval(primary_completion_date_imputed, results_received_date) < months(12) + days(1) ) |>
+        replace_na(FALSE),
+      # - 5 years.
+      results_reported_5yr =
+        ( interval(primary_completion_date_imputed, results_received_date) < years(5) + days(1) ) |>
+        replace_na(FALSE),
+    ) %>%
+    # Phase short names
+    mutate(phase.short_names =
+           fct_recode(phase,
+                      `1-2` = "Phase 1/Phase 2",
+                      `2` = "Phase 2",
+
+                      `2-3` = "Phase 2/Phase 3",
+                      `3` = "Phase 3",
+                      `4` = "Phase 4",
+                      ) |>
+           # Turn NA values into "Not applicable" level
+           fct_na_value_to_level(level = "Not applicable")
     )
+
+    assert_that( data |> subset( results12 != results_reported_12mo ) |> nrow() == 0,
+                msg = 'Original results12 should match computed results_reported_12mo' )
+
+    return(data)
 }
 
 # Function to fit the Kaplan-Meier models
@@ -111,4 +145,34 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
     scale_ggsurvfit(x_scales = list(breaks = breaks.fig),
                     y_scales = list(limits = c(0, 1))) +
     xlab("Months after primary completion date")
+}
+
+
+logistic_regression <- function(data) {
+  models <- list(
+       intervention_type = glm( results_reported_12mo ~
+                                 (intervention_type == 'Drug') +
+                                 (intervention_type == 'Device') +
+                                 (intervention_type == 'Biological') +
+                                 (intervention_type == 'Other'),
+                                data = data |> mutate(
+                                                      intervention_type =
+                                                        intervention_type #|>
+                                                        #factor(levels = c("Drug", "Device", "Biological", "Other"))
+                                ),
+                               family = binomial ),
+       phase = glm( results_reported_12mo ~ phase.short_names,
+                                data = data, family = binomial ),
+       funding = glm( results_reported_12mo ~ funding,
+                                data = data, family = binomial ),
+       status = glm( results_reported_12mo ~ overall_statusc,
+                                data = data, family = binomial )
+  )
+  #model <- glm(event ~ intervention_type + phase.norm + funding + overall_statusc, data = data, family = binomial)
+  lapply(models, \(x) tidy(x, exponentiate = TRUE, conf.int = TRUE) )
+}
+
+cox_regression <- function(data) {
+  model <- coxph(Surv(time_months, event) ~ intervention_type + phase.norm + funding + overall_statusc, data = data)
+  tidy(model, exponentiate = TRUE, conf.int = TRUE)
 }
