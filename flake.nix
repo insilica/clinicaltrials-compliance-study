@@ -19,6 +19,8 @@
           failures      = final.callPackage ./maint/nixpkg/perl/failures.nix {};
           ObjectUtil    = final.callPackage ./maint/nixpkg/perl/object-util.nix {};
           MooXTraits    = final.callPackage ./maint/nixpkg/perl/moox-traits.nix {};
+
+          TemplateToolkitSimple    = final.callPackage ./maint/nixpkg/perl/template-toolkit-simple.nix {};
         };
       };
     } //
@@ -46,6 +48,7 @@
                     EnvDot
                     failures
                     ObjectUtil
+                    TemplateToolkitSimple
                 ];
               parallelWithPerlEnv = pkgs.stdenv.mkDerivation {
                 name = "parallel-with-perl-env";
