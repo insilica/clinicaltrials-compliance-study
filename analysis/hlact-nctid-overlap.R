@@ -32,12 +32,16 @@ calculated_values <- dbGetQuery(aact_db, "SELECT * FROM ctgov.calculated_values"
 # contains some other data on trials' geographic locations
 facilities <- dbGetQuery(aact_db, "SELECT * FROM ctgov.facilities")
 
+studies <- dbGetQuery(aact_db, "SELECT * FROM ctgov.studies")
+
 ## new run of JSON data from ctgov
 fresh_df <- arrow::read_parquet("brick/analysis-20130927/ctgov_fresh.parquet")
 
 ## Data from paper results
 paper_df <- arrow::read_parquet("brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet")
 
+# number of trials that have only foreign trial locations but have US oversight in the Anderson data
+foreign_w_oversight <- paper_df |> filter(us_coderc == 'Foreign only', oversight == 'United States: Food and Drug Administration')
 
 # initial diff of all JSONs and Anderson data
 diff0 <- length(setdiff(paper_df$NCT_ID, fresh_df$nct_id))
@@ -102,6 +106,16 @@ num_rows_f7 <- nrow(f7) # 40279 -- 32345
 # join with calculated values to bring in oversight criteria
 f8 <- dplyr::inner_join(calculated_values, f7, by = c("nct_id" = "nct_id"))
 
+## trying to refine oversight criteria by including
+## the country data exposed by this table
+join_facilities <- dplyr::inner_join(facilities, calculated_values, by = c("nct_id" = "nct_id"))
+
+## these two joins reflect the SQL written in "sql/create_cthist_hlact.sql"
+join_studies <- dplyr::inner_join(join_facilities, studies, by = c("nct_id" = "nct_id"))
+
+## drops the specificity down to 84%, probably not the right thing to examine
+# f8 <- group_by(join_studies, nct_id) |> inner_join(f7, by = c("nct_id" = "nct_id")) |> filter(!is.na(has_us_facility))
+
 ## find where facility is not false
 dplyr::count(f8, (has_us_facility == TRUE | is.na(has_us_facility)))
 
@@ -112,23 +126,28 @@ dplyr::count(f8, (is_us_export == TRUE | is.na(is_us_export)))
 dplyr::group_by(f8, has_us_facility, is_us_export) |> dplyr::count()
 
 diff8 <- length(setdiff(paper_df$NCT_ID, f8$nct_id)) # 59 -- 60
-
+diff8
 f9 <- f8 |> dplyr::filter((has_us_facility == TRUE | is.na(has_us_facility)))
+
+length(setdiff(f9$nct_id, foreign_w_oversight$NCT_ID))
+
+setdiff(foreign_w_oversight$NCT_ID, f9$nct_id)
 
 true_negatives<-intersect(f9$nct_id, paper_df$NCT_ID)
 false_positives<-setdiff(paper_df$NCT_ID, f9$nct_id)
 
-length(true_negatives) / (length(true_negatives) + length(false_positives))
+# sensitivity: 95.13%
+sensitivity <- length(true_negatives) / (length(true_negatives) + length(false_positives))
 
 diff9 <- setdiff(paper_df$NCT_ID, f9$nct_id)
 ln_diff9 <- length(diff9) # 648 -- 649
 
-## specificity 2 -- 9570
-reversed9 <- length(setdiff(f9$nct_id, paper_df$NCT_ID))
+length(intersect(diff9, foreign_w_oversight$NCT_ID))
 
-diff9
-# f8 |> dplyr::filter(nct_id %in% diff9) |> dplyr::select(has_us_facility)
-# f8 |> dplyr::count(has_us_facility)
+setdiff(foreign_w_oversight$NCT_ID, diff9)
+
+## specificity: 4421
+reversed9 <- length(setdiff(f9$nct_id, paper_df$NCT_ID))
 
 ## intersection for Upset diagram -- new data
 all_ids <- unique(c(paper_df$NCT_ID, f9$nct_id))
