@@ -7,7 +7,50 @@ COPY (
         *
     FROM
         (
-            WITH country AS (
+            WITH
+            study_changes AS (
+                SELECT
+                    CAST(json_extract(change, '$.date')    AS DATE   ) AS change_date,
+                    CAST(json_extract(change, '$.version') AS INTEGER) AS change_version,
+                    studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS change_nct_id,
+                    *
+                FROM (
+                    SELECT
+                            change::JSON      AS change,
+                            studyRecord::JSON AS studyRecord,
+                    FROM
+                        read_ndjson_auto(
+                            'download/ctgov/historical/NCT*/*.jsonl',
+                            maximum_sample_files = 32768,
+                            ignore_errors = true
+                        )
+                    WHERE
+                            studyRecord IS NOT NULL
+                        AND change      IS NOT NULL
+                )
+                WHERE
+                    change_date <= '2013-09-27'::DATE -- cut-off date
+            ),
+            latest_per_file AS (
+                SELECT
+                    change_nct_id,
+                    MAX(change_version) AS max_change_version
+                FROM study_changes
+                GROUP BY change_nct_id
+            ),
+            cutoff_study_records AS (
+                    SELECT
+                        sc.change_date    AS change_date,
+                        sc.change_version AS change_version,
+                        -- sc.studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS nct_id,
+                        sc.change      AS change,
+                        sc.studyRecord AS studyRecord
+                    FROM study_changes sc
+                    JOIN latest_per_file lpf
+                        ON  sc.change_nct_id  = lpf.change_nct_id
+                        AND sc.change_version = lpf.max_change_version
+            ),
+            country AS (
                 SELECT
                     list_distinct(
                         studyRecord ->> '$.study.protocolSection.contactsLocationsModule.locations[*].country'
@@ -65,16 +108,8 @@ COPY (
                     TRY_CAST(
                         studyRecord -> '$.study.protocolSection.statusModule.dispFirstSubmitQcDate' AS DATE
                     ) AS disp_qc_date,
-                FROM
-                    read_ndjson_auto (
-                        'download/ctgov/historical/NCT*/*.jsonl',
-                        maximum_sample_files = 32768,
-                        ignore_errors = true
-                    )
-                WHERE
-                    studyRecord IS NOT NULL
-                    AND change IS NOT NULL
-                    -- AND coalesce(disp_date, disp_submit_date, disp_qc_date) IS NOT NULL
+                    FROM
+                        cutoff_study_records
             )
             SELECT
                 CASE
