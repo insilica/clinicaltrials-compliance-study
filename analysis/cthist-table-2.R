@@ -8,6 +8,7 @@ library(gtsummary)
 library(arrow)
 library(dplyr)
 library(tidyverse)
+library(lubridate)
 
 hlacts <- arrow::read_parquet("brick/analysis-20130927/ctgov-studies-hlact.parquet")
 
