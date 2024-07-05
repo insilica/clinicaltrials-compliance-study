@@ -1,6 +1,8 @@
 INSTALL postgres;
 
-ATTACH 'postgresql://postgres:postgres@localhost:6432/aact_20240430' as pg (TYPE postgres);
+-- See `.env.template` for how to set up other connection parameters.
+-- Make sure to source `.env` prior to running this SQL.
+ATTACH 'dbname=aact_20240430' AS pg (TYPE postgres);
 
 COPY (
     SELECT
