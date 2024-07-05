@@ -34,7 +34,7 @@ trials_with_results <- hlacts |>
     ),
     missing = "no"
   ) |>
-  add_overall(statistic = list(results12 ~ "{n} / {N}")) |>
+  add_overall() |>
   modify_header(label = "**Variable**") |>
   add_stat_label() |>
   modify_table_body(~ .x |>
@@ -129,6 +129,35 @@ section_four_summary <- hlacts |>
   modify_table_body(~ .x |> filter(variable == "Trials without extension request by September 2013" | label != "false"))
 
 section_four_summary
+
+section_five_summary <- hlacts |>
+filter(!is.na(has_results), funding_source %in% c("INDUSTRY", "NIH", "OTHER")) |>
+mutate(cdisp_date = coalesce(
+      disp_date, disp_submit_date,
+      disp_qc_date
+    ),
+    extension = cdisp_date < ymd("2013-09-01"),
+    no_extension = cdisp_date >= ymd("2013-09-01"),
+    twelve_month = ymd(cdisp_date) <= ymd(primary_completion_date) + months(12)) |>
+  tbl_summary(
+    by = funding_source,
+    include = c("funding_source", "has_results", "extension", "no_extension", "twelve_month"),
+    missing = "no",
+    statistic = everything() ~ "{n} / {N}",
+    label = c(has_results ~ "Results reported or extension submitted by 12months after primary completion date",
+    extension ~ "Extension submitted", no_extension ~ "No extension submitted",
+    twelve_month ~ "Extension or results submitted within 12 months of primary completion date")
+  ) |> add_overall() |>
+  modify_table_body(~ .x |>
+    filter(variable == "Results reported or extension submitted by 12months after primary completion date" | label != "false" || label != "true")
+    |>
+    mutate(label = ifelse(label == "true", "Results reported or extension submitted by 12months after primary completion date", label)))
+
+section_five_summary
+
+count <- section_five_summary |> filter(extension, 
+ymd(cdisp_date) <= ymd(primary_completion_date) + months(12)) |>
+nrow()
 
 # view the tables
 trials_with_results
