@@ -52,12 +52,14 @@ COPY (
             ),
             country AS (
                 SELECT
+                    TRY_CAST(change ->> '$.version' AS INTEGER) AS version_number,
+                    TRY_CAST(change ->> '$.date'    AS DATE   ) AS version_date,
+
+                    studyRecord ->> '$.study.protocolSection.identificationModule.nctId' AS nct_id,
+
                     list_distinct(
                         studyRecord ->> '$.study.protocolSection.contactsLocationsModule.locations[*].country'
                     ) as location_country,
-                    TRY_CAST(change ->> '$.version' AS INTEGER) AS version_number,
-                    TRY_CAST(change ->> '$.date' AS DATE) AS version_date,
-                    studyRecord ->> '$.study.protocolSection.identificationModule.nctId' AS nct_id,
                     TRY_CAST(
                         studyRecord ->> '$.study.protocolSection.oversightModule.oversightHasDmc' AS BOOLEAN
                     ) AS has_dmc,
@@ -112,14 +114,14 @@ COPY (
                         cutoff_study_records
             )
             SELECT
+                *,
                 CASE
                     WHEN list_contains(location_country, 'United States')
                     OR list_contains(location_country, 'Puerto Rico')
                     OR list_contains(location_country, 'American Samoa') THEN true
                     WHEN location_country [1] IS NULL THEN NULL
                     ELSE false
-                END AS has_us_facility,
-                *
+                END AS has_us_facility
             FROM
                 country
         )
