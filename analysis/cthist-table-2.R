@@ -11,32 +11,6 @@ library(tidyverse)
 
 hlacts <- arrow::read_parquet("brick/analysis-20130927/ctgov-studies-hlact.parquet")
 
-
-# get counts by funding source
-total_counts <- hlacts |>
-  group_by(funding_source) |>
-  summarize(n = n()) |>
-  arrange(desc(n)) |>
-  filter(funding_source %in% c("INDUSTRY", "NIH", "OTHER"))
-
-other_count <<- slice(total_counts, 1)
-industry_count <<- slice(total_counts, 2)
-nih_count <<- slice(total_counts, 3)
-
-count_totals <- function(data, ...) {
-  other_ratio <- other_count$n / nrow(data) * 100
-  industry_ratio <- industry_count$n / nrow(data) * 100
-  nih_ratio <- nih_count$n / nrow(data) * 100
-  tibble(
-    other_count = other_count$n,
-    other_ratio,
-    industry_count = industry_count$n,
-    industry_ratio,
-    nih_count = nih_count$n,
-    nih_ratio
-  )
-}
-
 trials_with_results <- hlacts |>
   filter(!is.na(has_results)) |>
   dplyr::mutate(results12 = ymd(results_rec_date) <=
@@ -61,7 +35,12 @@ trials_with_results <- hlacts |>
     missing = "no"
   ) |>
   add_overall(statistic = list(results12 ~ "{n} / {N}")) |>
-  modify_header(label = "**Variable**")
+  modify_header(label = "**Variable**") |>
+  add_stat_label() |>
+  modify_table_body(~ .x |>
+    filter(variable == "Results reported by September 2013" | label != "false")
+    |>
+    mutate(label = ifelse(label == "true", "Results reported by September 2013", label)))
 
 
 trials_w_extension <- hlacts |>
@@ -74,8 +53,7 @@ trials_w_extension <- hlacts |>
   mutate(results_reported = results_date < "2013-09-01") |>
   tbl_summary(
     by = funding_source, include = c(
-      "funding_source", "has_results",
-      "cdisp_date", "months_to_report_results", "results_reported"
+      "funding_source", "has_results", "months_to_report_results", "results_reported"
     ), missing = "no",
     label = list(
       has_results ~ "Trials with extension request by September 2013",
@@ -84,7 +62,9 @@ trials_w_extension <- hlacts |>
     )
   ) |>
   add_overall() |>
-  modify_header(label = "**Variable**")
+  modify_header(label = "**Variable**") |>
+  add_stat_label() |>
+  modify_table_body(~ .x |> filter(variable == "Trials with extension request by September 2013" | label != "false"))
 
 # this is the segment of Table 2 for
 # all trials that did not submit an extension request
@@ -103,7 +83,7 @@ trials_no_extension <- hlacts |>
   tbl_summary(
     by = funding_source, include = c(
       "funding_source", "has_results",
-      "cdisp_date", "months_to_report_results", "results_reported"
+      "months_to_report_results", "results_reported"
     ), missing = "no",
     label = list(
       has_results ~ "Trials without extension request by September 2013",
@@ -112,8 +92,43 @@ trials_no_extension <- hlacts |>
     )
   ) |>
   add_overall() |>
-  modify_header(label = "**Variable**")
+  modify_header(label = "**Variable**") |>
+  add_stat_label() |>
+  modify_table_body(~ .x |> filter(variable == "Trials without extension request by September 2013" | label != "false"))
 
+
+section_four_summary <- hlacts |>
+  filter(!is.na(has_results), ) |>
+  mutate(
+    cdisp_date = coalesce(
+      disp_date, disp_submit_date,
+      disp_qc_date
+    ),
+    extension = cdisp_date < ymd("2013-09-01"),
+    no_extension = cdisp_date >= ymd("2013-09-01")
+  ) |>
+  filter(funding_source %in% c("INDUSTRY", "NIH", "OTHER")) |>
+  tbl_summary(
+    by = funding_source, include = c(
+      "funding_source", "has_results",
+      "extension", "no_extension"
+    ), missing = "no",
+    statistic = list(
+      extension ~ "{n}",
+      no_extension ~ "{n}"
+    ),
+    label = list(
+      has_results ~ "Results reported or certification or extension request submitted by September 2013",
+      extension ~ "No results but extension submitted",
+    no_extension ~ "No results and no extension submitted"
+    )
+  ) |>
+  add_overall() |>
+  modify_header(label = "**Variable**") |>
+  add_stat_label() |>
+  modify_table_body(~ .x |> filter(variable == "Trials without extension request by September 2013" | label != "false"))
+
+section_four_summary
 
 # view the tables
 trials_with_results
@@ -121,27 +136,11 @@ trials_w_extension
 trials_no_extension
 
 # table stacked
-tbl_stack(list(trials_with_results, trials_w_extension, trials_no_extension))
+stacked <- tbl_stack(list(trials_with_results, trials_w_extension, 
+trials_no_extension, section_four_summary))
 
-hlacts |>
-  filter(!is.na(has_results), funding_source %in% c("NIH", "INDUSTRY", "OTHER"), disp_date < "2013-09-01") |>
-  mutate(disp_date = n()) |>
-  tbl_strata(
-    strata = funding_source, .combine_with = "tbl_merge",
-    .tbl_fun = \(t) tbl_summary(t,
-      by = has_results, include = c("disp_date", "has_results"), missing = "no",
-      label = list(
-        disp_date ~ "Trials with extension request submitted by September 2013",
-        has_results ~ "Results reported by September 2013"
-      ),
-      statistic = list(disp_date ~ "{n}")
-    ) |> add_overall()
-  )
+stacked
 
-
-hlacts |>
-  filter(!is.na(has_results)) |>
-  dplyr::mutate(results12 = ymd(results_rec_date) <=
-    ymd(primary_completion_date) + months(12)) |>
-  filter(results12) |>
-  nrow()
+stacked |>
+  as_gt() |>
+  gt::gtsave("analysis/table-2.html")
