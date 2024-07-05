@@ -116,9 +116,11 @@ COPY (
             SELECT
                 *,
                 CASE
-                    WHEN list_contains(location_country, 'United States')
-                    OR list_contains(location_country, 'Puerto Rico')
-                    OR list_contains(location_country, 'American Samoa') THEN true
+                    WHEN list_has_any(location_country, [
+                        'United States',
+                        'Puerto Rico',
+                        'American Samoa',
+                    ]) THEN true
                     WHEN location_country [1] IS NULL THEN NULL
                     ELSE false
                 END AS has_us_facility
