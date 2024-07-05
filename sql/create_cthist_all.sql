@@ -50,7 +50,7 @@ COPY (
                         ON  sc.change_nct_id  = lpf.change_nct_id
                         AND sc.change_version = lpf.max_change_version
             ),
-            country AS (
+            _extract AS (
                 SELECT
                     TRY_CAST(change ->> '$.version' AS INTEGER) AS version_number,
                     TRY_CAST(change ->> '$.date'    AS DATE   ) AS version_date,
@@ -59,7 +59,7 @@ COPY (
 
                     list_distinct(
                         studyRecord ->> '$.study.protocolSection.contactsLocationsModule.locations[*].country'
-                    ) as location_country,
+                    ) AS location_country,
                     TRY_CAST(
                         studyRecord ->> '$.study.protocolSection.oversightModule.oversightHasDmc' AS BOOLEAN
                     ) AS has_dmc,
@@ -127,6 +127,6 @@ COPY (
                     (acc, val) -> concat(acc, '; ', val)
                 ) AS phase,
             FROM
-                country
+                _extract
         )
 ) TO 'brick/analysis-20130927/ctgov-studies-all.parquet' (FORMAT PARQUET)
