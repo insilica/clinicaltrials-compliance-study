@@ -79,12 +79,9 @@ COPY (
                         studyRecord ->> '$.study.protocolSection.oversightModule.isUsExport' AS BOOLEAN
                     ) AS is_us_export,
                     studyRecord ->> '$.study.protocolSection.statusModule.overallStatus' AS overall_status,
-                    list_reduce(
-                        (
-                            studyRecord -> '$.study.protocolSection.designModule.phases'
-                        ) :: VARCHAR [],
-                        (acc, val) -> concat(acc, '; ', val)
-                    ) AS phase,
+                    TRY_CAST(
+                        studyRecord -> '$.study.protocolSection.designModule.phases' AS VARCHAR[]
+                    ) AS phases,
                     studyRecord ->> '$.study.protocolSection.statusModule.primaryCompletionDateStruct.date' AS primary_completion_date,
                     -- TODO Partial date type
                     studyRecord ->> '$.study.protocolSection.statusModule.completionDateStruct.date' AS completion_date,
@@ -124,7 +121,11 @@ COPY (
                         'Puerto Rico',
                         'American Samoa',
                     ]
-                ) AS has_us_facility
+                ) AS has_us_facility,
+                list_reduce(
+                    phases,
+                    (acc, val) -> concat(acc, '; ', val)
+                ) AS phase,
             FROM
                 country
         )
