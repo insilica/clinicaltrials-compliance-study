@@ -115,15 +115,16 @@ COPY (
             )
             SELECT
                 *,
-                CASE
-                    WHEN list_has_any(location_country, [
+                -- Assume that the list `location_country` does not contain
+                -- `NULL` elements (but can still be `NULL` or `[]` itself).
+                list_has_any(
+                    NULLIF(location_country, []),
+                    [
                         'United States',
                         'Puerto Rico',
                         'American Samoa',
-                    ]) THEN true
-                    WHEN location_country [1] IS NULL THEN NULL
-                    ELSE false
-                END AS has_us_facility
+                    ]
+                ) AS has_us_facility
             FROM
                 country
         )
