@@ -27,25 +27,25 @@ COPY (
                             OR completion_date IS NULL
                         )
                     )
-                        AND study_type = 'INTERVENTIONAL'
-                        AND phase NOT IN ('EARLY_PHASE1', 'PHASE1')
-                        AND overall_status IN ('TERMINATED', 'COMPLETED')
+                    AND study_type = 'INTERVENTIONAL'
+                    AND phase NOT IN ('EARLY_PHASE1', 'PHASE1')
+                    AND overall_status IN ('TERMINATED', 'COMPLETED')
+                    AND (
+                        strptime(primary_completion_date, '%Y-%m') :: DATE <= '2012-09-01'
+                        OR primary_completion_date IS NULL
                         AND (
-                            strptime(primary_completion_date, '%Y-%m') :: DATE <= '2012-09-01'
-                            OR primary_completion_date IS NULL
-                            AND (
-                                strptime(completion_date, '%Y-%m') :: DATE < '2012-09-01'
-                                OR completion_date IS NULL
-                            )
+                            strptime(completion_date, '%Y-%m') :: DATE < '2012-09-01'
+                            OR completion_date IS NULL
                         )
-                        AND (
-                            primary_completion_date IS NOT NULL
-                            OR completion_date IS NOT NULL
-                            OR (
-                                strptime(verification_date, '%Y-%m') :: DATE >= '2008-01-01'
-                                AND strptime(verification_date, '%Y-%m') :: DATE < '2012-09-01'
-                            )
+                    )
+                    AND (
+                        primary_completion_date IS NOT NULL
+                        OR completion_date IS NOT NULL
+                        OR (
+                            strptime(verification_date, '%Y-%m') :: DATE >= '2008-01-01'
+                            AND strptime(verification_date, '%Y-%m') :: DATE < '2012-09-01'
                         )
+                    )
             ),
             aact AS (
                 SELECT
