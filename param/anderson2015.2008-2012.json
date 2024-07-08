@@ -1,0 +1,11 @@
+{
+   "date" : {
+      "cutoff" : "2013-09-27",
+      "start"  : "2008-01-01",
+      "stop"   : "2012-09-01"
+   },
+   "output" : {
+      "all"            : "brick/analysis-20130927/ctgov-studies-all.parquet",
+      "hlact-filtered" : "brick/analysis-20130927/ctgov-studies-hlact.parquet"
+   }
+}
