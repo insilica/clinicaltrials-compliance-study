@@ -1,3 +1,20 @@
+-- syntax: DuckDB SQL (+ templating)
+--
+-- NAME
+--
+--   create_cthist_all.sql - Create records before a cut-off date
+--
+-- DESCRIPTION
+--
+--   Processes the versioned historical ClinicalTrials.gov study record JSONL
+--   data files before a given cut-off date (to represent the date that a given
+--   dataset was downloaded).
+--
+--   Extracts a subset of the study record data needed for further processing
+--   as a Parquet file.
+--
+-- [% TAGS \[\% \%\] --%% %]
+--%% ## See § Templating… in `sql/README.md`.
 INSTALL json;
 
 LOAD json;
@@ -29,7 +46,9 @@ COPY (
                         AND change      IS NOT NULL
                 )
                 WHERE
+--%%                FILTER replace('2013-09-27', date.cutoff)
                     change_date <= '2013-09-27'::DATE -- cut-off date
+--%%                END
             ),
             latest_per_file AS (
                 SELECT
@@ -129,4 +148,6 @@ COPY (
             FROM
                 _extract
         )
+--%% FILTER replace("brick/[^']+?\.parquet", output.all)
 ) TO 'brick/analysis-20130927/ctgov-studies-all.parquet' (FORMAT PARQUET)
+--%% END
