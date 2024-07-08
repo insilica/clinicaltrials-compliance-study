@@ -13,4 +13,7 @@ perlPackages.buildPerlPackage {
     description = "A Simple Interface to Template Toolkit";
     license = with lib.licenses; [ artistic1 gpl1Plus ];
   };
+  prePatch = ''
+    sed -i '1s|#!/usr/bin/env perl|#!perl|' bin/tt-render
+  '';
 }
