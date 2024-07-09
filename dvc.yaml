@@ -53,6 +53,7 @@ stages:
         - script/tt-render-by-param ${key} sql/create_cthist_all.sql | duckdb
       deps:
         - sql/create_cthist_all.sql
+        - download/ctgov/historical
       outs:
         - ${item.output.all}
   build-ctgov-studies-hlact-filtered:
