@@ -25,8 +25,8 @@ To render, use a command such as:
 
 ```shell
 
-env SQL="sql/create_cthist_hlact.sql" DATA="param/stanford.2019-2023.json" \
-  sh -c 'tt-render --data=$DATA $SQL'
+env SQL="sql/create_cthist_hlact.sql" KEY="stanford_2019-2023" \
+  sh -c 'script/tt-render-by-param $KEY $SQL'
 
 ```
 and to debug, use
@@ -34,8 +34,8 @@ and to debug, use
 ```shell
 
 # DEBUG
-env SQL="sql/create_cthist_hlact.sql" DATA="param/stanford.2019-2023.json" \
-  bash -c 'diff -u2 $SQL <( tt-render --data=$DATA $SQL )'
+env SQL="sql/create_cthist_hlact.sql" KEY="stanford_2019-2023" \
+  bash -c 'diff -u2 $SQL <( script/tt-render-by-param $KEY $SQL )'
   # | diff-highlight | colordiff
 
 ```
