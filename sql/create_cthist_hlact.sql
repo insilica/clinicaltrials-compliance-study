@@ -25,6 +25,11 @@ INSTALL postgres;
 ATTACH 'dbname=aact_20240430' AS pg (TYPE postgres);
 --%%  END
 
+
+CREATE MACRO try_parse_date(date_str) AS (
+    try_strptime(date_str, [ '%Y-%m-%d', '%Y-%m' ]) :: DATE
+);
+
 COPY (
     SELECT
         *
@@ -45,10 +50,10 @@ COPY (
 --%%                FILTER replace("2012-09-01", date.stop )
                     overall_status != 'WITHDRAWN'
                     AND (
-                        strptime(primary_completion_date, '%Y-%m') :: DATE >= '2008-01-01'
+                        try_parse_date(primary_completion_date) :: DATE >= '2008-01-01'
                         OR primary_completion_date IS NULL
                         AND (
-                            strptime(completion_date, '%Y-%m') :: DATE >= '2008-01-01'
+                            try_parse_date(completion_date) :: DATE >= '2008-01-01'
                             OR completion_date IS NULL
                         )
                     )
@@ -56,10 +61,10 @@ COPY (
                     AND phase NOT IN ('EARLY_PHASE1', 'PHASE1')
                     AND overall_status IN ('TERMINATED', 'COMPLETED')
                     AND (
-                        strptime(primary_completion_date, '%Y-%m') :: DATE <= '2012-09-01'
+                        try_parse_date(primary_completion_date) :: DATE <= '2012-09-01'
                         OR primary_completion_date IS NULL
                         AND (
-                            strptime(completion_date, '%Y-%m') :: DATE < '2012-09-01'
+                            try_parse_date(completion_date) :: DATE < '2012-09-01'
                             OR completion_date IS NULL
                         )
                     )
@@ -67,8 +72,8 @@ COPY (
                         primary_completion_date IS NOT NULL
                         OR completion_date IS NOT NULL
                         OR (
-                            strptime(verification_date, '%Y-%m') :: DATE >= '2008-01-01'
-                            AND strptime(verification_date, '%Y-%m') :: DATE < '2012-09-01'
+                            try_parse_date(verification_date) :: DATE >= '2008-01-01'
+                            AND try_parse_date(verification_date) :: DATE < '2012-09-01'
                         )
                     )
 --%%                END
