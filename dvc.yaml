@@ -27,13 +27,13 @@ stages:
       - download/anderson2015
     outs:
       - brick/anderson2015
-  download-ctgov-data:
-    outs:
-      - brick/ctgov/historical
-    deps:
-      - stages/01_download_cts.R
-      - download/aact/db-dump/20240430_clinical_trials.zip
-    cmd: make docker-compose-up; Rscript stages/01_download_cts.R
+  #download-ctgov-data:
+  #  outs:
+  #    - brick/ctgov/historical
+  #  deps:
+  #    - stages/01_download_cts.R
+  #    - download/aact/db-dump/20240430_clinical_trials.zip
+  #  cmd: make docker-compose-up; Rscript stages/01_download_cts.R
   download-cthist-json:
     cmd: stages/01_download_cthist_json.sh
     deps:
