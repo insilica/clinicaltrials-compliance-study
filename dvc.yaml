@@ -1,3 +1,5 @@
+params:
+  - 'params.yaml'
 stages:
   download-20170105:
     cmd: stages/01_download_db_20170105.sh
@@ -43,3 +45,26 @@ stages:
       - download/ctgov/historical:
           # Allow the stage to avoid downloading unchanged files
           persist: true
+  build-ctgov-studies-all:
+    foreach: ${param}
+    do:
+      cmd:
+        - mkdir -p $(dirname ${item.output.all})
+        - script/tt-render-by-param ${key} sql/create_cthist_all.sql | duckdb
+      deps:
+        - sql/create_cthist_all.sql
+      outs:
+        - ${item.output.all}
+  build-ctgov-studies-hlact-filtered:
+    foreach: ${param}
+    do:
+      cmd:
+        - make docker-compose-up
+        - mkdir -p $(dirname ${item.output.hlact-filtered})
+        - . .env; script/tt-render-by-param ${key} sql/create_cthist_hlact.sql | duckdb
+      deps:
+        - sql/create_cthist_hlact.sql
+        - ${item.output.all}
+        - download/aact/db-dump/20240430_clinical_trials.zip
+      outs:
+        - ${item.output.hlact-filtered}

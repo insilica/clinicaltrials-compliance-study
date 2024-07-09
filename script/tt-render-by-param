@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [ "$#" -ne 2 ]; then
+	echo "Usage: $0 parameter_key template_file" >&2
+	exit 1
+fi
+
+export BIN_NAME="$0"
+export PARAM_KEY="$1"
+export TEMPLATE_FILE="$2"
+
+export PARAMS_FILE="params.yaml"
+
+export MYTEMPDIR=$(mktemp -d)
+export MYTEMPDATA="$MYTEMPDIR/data.yaml"
+
+cleanup() {
+	rm "$MYTEMPDATA"
+	rmdir "$MYTEMPDIR"
+}
+
+trap cleanup EXIT
+
+cpanel_json_xs -f yaml-xs -t yaml-xs \
+	-e '
+		my @params = keys %{ $_->{param} };
+		$_ = $_->{param}{$ENV{PARAM_KEY}}
+			or die <<~EOF
+			$ENV{BIN_NAME}: Missing parameter key $ENV{PARAM_KEY} in $ENV{PARAMS_FILE}
+
+			Existing parameter keys are: @params
+			EOF
+	' \
+	< $PARAMS_FILE > $MYTEMPDATA
+
+tt-render --data=$MYTEMPDATA $TEMPLATE_FILE
+
+# vim:ft=bash
