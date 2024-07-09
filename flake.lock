@@ -34,11 +34,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1703714825,
-        "narHash": "sha256-SyPwt3vSGqCEPHQshNYMnwf/CxXWDFyo1c6UD3G4KIs=",
+        "lastModified": 1720492571,
+        "narHash": "sha256-dRjYE+P42JtD/vFP+K/s4Cgb+uMsoRunmu1p4QhNM3g=",
         "owner": "biobricks-ai",
         "repo": "dev-shell",
-        "rev": "33659c58a17b3650c0c23b882fffe54d4c5f19c2",
+        "rev": "510e315ac0ff2a141a6956bf1395b284ce35aebc",
         "type": "github"
       },
       "original": {
