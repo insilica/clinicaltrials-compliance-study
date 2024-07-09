@@ -67,8 +67,17 @@
               ++ oldAttrs.buildInputs
               ++ [ (pkgs.python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
               ++ (with pkgs.rPackages; [
-                            arrow cthist DBI RPostgres dotenv dplyr readr vroom
-                            ggplot2 ComplexUpset
+                            arrow
+                            ComplexUpset cthist
+                            DBI dotenv dplyr
+                            forcats fs
+                            ggplot2 ggsurvfit gtsummary
+                            lubridate
+                            pacman parsedate
+                            readr RPostgres
+                            stringr survival survminer
+                            tidyverse
+                            vroom
                     ]);
             env = oldAttrs.env // {
               LC_ALL = "C";
