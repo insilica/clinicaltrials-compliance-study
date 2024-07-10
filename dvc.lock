@@ -85,3 +85,90 @@ stages:
       md5: c920d855e9b65a50f913295329fc9cbb.dir
       size: 9443877912
       nfiles: 492953
+  build-ctgov-studies-all@anderson2015_2008-2012:
+    cmd:
+    - mkdir -p $(dirname brick/analysis-20130927/ctgov-studies-all.parquet)
+    - script/tt-render-by-param anderson2015_2008-2012 sql/create_cthist_all.sql |
+      duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: c920d855e9b65a50f913295329fc9cbb.dir
+      size: 9443877912
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 200b9bee2aebe6837c4b71a55aab9e45
+      size: 7392
+    outs:
+    - path: brick/analysis-20130927/ctgov-studies-all.parquet
+      hash: md5
+      md5: 82b534f103d26a2786e6fa237f47310e
+      size: 5037858
+  build-ctgov-studies-all@stanford_2019-2023:
+    cmd:
+    - mkdir -p $(dirname brick/analysis-20240430/ctgov-studies-all.parquet)
+    - script/tt-render-by-param stanford_2019-2023 sql/create_cthist_all.sql | duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: c920d855e9b65a50f913295329fc9cbb.dir
+      size: 9443877912
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 200b9bee2aebe6837c4b71a55aab9e45
+      size: 7392
+    outs:
+    - path: brick/analysis-20240430/ctgov-studies-all.parquet
+      hash: md5
+      md5: 799bd0b4a1b002b0ac5dcfdabc98e2f1
+      size: 18085868
+  build-ctgov-studies-hlact-filtered@anderson2015_2008-2012:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/analysis-20130927/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param anderson2015_2008-2012 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/analysis-20130927/ctgov-studies-all.parquet
+      hash: md5
+      md5: 82b534f103d26a2786e6fa237f47310e
+      size: 5037858
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/analysis-20130927/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: b53d67bb50249f6a52ad8fcfdb563913
+      size: 861025
+  build-ctgov-studies-hlact-filtered@stanford_2019-2023:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/analysis-20240430/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param stanford_2019-2023 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/analysis-20240430/ctgov-studies-all.parquet
+      hash: md5
+      md5: 799bd0b4a1b002b0ac5dcfdabc98e2f1
+      size: 18085868
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/analysis-20240430/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: 7ae8709bfcdf9612ab1099be6ff18e11
+      size: 1411802

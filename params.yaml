@@ -1,0 +1,17 @@
+param:
+  anderson2015_2008-2012:
+    date:
+      cutoff: '2013-09-27'
+      start:  '2008-01-01'
+      stop:   '2012-09-01'
+    output:
+      all:            brick/analysis-20130927/ctgov-studies-all.parquet
+      hlact-filtered: brick/analysis-20130927/ctgov-studies-hlact.parquet
+  stanford_2019-2023:
+    date:
+      cutoff: '2024-04-30'
+      start:  '2019-01-01'
+      stop:   '2023-04-01'
+    output:
+      all:            brick/analysis-20240430/ctgov-studies-all.parquet
+      hlact-filtered: brick/analysis-20240430/ctgov-studies-hlact.parquet

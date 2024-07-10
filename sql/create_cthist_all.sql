@@ -1,3 +1,20 @@
+-- syntax: DuckDB SQL (+ templating)
+--
+-- NAME
+--
+--   create_cthist_all.sql - Create records before a cut-off date
+--
+-- DESCRIPTION
+--
+--   Processes the versioned historical ClinicalTrials.gov study record JSONL
+--   data files before a given cut-off date (to represent the date that a given
+--   dataset was downloaded).
+--
+--   Extracts a subset of the study record data needed for further processing
+--   as a Parquet file.
+--
+-- [% TAGS \[\% \%\] --%% %]
+--%% ## See § Templating… in `sql/README.md`.
 INSTALL json;
 
 LOAD json;
@@ -7,14 +24,61 @@ COPY (
         *
     FROM
         (
-            WITH country AS (
+            WITH
+            study_changes AS (
                 SELECT
+                    CAST(json_extract(change, '$.date')    AS DATE   ) AS change_date,
+                    CAST(json_extract(change, '$.version') AS INTEGER) AS change_version,
+                    studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS change_nct_id,
+                    *
+                FROM (
+                    SELECT
+                            change::JSON      AS change,
+                            studyRecord::JSON AS studyRecord,
+                    FROM
+                        read_ndjson_auto(
+                            'download/ctgov/historical/NCT*/*.jsonl',
+                            maximum_sample_files = 32768,
+                            ignore_errors = true
+                        )
+                    WHERE
+                            studyRecord IS NOT NULL
+                        AND change      IS NOT NULL
+                )
+                WHERE
+--%%                FILTER replace('2013-09-27', date.cutoff)
+                    change_date <= '2013-09-27'::DATE -- cut-off date
+--%%                END
+            ),
+            latest_per_file AS (
+                SELECT
+                    change_nct_id,
+                    MAX(change_version) AS max_change_version
+                FROM study_changes
+                GROUP BY change_nct_id
+            ),
+            cutoff_study_records AS (
+                    SELECT
+                        sc.change_date    AS change_date,
+                        sc.change_version AS change_version,
+                        -- sc.studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS nct_id,
+                        sc.change      AS change,
+                        sc.studyRecord AS studyRecord
+                    FROM study_changes sc
+                    JOIN latest_per_file lpf
+                        ON  sc.change_nct_id  = lpf.change_nct_id
+                        AND sc.change_version = lpf.max_change_version
+            ),
+            _extract AS (
+                SELECT
+                    TRY_CAST(change ->> '$.version' AS INTEGER) AS version_number,
+                    TRY_CAST(change ->> '$.date'    AS DATE   ) AS version_date,
+
+                    studyRecord ->> '$.study.protocolSection.identificationModule.nctId' AS nct_id,
+
                     list_distinct(
                         studyRecord ->> '$.study.protocolSection.contactsLocationsModule.locations[*].country'
-                    ) as location_country,
-                    TRY_CAST(change ->> '$.version' AS INTEGER) AS version_number,
-                    TRY_CAST(change ->> '$.date' AS DATE) AS version_date,
-                    studyRecord ->> '$.study.protocolSection.identificationModule.nctId' AS nct_id,
+                    ) AS location_country,
                     TRY_CAST(
                         studyRecord ->> '$.study.protocolSection.oversightModule.oversightHasDmc' AS BOOLEAN
                     ) AS has_dmc,
@@ -34,12 +98,9 @@ COPY (
                         studyRecord ->> '$.study.protocolSection.oversightModule.isUsExport' AS BOOLEAN
                     ) AS is_us_export,
                     studyRecord ->> '$.study.protocolSection.statusModule.overallStatus' AS overall_status,
-                    list_reduce(
-                        (
-                            studyRecord -> '$.study.protocolSection.designModule.phases'
-                        ) :: VARCHAR [],
-                        (acc, val) -> concat(acc, '; ', val)
-                    ) AS phase,
+                    TRY_CAST(
+                        studyRecord -> '$.study.protocolSection.designModule.phases' AS VARCHAR[]
+                    ) AS phases,
                     studyRecord ->> '$.study.protocolSection.statusModule.primaryCompletionDateStruct.date' AS primary_completion_date,
                     -- TODO Partial date type
                     studyRecord ->> '$.study.protocolSection.statusModule.completionDateStruct.date' AS completion_date,
@@ -65,27 +126,28 @@ COPY (
                     TRY_CAST(
                         studyRecord -> '$.study.protocolSection.statusModule.dispFirstSubmitQcDate' AS DATE
                     ) AS disp_qc_date,
-                FROM
-                    read_ndjson_auto (
-                        'download/ctgov/historical/NCT*/*.jsonl',
-                        maximum_sample_files = 32768,
-                        ignore_errors = true
-                    )
-                WHERE
-                    studyRecord IS NOT NULL
-                    AND change IS NOT NULL
-                    -- AND coalesce(disp_date, disp_submit_date, disp_qc_date) IS NOT NULL
+                    FROM
+                        cutoff_study_records
             )
             SELECT
-                CASE
-                    WHEN list_contains(location_country, 'United States')
-                    OR list_contains(location_country, 'Puerto Rico')
-                    OR list_contains(location_country, 'American Samoa') THEN true
-                    WHEN location_country [1] IS NULL THEN NULL
-                    ELSE false
-                END AS has_us_facility,
-                *
+                *,
+                -- Assume that the list `location_country` does not contain
+                -- `NULL` elements (but can still be `NULL` or `[]` itself).
+                list_has_any(
+                    NULLIF(location_country, []),
+                    [
+                        'United States',
+                        'Puerto Rico',
+                        'American Samoa',
+                    ]
+                ) AS has_us_facility,
+                list_reduce(
+                    phases,
+                    (acc, val) -> concat(acc, '; ', val)
+                ) AS phase,
             FROM
-                country
+                _extract
         )
+--%% FILTER replace("brick/[^']+?\.parquet", output.all)
 ) TO 'brick/analysis-20130927/ctgov-studies-all.parquet' (FORMAT PARQUET)
+--%% END
