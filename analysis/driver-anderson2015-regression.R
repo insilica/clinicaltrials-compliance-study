@@ -16,4 +16,4 @@ hlact.studies <- preprocess_data(hlact.studies, censor_date)
 
 ### REGRESSION MODELS
 models.logistic <- logistic_regression(hlact.studies)
-print(models.logistic)
+models.logistic |> walk( \(x) print(x, n = 50 ) ); NA
