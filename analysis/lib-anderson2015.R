@@ -69,6 +69,10 @@ preprocess_data.anderson2015.dates <- function(data) {
     # Convert results_received_date to Date object
     mutate(results_received_date =
            create_date_month_int(resultsreceived_year, resultsreceived_month)
+    ) %>%
+    mutate(
+           start_date = create_date_month_name(start_year, start_month),
+           pc_year_imputed = year(primary_completion_date_imputed),
     )
   return(data)
 }
@@ -161,17 +165,6 @@ preprocess_data.anderson2015.regression <- function(data) {
                                         c("Treatment", "Prevention", "Diagnostic")))
     ) %>%
     mutate(
-      rr.intervention_type  = relevel(intervention_type,  ref = "Drug"      ),
-      rr.funding            = relevel(funding,            ref = "NIH"       ),
-      rr.phase              = relevel(rr.phase,           ref = "4"         ),
-      rr.primary_purpose    = relevel(rr.primary_purpose, ref = "Treatment" ),
-      rr.overall_statusc    = relevel(overall_statusc,    ref = "Completed" )
-    ) %>%
-    mutate(
-           start_date = create_date_month_name(start_year, start_month),
-           pc_year_imputed = year(primary_completion_date_imputed),
-    ) |>
-    mutate(
            # Impute NA with mean
            enrollment.pre = ifelse(is.na(ENROLLMENT), mean(ENROLLMENT, na.rm = TRUE), ENROLLMENT),
            # Replace 0 with a small positive value
@@ -206,6 +199,13 @@ preprocess_data.anderson2015.regression <- function(data) {
         NUMBER_OF_ARMS == 2 ~ "two",
         NUMBER_OF_ARMS >= 3 ~ "three or more"
       ) |> as.factor() |> relevel( ref = "one" )
+    ) %>%
+    mutate(
+      rr.intervention_type  = relevel(intervention_type,  ref = "Drug"      ),
+      rr.funding            = relevel(funding,            ref = "NIH"       ),
+      rr.phase              = relevel(rr.phase,           ref = "4"         ),
+      rr.primary_purpose    = relevel(rr.primary_purpose, ref = "Treatment" ),
+      rr.overall_statusc    = relevel(overall_statusc,    ref = "Completed" )
     )
 
   assert_that( data |> subset( results12 != rr.results_reported_12mo ) |> nrow() == 0,
