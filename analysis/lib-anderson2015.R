@@ -58,13 +58,8 @@ preprocess_data.anderson2015.type <- function(data) {
   return(data)
 }
 
-preprocess_data.anderson2015.pc_date_impute <- function(data) {
-}
-
-
-preprocess_data <- function(data, censor_date) {
+preprocess_data.anderson2015.dates <- function(data) {
   data <- data %>%
-    preprocess_data.anderson2015.type() %>%
     # Create the primary completion date based on the given priority
     mutate(primary_completion_date_imputed = coalesce(
       create_date_month_name(p_completion_year, p_completion_month),
@@ -74,7 +69,12 @@ preprocess_data <- function(data, censor_date) {
     # Convert results_received_date to Date object
     mutate(results_received_date =
            create_date_month_int(resultsreceived_year, resultsreceived_month)
-    ) %>%
+    )
+  return(data)
+}
+
+preprocess_data.anderson2015.norm <- function(data) {
+  data <- data %>%
     # Normalize phases
     mutate(phase.norm =
            # Normalize 1: Merge phases
@@ -99,7 +99,12 @@ preprocess_data <- function(data, censor_date) {
                      ) %>%
            # match factor level order used in paper
            factor(levels = c("Device", "Biological", "Drug", "Other"))
-    ) %>%
+    )
+  return(data)
+}
+
+preprocess_data.anderson2015.survival <- function(data, censor_date) {
+  data <- data %>%
     # Define the event and time variables
     mutate(
       surv.event = if_else(!is.na(results_received_date) & results_received_date <= censor_date, 1, 0),
@@ -108,7 +113,12 @@ preprocess_data <- function(data, censor_date) {
         interval(primary_completion_date_imputed, censor_date) / months(1),
         na.rm = TRUE
       )
-    ) %>%
+    )
+  return(data)
+}
+
+preprocess_data.anderson2015.regression <- function(data) {
+  data <- data %>%
     # Define the variables for reporting by a particular time, either by
     mutate(
       # - 12 months or
@@ -142,7 +152,18 @@ preprocess_data <- function(data, censor_date) {
     assert_that( data |> subset( results12 != results_reported_12mo ) |> nrow() == 0,
                 msg = 'Original results12 should match computed results_reported_12mo' )
 
-    return(data)
+  return(data)
+}
+
+preprocess_data <- function(data, censor_date) {
+  data <- data %>%
+    preprocess_data.anderson2015.type() %>%
+    preprocess_data.anderson2015.dates() %>%
+    preprocess_data.anderson2015.norm() %>%
+    preprocess_data.anderson2015.survival(censor_date) %>%
+    preprocess_data.anderson2015.regression()
+
+  return(data)
 }
 
 # Function to fit the Kaplan-Meier models
