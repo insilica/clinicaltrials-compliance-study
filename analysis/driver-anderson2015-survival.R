@@ -3,10 +3,14 @@ library(pacman)
 pacman::p_load(
   fs,
   parsedate,
-  purrr
+  purrr,
+  this.path,
+  here
 )
 
 source('analysis/lib-anderson2015.R')
+
+debug_mode <- Sys.getenv("DEBUG") == "1"
 
 ### INPUT
 hlact.studies <- arrow::read_parquet('brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet') |>
@@ -29,21 +33,28 @@ fits <- create_survfit_models(hlact.studies)
 
 ### PLOT RESULTS
 
-# Obtain the current git tag and the path to this script
-git_tag <- system("git describe --tags --always", intern = TRUE)
-script_path <- path(sys.frame(1)$ofile)
-output_plot_caption <- sprintf("Prepared on %s %s:%s",
-                               format_iso_8601(Sys.time()),
-                               git_tag, script_path)
+if(debug_mode) {
+  # Obtain the current git tag and the path to this script
+  git_tag <- system("git describe --tags --always", intern = TRUE)
+  script_path <- path_rel(this.path(), here::here())
+  output_plot_caption <- sprintf("Prepared on %s %s:%s",
+                                 format_iso_8601(Sys.time()),
+                                 git_tag, script_path)
+}
 
 plot_survfit_with_title <- function(fit, title) {
-  plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
+  f <- plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
     ggtitle(str_wrap(title, 72)) +
-    labs(caption = output_plot_caption) +
     theme(
           legend.text         = element_text(size = rel(1.0),
                                              margin = margin(r = 20, unit = "pt"))
     )
+
+  if(debug_mode) {
+    f <- f + labs(caption = output_plot_caption)
+  }
+
+  return(f)
 }
 
 dir_create('figtab/anderson2015')
