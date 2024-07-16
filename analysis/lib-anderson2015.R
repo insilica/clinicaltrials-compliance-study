@@ -162,7 +162,8 @@ preprocess_data.anderson2015.regression <- function(data) {
     mutate(rr.primary_purpose =
            fct_collapse(primary_purpose,
                         Other = setdiff(levels(primary_purpose),
-                                        c("Treatment", "Prevention", "Diagnostic")))
+                                        c("Treatment", "Prevention", "Diagnostic"))) |>
+           factor(levels = c('Treatment', 'Prevention', 'Diagnostic', 'Other'))
     ) %>%
     mutate(
            # Impute NA with mean
