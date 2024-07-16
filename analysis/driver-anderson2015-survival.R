@@ -23,7 +23,7 @@ censor_date <- as.Date("2013-09-27")
 hlact.studies <- preprocess_data(hlact.studies, censor_date)
 
 ### DEFINE BREAKS
-time_months.max <- max(hlact.studies$time_months, na.rm = TRUE)
+time_months.max <- max(hlact.studies$surv.time_months, na.rm = TRUE)
 breaks.risktable.less_than <- seq(0, time_months.max, by = 12) - 1
 breaks.risktable.less_than[1] <- 0
 breaks.fig <- seq(0, time_months.max, by = 6)
