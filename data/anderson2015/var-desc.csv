@@ -1,0 +1,27 @@
+name,heading,subheading
+rr.primary_purposePrevention            , Primary purpose vs treatment,Prevention
+rr.primary_purposeDiagnostic            , Primary purpose vs treatment,Diagnostic
+rr.primary_purposeOther                 , Primary purpose vs treatment,Other
+rr.intervention_typeDevice              , Intervention group vs drug,Device
+rr.intervention_typeBiological          , Intervention group vs drug,Biological
+rr.intervention_typeOther               , Intervention group vs drug,Other
+rr.phase1-2                             , Phase vs. phase 4,Phase 1/Phase 2
+rr.phase2                               , Phase vs. phase 4,Phase 2
+rr.phase2-3                             , Phase vs. phase 4,Phase 2/Phase 3
+rr.phase3                               , Phase vs. phase 4,Phase 3
+rr.phaseNot applicable                  , Phase vs. phase 4,N/A
+rr.oversight_is_fdaNo                   , No US FDA oversight vs. US FDA oversight
+rr.fundingIndustry                      , Funding source vs. NIH,Industry
+rr.fundingOther                         , Funding source vs. NIH,Other
+rr.log2_enrollment_less_split           , Total enrollment‡ through 1000 participants,Per doubling < 32 participants
+rr.log2_enrollment_more_split           , Total enrollment‡ through 1000 participants,Per doubling > 32 participants
+rr.overall_statuscTerminated            , Terminated vs. completed,
+rr.pc_year_increase_pre_split           , Primary completion year,Per year increase < 2010
+rr.pc_year_increase_post_split          , Primary completion year,Per year increase > 2010
+rr.sdur.per_3_months_increase_pre_12    , Study duration through 24 months,Per 3 months increase < 12 months
+rr.sdur.per_3_months_increase_post_12   , Study duration through 24 months,Per 3 months increase > 12 months
+rr.number_of_armstwo                    , Number of arms vs. one,Two
+rr.number_of_armsthree or more          , Number of arms vs. one,Three or more
+rr.use_of_randomized_assgnTRUE          , Use of randomized allocation,
+rr.maskingSingle Blind                  , Masking vs. open-label,Single-blind
+rr.maskingDouble Blind                  , Masking vs. open-label,Double-blind
