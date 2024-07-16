@@ -250,28 +250,27 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
     xlab("Months after primary completion date")
 }
 
+
 logistic_regression <- function(data) {
-  data <- hlact.studies
-  models <- list(
-       overall = glm( rr.results_reported_12mo ~
-                     (rr.intervention_type
-                      + rr.phase
-                      + rr.oversight_is_fda
-                      + rr.funding
-                      + rr.overall_statusc
-                      + rr.primary_purpose
-                      + rr.log2_enrollment_less_split + rr.log2_enrollment_more_split
-                      + rr.pc_year_increase_pre_split + rr.pc_year_increase_post_split
-                      + rr.sdur.per_3_months_increase_pre_12 + rr.sdur.per_3_months_increase_post_12
-                      ##+ mntopcom # weird that this has more exact values?
-                      + rr.number_of_arms
-                      + rr.use_of_randomized_assgn
-                      + rr.masking
-                        ),
-                     data = data, family = binomial )
-  )
+  ##+ mntopcom # weird that this has more exact values?
+  model <- glm( rr.results_reported_12mo ~
+               ( rr.primary_purpose
+               + rr.intervention_type
+               + rr.phase
+               + rr.oversight_is_fda
+               + rr.funding
+               + rr.log2_enrollment_less_split + rr.log2_enrollment_more_split
+               + rr.overall_statusc
+               + rr.pc_year_increase_pre_split + rr.pc_year_increase_post_split
+               + rr.sdur.per_3_months_increase_pre_12 + rr.sdur.per_3_months_increase_post_12
+               + rr.number_of_arms
+               + rr.use_of_randomized_assgn
+               + rr.masking
+               ),
+               data = data, family = binomial )
   #model <- glm(event ~ intervention_type + phase.norm + funding + overall_statusc, data = data, family = binomial)
-  lapply(models, \(x) tidy(x, exponentiate = TRUE, conf.int = TRUE) )
+  model <- tidy(model, exponentiate = TRUE, conf.int = TRUE)
+  return(model)
 }
 
 cox_regression <- function(data) {
