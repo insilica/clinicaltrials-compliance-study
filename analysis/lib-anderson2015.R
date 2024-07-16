@@ -102,8 +102,8 @@ preprocess_data <- function(data, censor_date) {
     ) %>%
     # Define the event and time variables
     mutate(
-      event = if_else(!is.na(results_received_date) & results_received_date <= censor_date, 1, 0),
-      time_months = pmin(
+      surv.event = if_else(!is.na(results_received_date) & results_received_date <= censor_date, 1, 0),
+      surv.time_months = pmin(
         interval(primary_completion_date_imputed, results_received_date) / months(1),
         interval(primary_completion_date_imputed, censor_date) / months(1),
         na.rm = TRUE
@@ -148,13 +148,13 @@ preprocess_data <- function(data, censor_date) {
 # Function to fit the Kaplan-Meier models
 create_survfit_models <- function(data) {
   list(
-    fit.funding       = survfit2(Surv(time_months, event) ~ funding,
+    fit.funding       = survfit2(Surv(surv.time_months, surv.event) ~ funding,
                                  data = data, start.time = 0),
-    fit.phase         = survfit2(Surv(time_months, event) ~ phase.norm,
+    fit.phase         = survfit2(Surv(surv.time_months, surv.event) ~ phase.norm,
                                  data = data, start.time = 0),
-    fit.interventions = survfit2(Surv(time_months, event) ~ intervention_type,
+    fit.interventions = survfit2(Surv(surv.time_months, surv.event) ~ intervention_type,
                                  data = data, start.time = 0),
-    fit.status        = survfit2(Surv(time_months, event) ~ overall_statusc,
+    fit.status        = survfit2(Surv(surv.time_months, surv.event) ~ overall_statusc,
                                  data = data, start.time = 0)
   )
 }
