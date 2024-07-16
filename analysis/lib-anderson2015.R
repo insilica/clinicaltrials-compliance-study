@@ -246,34 +246,6 @@ logistic_regression <- function(data) {
     ) |> as.factor() |> relevel( ref = "one" )
   )
 
-  #models <- list(
-  #     intervention_type = glm( results_reported_12mo ~ intervention_type,
-  #                               #(intervention_type == 'Drug') +
-  #                               #(intervention_type == 'Device') +
-  #                               #(intervention_type == 'Biological') +
-  #                               #(intervention_type == 'Other'),
-  #                              eata = data |> mutate(
-  #                                                    intervention_type =
-  #                                                      intervention_type #|>
-  #                                                      #factor(levels = c("Drug", "Device", "Biological", "Other"))
-  #                              ),
-  #                             family = binomial ),
-  #     phase = glm( results_reported_12mo ~ phase.short_names,
-  #                              data = data, family = binomial ),
-  #     funding = glm( results_reported_12mo ~ funding,
-  #                              data = data, family = binomial ),
-  #     status = glm( results_reported_12mo ~ overall_statusc,
-  #                              data = data, family = binomial )
-  #)
-  # >
-
-  # > hlact.studies |> subset( is.na( coalesce( p_completion_year, completion_year, verification_year ) ) ) |> nrow()
-  # 0
-  # > hlact.studies |> subset( is.na( coalesce( p_completion_year, completion_year ) ) ) |> nrow()
-  # 307
-  # > hlact.studies |> subset( is.na( coalesce( p_completion_year ) ) ) |> nrow()
-  # 403
-
   # From paper Table 3:
   # Regression models included the following covariates in addition to those
   # listed:
