@@ -1,4 +1,4 @@
-name                                    ,or,or.conf.low,or.conf.high,hr,hr.conf.low,hr.conf.high
+term                                    ,or,or.conf.low,or.conf.high,hr,hr.conf.low,hr.conf.high
 rr.primary_purposePrevention            , 0.86 ,0.70 , 1.07, 0.91 ,0.81 , 1.01
 rr.primary_purposeDiagnostic            , 0.93 ,0.66 , 1.31, 1.05 ,0.87 , 1.25
 rr.primary_purposeOther                 , 0.73 ,0.53 , 0.99, 0.84 ,0.72 , 0.97
