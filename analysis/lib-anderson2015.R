@@ -118,20 +118,32 @@ preprocess_data.anderson2015.survival <- function(data, censor_date) {
 }
 
 preprocess_data.anderson2015.regression <- function(data) {
+  # From paper Table 3:
+  # Regression models included the following covariates in addition to those
+  # listed:
+  #   - primary purpose of study,
+  #   - enrollment,
+  #   - year of study completion,
+  #   - study duration,
+  #   - number of study groups,
+  #   - use of randomized assignment, and
+  #   - use of masking.
+  split.enrollment <- 32
+  split.pc_year <- 2010
   data <- data %>%
     # Define the variables for reporting by a particular time, either by
     mutate(
       # - 12 months or
-      results_reported_12mo =
+      rr.results_reported_12mo =
         ( interval(primary_completion_date_imputed, results_received_date) < months(12) + days(1) ) |>
         replace_na(FALSE),
       # - 5 years.
-      results_reported_5yr =
+      rr.results_reported_5yr =
         ( interval(primary_completion_date_imputed, results_received_date) < years(5) + days(1) ) |>
         replace_na(FALSE),
     ) %>%
     # Phase short names
-    mutate(phase.rr =
+    mutate(rr.phase =
            fct_recode(phase,
                       `1-2` = "Phase 1/Phase 2",
                       `2` = "Phase 2",
@@ -143,14 +155,61 @@ preprocess_data.anderson2015.regression <- function(data) {
            # Turn NA values into "Not applicable" level
            fct_na_value_to_level(level = "Not applicable")
     ) %>%
-    mutate(primary_purpose.rr =
+    mutate(rr.primary_purpose =
            fct_collapse(primary_purpose,
                         Other = setdiff(levels(primary_purpose),
                                         c("Treatment", "Prevention", "Diagnostic")))
+    ) %>%
+    mutate(
+      rr.intervention_type  = relevel(intervention_type,  ref = "Drug"      ),
+      rr.funding            = relevel(funding,            ref = "NIH"       ),
+      rr.phase              = relevel(rr.phase,           ref = "4"         ),
+      rr.primary_purpose    = relevel(rr.primary_purpose, ref = "Treatment" ),
+      rr.overall_statusc    = relevel(overall_statusc,    ref = "Completed" )
+    ) %>%
+    mutate(
+           start_date = create_date_month_name(start_year, start_month),
+           pc_year_imputed = year(primary_completion_date_imputed),
+    ) |>
+    mutate(
+           # Impute NA with mean
+           enrollment.pre = ifelse(is.na(ENROLLMENT), mean(ENROLLMENT, na.rm = TRUE), ENROLLMENT),
+           # Replace 0 with a small positive value
+           enrollment.pre = ifelse(enrollment.pre == 0, 0.5, enrollment.pre)
+    ) |>
+    mutate(
+           # compare with mntopcom
+           rr.study_duration = interval(start_date, primary_completion_date_imputed) / months(1),
+           rr.oversight_is_fda = ifelse(oversight == 'United States: Food and Drug Administration',
+                                     'Yes', 'No') |>
+                             as.factor() |> relevel( ref = 'Yes' ),
+           rr.use_of_randomized_assgn = allocation == 'Randomized' & NUMBER_OF_ARMS > 1,
+           rr.masking = case_when(
+                                  allocation == 'Non-Randomized' ~ "Open",
+                                  .default = masking
+                          ) |> as.factor() |> relevel( ref = 'Open' ),
+           rr.log2_enrollment_less_split = ifelse(enrollment.pre <= split.enrollment, log2(enrollment.pre), 0),
+           rr.log2_enrollment_more_split = ifelse(enrollment.pre > split.enrollment, log2(enrollment.pre), 0),
+           rr.pc_year_increase_pre_split = ifelse(pc_year_imputed < split.pc_year, pc_year_imputed - split.pc_year, 0),
+           rr.pc_year_increase_post_split = ifelse(pc_year_imputed >= split.pc_year, pc_year_imputed - split.pc_year, 0),
+    ) |>
+    mutate(
+           rr.study_duration.clamp = ifelse(rr.study_duration > 24, 24, rr.study_duration)
+    ) |>
+    mutate(
+      rr.sdur.per_3_months_increase_pre_12  = ifelse(rr.study_duration.clamp <= 12, rr.study_duration.clamp / 3, 12 / 3),
+      rr.sdur.per_3_months_increase_post_12 = ifelse(rr.study_duration.clamp > 12, (rr.study_duration.clamp - 12) / 3, 0)
+    ) |>
+    mutate(
+      rr.number_of_arms = case_when(
+        NUMBER_OF_ARMS == 1 ~ "one",
+        NUMBER_OF_ARMS == 2 ~ "two",
+        NUMBER_OF_ARMS >= 3 ~ "three or more"
+      ) |> as.factor() |> relevel( ref = "one" )
     )
 
-    assert_that( data |> subset( results12 != results_reported_12mo ) |> nrow() == 0,
-                msg = 'Original results12 should match computed results_reported_12mo' )
+  assert_that( data |> subset( results12 != rr.results_reported_12mo ) |> nrow() == 0,
+              msg = 'Original results12 should match computed rr.results_reported_12mo' )
 
   return(data)
 }
@@ -191,86 +250,23 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
     xlab("Months after primary completion date")
 }
 
-relevel_factors <- function(data) {
-  data %>%
-    mutate(
-      intervention_type  = relevel(intervention_type,  ref = "Drug"      ),
-      funding            = relevel(funding,            ref = "NIH"       ),
-      phase.rr           = relevel(phase.rr,           ref = "4"         ),
-      primary_purpose.rr = relevel(primary_purpose.rr, ref = "Treatment" ),
-      overall_statusc    = relevel(overall_statusc,    ref = "Completed" )
-    )
-}
-
 logistic_regression <- function(data) {
   data <- hlact.studies
-  data <- relevel_factors(data) |>
-      mutate(
-             start_date = create_date_month_name(start_year, start_month),
-             pc_year_imputed = year(primary_completion_date_imputed),
-      ) |>
-      mutate(
-             # Impute NA with mean
-             enrollment.pre = ifelse(is.na(ENROLLMENT), mean(ENROLLMENT, na.rm = TRUE), ENROLLMENT),
-             # Replace 0 with a small positive value
-             enrollment.pre = ifelse(enrollment.pre == 0, 0.5, enrollment.pre)
-      ) |>
-      mutate(
-             # compare with mntopcom
-             study_duration = interval(start_date, primary_completion_date_imputed) / months(1),
-             oversight_is_fda = ifelse(oversight == 'United States: Food and Drug Administration',
-                                       'Yes', 'No') |>
-                               as.factor() |> relevel( ref = 'Yes' ),
-             use_of_randomized_assgn = allocation == 'Randomized' & NUMBER_OF_ARMS > 1,
-             masking.rr = case_when(
-                                    allocation == 'Non-Randomized' ~ "Open",
-                                    .default = masking
-                            ) |> as.factor() |> relevel( ref = 'Open' ),
-             log2_enrollment_less_32 = ifelse(enrollment.pre <= 32, log2(enrollment.pre), 0),
-             log2_enrollment_more_32 = ifelse(enrollment.pre > 32 , log2(enrollment.pre), 0),
-             pc_year_increase_pre_2010 = ifelse(pc_year_imputed < 2010, pc_year_imputed - 2010, 0),
-             pc_year_increase_post_2010 = ifelse(pc_year_imputed >= 2010, pc_year_imputed - 2010, 0),
-  ) |>
-  mutate(
-         study_duration.clamp = ifelse(study_duration > 24, 24, study_duration)
-  ) |>
-  mutate(
-    sdur.per_3_months_increase_pre_12  = ifelse(study_duration.clamp <= 12, study_duration.clamp / 3, 12 / 3),
-    sdur.per_3_months_increase_post_12 = ifelse(study_duration.clamp > 12, (study_duration.clamp - 12) / 3, 0)
-  ) |>
-  mutate(
-    number_of_arms.rr = case_when(
-      NUMBER_OF_ARMS == 1 ~ "one",
-      NUMBER_OF_ARMS == 2 ~ "two",
-      NUMBER_OF_ARMS >= 3 ~ "three or more"
-    ) |> as.factor() |> relevel( ref = "one" )
-  )
-
-  # From paper Table 3:
-  # Regression models included the following covariates in addition to those
-  # listed:
-  #   - primary purpose of study,
-  #   - enrollment,
-  #   - year of study completion,
-  #   - study duration,
-  #   - number of study groups,
-  #   - use of randomized assignment, and
-  #   - use of masking.
   models <- list(
-       overall = glm( results_reported_12mo ~
-                     (intervention_type
-                      + phase.rr
-                      + oversight_is_fda
-                      + funding
-                      + overall_statusc
-                      + primary_purpose.rr
-                      + log2_enrollment_less_32 + log2_enrollment_more_32
-                      + pc_year_increase_pre_2010 + pc_year_increase_post_2010
-                      + sdur.per_3_months_increase_pre_12 + sdur.per_3_months_increase_post_12
+       overall = glm( rr.results_reported_12mo ~
+                     (rr.intervention_type
+                      + rr.phase
+                      + rr.oversight_is_fda
+                      + rr.funding
+                      + rr.overall_statusc
+                      + rr.primary_purpose
+                      + rr.log2_enrollment_less_split + rr.log2_enrollment_more_split
+                      + rr.pc_year_increase_pre_split + rr.pc_year_increase_post_split
+                      + rr.sdur.per_3_months_increase_pre_12 + rr.sdur.per_3_months_increase_post_12
                       ##+ mntopcom # weird that this has more exact values?
-                      + number_of_arms.rr
-                      + use_of_randomized_assgn
-                      + masking.rr
+                      + rr.number_of_arms
+                      + rr.use_of_randomized_assgn
+                      + rr.masking
                         ),
                      data = data, family = binomial )
   )
