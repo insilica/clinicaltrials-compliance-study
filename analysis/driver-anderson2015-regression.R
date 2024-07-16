@@ -15,5 +15,5 @@ censor_date <- as.Date("2013-09-27")
 hlact.studies <- preprocess_data(hlact.studies, censor_date)
 
 ### REGRESSION MODELS
-models.logistic <- logistic_regression(hlact.studies)
-models.logistic |> walk( \(x) print(x, n = 50 ) ); NA
+model.logistic <- logistic_regression(hlact.studies)
+model.logistic |> print(n = 50 ); NA
