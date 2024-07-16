@@ -36,8 +36,9 @@ create_date_month_int <- function(year, month) {
 }
 
 # Function to preprocess data
-preprocess_data <- function(data, censor_date) {
-  data <- data %>%
+
+preprocess_data.anderson2015.type <- function(data) {
+  data <- data |>
     rename(nct_id = NCT_ID) %>%
     mutate(
       # These are all factor variables.
@@ -53,7 +54,17 @@ preprocess_data <- function(data, censor_date) {
       across(c(behavioral, biological, device, dietsup, drug, genetic, procedure, radiation, otherint), \(x) x == 'Yes'),
       # results12 is stored as { "Yes",  "No" }
       across(c(results12), \(x) x == 'Yes'),
-    ) %>%
+    )
+  return(data)
+}
+
+preprocess_data.anderson2015.pc_date_impute <- function(data) {
+}
+
+
+preprocess_data <- function(data, censor_date) {
+  data <- data %>%
+    preprocess_data.anderson2015.type() %>%
     # Create the primary completion date based on the given priority
     mutate(primary_completion_date_imputed = coalesce(
       create_date_month_name(p_completion_year, p_completion_month),
