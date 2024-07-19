@@ -269,7 +269,6 @@ logistic_regression <- function(data) {
                + rr.masking
                ),
                data = data, family = binomial )
-  #model <- glm(event ~ intervention_type + phase.norm + funding + overall_statusc, data = data, family = binomial)
   model <- tidy(model, exponentiate = TRUE, conf.int = TRUE)
   return(model)
 }
