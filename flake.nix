@@ -67,16 +67,18 @@
               ++ oldAttrs.buildInputs
               ++ [ (pkgs.python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
               ++ (with pkgs.rPackages; [
-                            arrow
+                            arrow assertthat
+                            broom
                             ComplexUpset cthist
                             DBI dotenv dplyr
                             forcats fs
                             ggplot2 ggsurvfit gtsummary
+                            here
                             lubridate
-                            pacman parsedate
+                            pacman parsedate purrr
                             readr RPostgres
                             stringr survival survminer
-                            tidyverse
+                            this_path tidyr tidyverse
                             vroom
                     ]);
             env = oldAttrs.env // {
