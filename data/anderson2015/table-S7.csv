@@ -1,0 +1,27 @@
+term                                    ,or,or.conf.low,or.conf.high,hr,hr.conf.low,hr.conf.high
+rr.primary_purposePrevention            , 0.86 ,0.70 , 1.07, 0.91 ,0.81 , 1.01
+rr.primary_purposeDiagnostic            , 0.93 ,0.66 , 1.31, 1.05 ,0.87 , 1.25
+rr.primary_purposeOther                 , 0.73 ,0.53 , 0.99, 0.84 ,0.72 , 0.97
+rr.intervention_typeDevice              , 0.88 ,0.72 , 1.07, 0.95 ,0.86 , 1.06
+rr.intervention_typeBiological          , 1.16 ,0.95 , 1.44, 1.17 ,1.06 , 1.30
+rr.intervention_typeOther               , 0.48 ,0.26 , 0.90, 0.53 ,0.39 , 0.71
+rr.phase1-2                             , 0.28 ,0.21 , 0.38, 0.46 ,0.40 , 0.54
+rr.phase2                               , 0.33 ,0.27 , 0.39, 0.54 ,0.49 , 0.59
+rr.phase2-3                             , 0.22 ,0.14 , 0.36, 0.54 ,0.44 , 0.66
+rr.phase3                               , 0.60 ,0.50 , 0.70, 0.80 ,0.72 , 0.88
+rr.phaseNot applicable                  , 0.56 ,0.45 , 0.70, 0.71 ,0.63 , 0.79
+rr.oversight_is_fdaNo                   , 0.61 ,0.52 , 0.71, 0.86 ,0.80 , 0.93
+rr.fundingIndustry                      , 1.62 ,1.34 , 1.97, 0.97 ,0.89 , 1.07
+rr.fundingOther                         , 0.58 ,0.45 , 0.75, 0.62 ,0.56 , 0.70
+rr.log2_enrollment_less_split           , 0.96 ,0.88 , 1.04, 0.90 ,0.86 , 0.93
+rr.log2_enrollment_more_split           , 1.12 ,1.07 , 1.17, 1.08 ,1.06 , 1.11
+rr.overall_statuscTerminated            , 0.97 ,0.83 , 1.11, 0.94 ,0.86 , 1.02
+rr.pc_year_increase_pre_split           , 1.21 ,1.12 , 1.31, 1.18 ,1.13 , 1.22
+rr.pc_year_increase_post_split          , 1.01 ,0.93 , 1.11, 0.94 ,0.88 , 0.99
+rr.sdur.per_3_months_increase_pre_12    , 0.89 ,0.83 , 0.96, 0.94 ,0.89 , 0.97
+rr.sdur.per_3_months_increase_post_12   , 1.07 ,1.03 , 1.11, 1.05 ,1.03 , 1.07
+rr.number_of_armstwo                    , 1.09 ,0.82 , 1.45, 1.31 ,1.13 , 1.51
+rr.number_of_armsthree or more          , 0.71 ,0.52 , 0.96, 1.02 ,0.88 , 1.19
+rr.use_of_randomized_assgnTRUE          , 1.26 ,0.96 , 1.69, 0.97 ,0.83 , 1.13
+rr.maskingSingle Blind                  , 0.65 ,0.49 , 0.87, 0.96 ,0.83 , 1.10
+rr.maskingDouble Blind                  , 0.73 ,0.63 , 0.85, 0.88 ,0.81 , 0.96

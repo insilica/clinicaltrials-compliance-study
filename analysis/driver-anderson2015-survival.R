@@ -2,10 +2,15 @@ if (!require("pacman")) install.packages("pacman")
 library(pacman)
 pacman::p_load(
   fs,
-  parsedate
+  parsedate,
+  purrr,
+  this.path,
+  here
 )
 
 source('analysis/lib-anderson2015.R')
+
+debug_mode <- Sys.getenv("DEBUG") == "1"
 
 ### INPUT
 hlact.studies <- arrow::read_parquet('brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet') |>
@@ -18,7 +23,7 @@ censor_date <- as.Date("2013-09-27")
 hlact.studies <- preprocess_data(hlact.studies, censor_date)
 
 ### DEFINE BREAKS
-time_months.max <- max(hlact.studies$time_months, na.rm = TRUE)
+time_months.max <- max(hlact.studies$surv.time_months, na.rm = TRUE)
 breaks.risktable.less_than <- seq(0, time_months.max, by = 12) - 1
 breaks.risktable.less_than[1] <- 0
 breaks.fig <- seq(0, time_months.max, by = 6)
@@ -28,37 +33,50 @@ fits <- create_survfit_models(hlact.studies)
 
 ### PLOT RESULTS
 
-# Obtain the current git tag and the path to this script
-git_tag <- system("git describe --tags --always", intern = TRUE)
-script_path <- path(sys.frame(1)$ofile)
-output_plot_caption <- sprintf("Prepared on %s %s:%s",
-                               format_iso_8601(Sys.time()),
-                               git_tag, script_path)
+if(debug_mode) {
+  # Obtain the current git tag and the path to this script
+  git_tag <- system("git describe --tags --always", intern = TRUE)
+  script_path <- path_rel(this.path(), here::here())
+  output_plot_caption <- sprintf("Prepared on %s %s:%s",
+                                 format_iso_8601(Sys.time()),
+                                 git_tag, script_path)
+}
 
 plot_survfit_with_title <- function(fit, title) {
-  plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
+  f <- plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
     ggtitle(str_wrap(title, 72)) +
-    labs(caption = output_plot_caption)
+    theme(
+          legend.text         = element_text(size = rel(1.0),
+                                             margin = margin(r = 20, unit = "pt"))
+    )
+
+  if(debug_mode) {
+    f <- f + labs(caption = output_plot_caption)
+  }
+
+  return(f)
 }
 
 dir_create('figtab/anderson2015')
+ggsave.partial <- partial(ggsave, ... = ,
+                          dpi = 300, width = 10 )
 
 # Fig 2
 show(fig.surv.funding <- plot_survfit_with_title(fits$fit.funding,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Funding"))
-ggsave('figtab/anderson2015/fig_2.survfit.funding.png', width = 10, dpi = 300)
+ggsave.partial('figtab/anderson2015/fig_2.survfit.funding.png')
 
 # Fig S1
 show(fig.surv.phase <- plot_survfit_with_title(fits$fit.phase,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Phase"))
-ggsave('figtab/anderson2015/fig_s1.survfit.phase.png', width = 10, dpi = 300)
+ggsave.partial('figtab/anderson2015/fig_s1.survfit.phase.png')
 
 # Fig S2
 show(fig.surv.interventions <- plot_survfit_with_title(fits$fit.interventions,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Intervention Type"))
-ggsave('figtab/anderson2015/fig_s2.survfit.interventions.png', width = 10, dpi = 300)
+ggsave.partial('figtab/anderson2015/fig_s2.survfit.interventions.png')
 
 # Fig S3
 show(fig.surv.status <- plot_survfit_with_title(fits$fit.status,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Terminated/Completed Status"))
-ggsave('figtab/anderson2015/fig_s2.survfit.status.png', width = 10, dpi = 300)
+ggsave.partial('figtab/anderson2015/fig_s3.survfit.status.png')
