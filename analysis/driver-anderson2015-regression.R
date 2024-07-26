@@ -15,7 +15,8 @@ paper.regress.s7 <- read.csv('data/anderson2015/table-S7.csv') |>
   mutate(across(term,trimws))
 
 ### PREPROCESS
-hlact.studies <- preprocess_data(hlact.studies, censor_date)
+hlact.studies <- standardize.anderson2015(hlact.studies) |>
+  preprocess_data.common(censor_date)
 
 ### REGRESSION MODELS
 model.logistic <- logistic_regression(hlact.studies)
@@ -24,7 +25,7 @@ model.logistic |> print(n = 50 ); NA
 prefixes <- c(
   "rr.primary_purpose", "rr.intervention_type", "rr.phase",
   "rr.oversight_is_fda", "rr.funding", "rr.log2_enrollment_",
-  "rr.overall_statusc", "rr.pc_year_increase_", "rr.sdur.per_3_months_increase_",
+  "rr.overall_status", "rr.pc_year_increase_", "rr.sdur.per_3_months_increase_",
   "rr.number_of_arms", "rr.use_of_randomized_assgn", "rr.masking"
 )
 escaped_prefixes <- map(prefixes, str_escape)

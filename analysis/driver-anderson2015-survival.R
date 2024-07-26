@@ -20,7 +20,8 @@ print(hlact.studies)#DEBUG
 censor_date <- as.Date("2013-09-27")
 
 ### PREPROCESS
-hlact.studies <- preprocess_data(hlact.studies, censor_date)
+hlact.studies <- standardize.anderson2015(hlact.studies) |>
+  preprocess_data.common(censor_date)
 
 ### DEFINE BREAKS
 time_months.max <- max(hlact.studies$surv.time_months, na.rm = TRUE)

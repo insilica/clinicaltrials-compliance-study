@@ -15,7 +15,7 @@ rr.fundingIndustry                      , Funding source vs. NIH,Industry
 rr.fundingOther                         , Funding source vs. NIH,Other
 rr.log2_enrollment_less_split           , Total enrollment‡ through 1000 participants,Per doubling < 32 participants
 rr.log2_enrollment_more_split           , Total enrollment‡ through 1000 participants,Per doubling > 32 participants
-rr.overall_statuscTerminated            , Terminated vs. completed,
+rr.overall_statusTerminated             , Terminated vs. completed,
 rr.pc_year_increase_pre_split           , Primary completion year,Per year increase < 2010
 rr.pc_year_increase_post_split          , Primary completion year,Per year increase > 2010
 rr.sdur.per_3_months_increase_pre_12    , Study duration through 24 months,Per 3 months increase < 12 months
