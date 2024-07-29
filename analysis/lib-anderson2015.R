@@ -325,3 +325,53 @@ cox_regression <- function(data) {
   model <- coxph(Surv(time_months, event) ~ intervention_type + phase.norm + funding + overall_status, data = data)
   tidy(model, exponentiate = TRUE, conf.int = TRUE)
 }
+
+
+prefixes.rr <- c(
+  "rr.primary_purpose", "rr.intervention_type", "rr.phase",
+  "rr.oversight_is_fda", "rr.funding", "rr.log2_enrollment_",
+  "rr.overall_status", "rr.pc_year_increase_", "rr.sdur.per_3_months_increase_",
+  "rr.number_of_arms", "rr.use_of_randomized_assgn", "rr.masking"
+)
+escaped_prefixes.rr <- map(prefixes.rr, str_escape)
+prefix_pattern.rr <- paste(escaped_prefixes.rr, collapse = "|")
+
+compare.model.logistic <- function(model.logistic) {
+  paper.regress.s7 <- read.csv('data/anderson2015/table-S7.csv') |>
+    mutate(across(term,trimws))
+
+  or.combined <- bind_rows(
+          model.logistic |>
+            rename(
+                   or = estimate,
+                   or.conf.low = conf.low,
+                   or.conf.high = conf.high
+            ) |>
+            filter( term != '(Intercept)' ) |>
+            select( term, or, or.conf.low, or.conf.high ) |>
+            mutate( source = 'Model' ),
+          paper.regress.s7 |>
+            select( term, or, or.conf.low, or.conf.high ) |>
+            mutate( source = 'Paper' ),
+  ) %>%
+  mutate(
+      prefix = str_extract(term, prefix_pattern.rr),
+      suffix = str_remove(term, prefix_pattern.rr)
+  )
+  return(or.combined)
+}
+
+plot.compare.logistic <- function(or.combined) {
+  # Create the box-and-whiskers plot
+  fig <- ggplot(or.combined, aes(x = suffix, y = or, color = source)) +
+    geom_point(position = position_dodge(width = 0.5)) +
+    geom_errorbar(aes(ymin = or.conf.low, ymax = or.conf.high),
+                  position = position_dodge(width = 0.5), width = 0.2) +
+    facet_wrap(~ prefix, scales = "free", ncol = 3) +
+    labs(title = "Comparison of Odds Ratios to Paper Table S7",
+         x = "Term",
+         y = "Odds Ratio") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  return(fig)
+}
