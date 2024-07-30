@@ -101,17 +101,30 @@ COPY (
                     TRY_CAST(
                         studyRecord -> '$.study.protocolSection.designModule.phases' AS VARCHAR[]
                     ) AS phases,
+                    studyRecord ->> '$.study.protocolSection.statusModule.startDateStruct.date' AS start_date,
+                    -- TODO Partial date type
                     studyRecord ->> '$.study.protocolSection.statusModule.primaryCompletionDateStruct.date' AS primary_completion_date,
                     -- TODO Partial date type
                     studyRecord ->> '$.study.protocolSection.statusModule.completionDateStruct.date' AS completion_date,
                     -- TODO Partial date type
                     studyRecord ->> '$.study.protocolSection.designModule.studyType' AS study_type,
                     studyRecord ->> '$.study.protocolSection.designModule.designInfo.primaryPurpose' AS primary_purpose,
+                    studyRecord ->> '$.study.protocolSection.designModule.designInfo.allocation' AS allocation,
+                    studyRecord ->> '$.study.protocolSection.designModule.designInfo.maskingInfo.masking' AS masking,
+                    TRY_CAST(
+                        studyRecord ->> '$.study.protocolSection.designModule.enrollmentInfo.count' AS INTEGER
+                    ) AS enrollment,
                     studyRecord ->> '$.study.protocolSection.statusModule.statusVerifiedDate' AS verification_date,
                     -- TODO Partial date type
                     list_distinct(
                         studyRecord ->> '$.study.protocolSection.armsInterventionsModule.interventions[*].type'
                     ) AS intervention_type,
+                    len(
+                        studyRecord ->> '$.study.protocolSection.armsInterventionsModule.armGroups[*]'
+                    ) AS number_of_arm_groups,
+                    len(
+                        studyRecord ->> '$.study.protocolSection.armsInterventionsModule.interventions[*]'
+                    ) AS number_of_interventions,
                     studyRecord ->> '$.study.hasResults' as has_results,
                     studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.class' AS funding_source,
                     studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.name' AS sponsor_name,
