@@ -172,3 +172,223 @@ stages:
       hash: md5
       md5: 2cdf77dd7853e1e0ffa1f616c3d65084
       size: 1682608
+  build-ctgov-studies-all@sliding-window_n-1_20130901:
+    cmd:
+    - mkdir -p $(dirname brick/sliding-window_n-1_20130901/ctgov-studies-all.parquet)
+    - script/tt-render-by-param sliding-window_n-1_20130901 sql/create_cthist_all.sql
+      | duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: c920d855e9b65a50f913295329fc9cbb.dir
+      size: 9443877912
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 8b2473c013948c766a2e1978c15ac12c
+      size: 8314
+    outs:
+    - path: brick/sliding-window_n-1_20130901/ctgov-studies-all.parquet
+      hash: md5
+      md5: 2927720ea69f28b7747e0086854713f7
+      size: 5862510
+  build-ctgov-studies-all@sliding-window_n-2_20160101:
+    cmd:
+    - mkdir -p $(dirname brick/sliding-window_n-2_20160101/ctgov-studies-all.parquet)
+    - script/tt-render-by-param sliding-window_n-2_20160101 sql/create_cthist_all.sql
+      | duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: c920d855e9b65a50f913295329fc9cbb.dir
+      size: 9443877912
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 8b2473c013948c766a2e1978c15ac12c
+      size: 8314
+    outs:
+    - path: brick/sliding-window_n-2_20160101/ctgov-studies-all.parquet
+      hash: md5
+      md5: 72532c812d3f8f4b41ec76bf7d596243
+      size: 6991837
+  build-ctgov-studies-all@sliding-window_n-3_20180501:
+    cmd:
+    - mkdir -p $(dirname brick/sliding-window_n-3_20180501/ctgov-studies-all.parquet)
+    - script/tt-render-by-param sliding-window_n-3_20180501 sql/create_cthist_all.sql
+      | duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: c920d855e9b65a50f913295329fc9cbb.dir
+      size: 9443877912
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 8b2473c013948c766a2e1978c15ac12c
+      size: 8314
+    outs:
+    - path: brick/sliding-window_n-3_20180501/ctgov-studies-all.parquet
+      hash: md5
+      md5: 83df1f67244803950ea72f553ff80630
+      size: 8812346
+  build-ctgov-studies-all@sliding-window_n-4_20200901:
+    cmd:
+    - mkdir -p $(dirname brick/sliding-window_n-4_20200901/ctgov-studies-all.parquet)
+    - script/tt-render-by-param sliding-window_n-4_20200901 sql/create_cthist_all.sql
+      | duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: c920d855e9b65a50f913295329fc9cbb.dir
+      size: 9443877912
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 8b2473c013948c766a2e1978c15ac12c
+      size: 8314
+    outs:
+    - path: brick/sliding-window_n-4_20200901/ctgov-studies-all.parquet
+      hash: md5
+      md5: 3c5781874c504ec74ba0f84d64d2d03e
+      size: 11817543
+  build-ctgov-studies-all@sliding-window_n-5_20230101:
+    cmd:
+    - mkdir -p $(dirname brick/sliding-window_n-5_20230101/ctgov-studies-all.parquet)
+    - script/tt-render-by-param sliding-window_n-5_20230101 sql/create_cthist_all.sql
+      | duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: c920d855e9b65a50f913295329fc9cbb.dir
+      size: 9443877912
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 8b2473c013948c766a2e1978c15ac12c
+      size: 8314
+    outs:
+    - path: brick/sliding-window_n-5_20230101/ctgov-studies-all.parquet
+      hash: md5
+      md5: bd57b85160acde7e5e5d18c7950fbf36
+      size: 15995349
+  build-ctgov-studies-hlact-filtered@sliding-window_n-1_20130901:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/sliding-window_n-1_20130901/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param sliding-window_n-1_20130901 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/sliding-window_n-1_20130901/ctgov-studies-all.parquet
+      hash: md5
+      md5: 2927720ea69f28b7747e0086854713f7
+      size: 5862510
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/sliding-window_n-1_20130901/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: b7a9d1d9905c4d62f7fc4a3579d7a140
+      size: 971518
+  build-ctgov-studies-hlact-filtered@sliding-window_n-2_20160101:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/sliding-window_n-2_20160101/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param sliding-window_n-2_20160101 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/sliding-window_n-2_20160101/ctgov-studies-all.parquet
+      hash: md5
+      md5: 72532c812d3f8f4b41ec76bf7d596243
+      size: 6991837
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/sliding-window_n-2_20160101/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: a62c3bf4497e8e675eb93e05c617970e
+      size: 870543
+  build-ctgov-studies-hlact-filtered@sliding-window_n-3_20180501:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/sliding-window_n-3_20180501/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param sliding-window_n-3_20180501 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/sliding-window_n-3_20180501/ctgov-studies-all.parquet
+      hash: md5
+      md5: 83df1f67244803950ea72f553ff80630
+      size: 8812346
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/sliding-window_n-3_20180501/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: 40c3bb22f763c6a580af2f3e71c9fbf4
+      size: 915643
+  build-ctgov-studies-hlact-filtered@sliding-window_n-4_20200901:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/sliding-window_n-4_20200901/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param sliding-window_n-4_20200901 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/sliding-window_n-4_20200901/ctgov-studies-all.parquet
+      hash: md5
+      md5: 3c5781874c504ec74ba0f84d64d2d03e
+      size: 11817543
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/sliding-window_n-4_20200901/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: 4eb576e5f5cd7f504682fb31a9e9cf4c
+      size: 1227974
+  build-ctgov-studies-hlact-filtered@sliding-window_n-5_20230101:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/sliding-window_n-5_20230101/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param sliding-window_n-5_20230101 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/sliding-window_n-5_20230101/ctgov-studies-all.parquet
+      hash: md5
+      md5: bd57b85160acde7e5e5d18c7950fbf36
+      size: 15995349
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/sliding-window_n-5_20230101/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: 097d2ddec4d7af6d6d8d1bdd769f5643
+      size: 1541536
