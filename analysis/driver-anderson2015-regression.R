@@ -15,6 +15,8 @@ censor_date <- as.Date("2013-09-27")
 hlact.studies <- standardize.anderson2015(hlact.studies) |>
   preprocess_data.common(censor_date)
 
+assertion.anderson2015.results12(hlact.studies)
+
 ### REGRESSION MODELS
 model.logistic <- logistic_regression(hlact.studies)
 model.logistic |> print(n = 50 ); NA

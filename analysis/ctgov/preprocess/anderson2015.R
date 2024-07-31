@@ -16,7 +16,6 @@ standardize.anderson2015 <- function(df) {
            common.allocation = schema0.allocation,
            common.number_of_arms = schema0.NUMBER_OF_ARMS,
            common.masking = schema0.masking,
-           common.masking = schema0.masking,
     )
 }
 
@@ -82,4 +81,9 @@ standardize.anderson2015.norm <- function(data) {
            factor(levels = c("Device", "Biological", "Drug", "Other"))
     )
   return(data)
+}
+
+assertion.anderson2015.results12 <- function(data) {
+  assert_that( data |> subset( schema0.results12 != rr.results_reported_12mo ) |> nrow() == 0,
+              msg = 'Original results12 should match computed rr.results_reported_12mo' )
 }

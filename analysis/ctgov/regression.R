@@ -55,7 +55,7 @@ preprocess_data.common.regression <- function(data) {
            rr.study_duration = interval(common.start_date, common.primary_completion_date_imputed) / months(1),
            rr.oversight_is_fda = ifelse(common.oversight == 'United States: Food and Drug Administration',
                                      'Yes', 'No') |>
-                             as.factor() |> relevel( ref = 'Yes' ),
+                             factor( levels = c('Yes', 'No') ) |> relevel( ref = 'Yes' ),
            rr.use_of_randomized_assgn = common.allocation == 'Randomized' & common.number_of_arms > 1,
            rr.masking = case_when(
                                   common.allocation == 'Non-Randomized' ~ "Open",
@@ -95,9 +95,6 @@ preprocess_data.common.regression <- function(data) {
       rr.primary_purpose    = relevel(rr.primary_purpose,       ref = "Treatment" ),
       rr.overall_status     = relevel(common.overall_status,    ref = "Completed" )
     )
-
-  assert_that( data |> subset( schema0.results12 != rr.results_reported_12mo ) |> nrow() == 0,
-              msg = 'Original results12 should match computed rr.results_reported_12mo' )
 
   return(data)
 }
