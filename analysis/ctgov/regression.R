@@ -156,28 +156,40 @@ prefixes.rr <- c(
 escaped_prefixes.rr <- map(prefixes.rr, str_escape)
 prefix_pattern.rr <- paste(escaped_prefixes.rr, collapse = "|")
 
-compare.model.logistic <- function(model.logistic) {
+compare.model.logistic.or <- function(model.logistic) {
+  model.logistic |>
+    rename(
+           or = estimate,
+           or.conf.low = conf.low,
+           or.conf.high = conf.high
+    ) |>
+    filter( term != '(Intercept)' ) |>
+    select( term, or, or.conf.low, or.conf.high )
+}
+
+compare.model.logistic.or.paper <- function() {
   paper.regress.s7 <- read.csv('data/anderson2015/table-S7.csv') |>
     mutate(across(term,trimws))
+  paper.regress.s7 |>
+    select( term, or, or.conf.low, or.conf.high )
+}
 
+compare.model.extract_prefix <- function(term.data) {
+  term.data |>
+    mutate(
+        prefix = str_extract(term, prefix_pattern.rr),
+        suffix = str_remove(term, prefix_pattern.rr)
+    )
+}
+
+compare.model.logistic <- function(model.logistic) {
   or.combined <- bind_rows(
-          model.logistic |>
-            rename(
-                   or = estimate,
-                   or.conf.low = conf.low,
-                   or.conf.high = conf.high
-            ) |>
-            filter( term != '(Intercept)' ) |>
-            select( term, or, or.conf.low, or.conf.high ) |>
+          compare.model.logistic.or(model.logistic) |>
             mutate( source = 'Model' ),
-          paper.regress.s7 |>
-            select( term, or, or.conf.low, or.conf.high ) |>
+          compare.model.logistic.or.paper() |>
             mutate( source = 'Paper' ),
   ) %>%
-  mutate(
-      prefix = str_extract(term, prefix_pattern.rr),
-      suffix = str_remove(term, prefix_pattern.rr)
-  )
+  compare.model.extract_prefix()
   return(or.combined)
 }
 
