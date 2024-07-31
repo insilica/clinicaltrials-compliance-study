@@ -15,3 +15,43 @@ param:
     output:
       all:            brick/analysis-20240430/ctgov-studies-all.parquet
       hlact-filtered: brick/analysis-20240430/ctgov-studies-hlact.parquet
+  sliding-window_n-1_20130901:
+    date:
+      cutoff: '2013-09-01'
+      start:  '2008-01-01'
+      stop:   '2012-09-01'
+    output:
+      all:            brick/sliding-window_n-1_20130901/ctgov-studies-all.parquet
+      hlact-filtered: brick/sliding-window_n-1_20130901/ctgov-studies-hlact.parquet
+  sliding-window_n-2_20160101:
+    date:
+      cutoff: '2016-01-01'
+      start:  '2010-05-01'
+      stop:   '2015-01-01'
+    output:
+      all:            brick/sliding-window_n-2_20160101/ctgov-studies-all.parquet
+      hlact-filtered: brick/sliding-window_n-2_20160101/ctgov-studies-hlact.parquet
+  sliding-window_n-3_20180501:
+    date:
+      cutoff: '2018-05-01'
+      start:  '2012-09-01'
+      stop:   '2017-05-01'
+    output:
+      all:            brick/sliding-window_n-3_20180501/ctgov-studies-all.parquet
+      hlact-filtered: brick/sliding-window_n-3_20180501/ctgov-studies-hlact.parquet
+  sliding-window_n-4_20200901:
+    date:
+      cutoff: '2020-09-01'
+      start:  '2015-01-01'
+      stop:   '2019-09-01'
+    output:
+      all:            brick/sliding-window_n-4_20200901/ctgov-studies-all.parquet
+      hlact-filtered: brick/sliding-window_n-4_20200901/ctgov-studies-hlact.parquet
+  sliding-window_n-5_20230101:
+    date:
+      cutoff: '2023-01-01'
+      start:  '2017-05-01'
+      stop:   '2022-01-01'
+    output:
+      all:            brick/sliding-window_n-5_20230101/ctgov-studies-all.parquet
+      hlact-filtered: brick/sliding-window_n-5_20230101/ctgov-studies-hlact.parquet
