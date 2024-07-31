@@ -22,7 +22,18 @@ model.logistic <- logistic_regression(hlact.studies, formula.anderson2015)
 
 model.logistic |> print(n = 50 ); NA
 
-or.combined <- compare.model.logistic(model.logistic)
+jsonl.studies <- arrow::read_parquet('brick/analysis-20130927/ctgov-studies-hlact.parquet') |>
+  tibble()
+print(jsonl.studies)#DEBUG
+
+jsonl.studies <- standardize.jsonl_derived(jsonl.studies) |>
+  preprocess_data.common(censor_date)
+
+model.logistic.jsonl <- logistic_regression(jsonl.studies, formula.jsonl_derived)
+
+model.logistic.jsonl |> print(n = 50 ); NA
+
+or.combined <- compare.model.logistic(model.logistic.jsonl)
 
 fig.compare.logistic <- plot.compare.logistic(or.combined)
 show(fig.compare.logistic)

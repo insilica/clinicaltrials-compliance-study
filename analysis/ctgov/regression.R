@@ -117,6 +117,23 @@ formula.anderson2015 <-
    + rr.masking
    )
 
+formula.jsonl_derived <-
+     rr.results_reported_12mo ~
+   ( rr.primary_purpose
+   + rr.intervention_type
+   + rr.phase
+   # no rr.oversight_is_fda term
+   + rr.funding
+   + rr.log2_enrollment_less_split + rr.log2_enrollment_more_split
+   + rr.overall_status
+   + rr.pc_year_increase_pre_split + rr.pc_year_increase_post_split
+   + rr.sdur.per_3_months_increase_pre_12 + rr.sdur.per_3_months_increase_post_12
+   + rr.number_of_arms
+   + rr.use_of_randomized_assgn
+   + rr.masking
+   )
+
+
 logistic_regression <- function(data, formula) {
   model <- glm(formula,
                data = data, family = binomial )
