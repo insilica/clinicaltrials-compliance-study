@@ -100,22 +100,25 @@ preprocess_data.common.regression <- function(data) {
 }
 
 
-logistic_regression <- function(data) {
-  ##+ mntopcom # weird that this has more exact values?
-  model <- glm( rr.results_reported_12mo ~
-               ( rr.primary_purpose
-               + rr.intervention_type
-               + rr.phase
-               + rr.oversight_is_fda
-               + rr.funding
-               + rr.log2_enrollment_less_split + rr.log2_enrollment_more_split
-               + rr.overall_status
-               + rr.pc_year_increase_pre_split + rr.pc_year_increase_post_split
-               + rr.sdur.per_3_months_increase_pre_12 + rr.sdur.per_3_months_increase_post_12
-               + rr.number_of_arms
-               + rr.use_of_randomized_assgn
-               + rr.masking
-               ),
+##+ mntopcom # weird that this has more exact values?
+formula.anderson2015 <-
+     rr.results_reported_12mo ~
+   ( rr.primary_purpose
+   + rr.intervention_type
+   + rr.phase
+   + rr.oversight_is_fda
+   + rr.funding
+   + rr.log2_enrollment_less_split + rr.log2_enrollment_more_split
+   + rr.overall_status
+   + rr.pc_year_increase_pre_split + rr.pc_year_increase_post_split
+   + rr.sdur.per_3_months_increase_pre_12 + rr.sdur.per_3_months_increase_post_12
+   + rr.number_of_arms
+   + rr.use_of_randomized_assgn
+   + rr.masking
+   )
+
+logistic_regression <- function(data, formula) {
+  model <- glm(formula,
                data = data, family = binomial )
   model <- tidy(model, exponentiate = TRUE, conf.int = TRUE)
   return(model)

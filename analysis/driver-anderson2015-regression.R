@@ -18,7 +18,8 @@ hlact.studies <- standardize.anderson2015(hlact.studies) |>
 assertion.anderson2015.results12(hlact.studies)
 
 ### REGRESSION MODELS
-model.logistic <- logistic_regression(hlact.studies)
+model.logistic <- logistic_regression(hlact.studies, formula.anderson2015)
+
 model.logistic |> print(n = 50 ); NA
 
 or.combined <- compare.model.logistic(model.logistic)
