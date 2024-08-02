@@ -35,6 +35,17 @@ model.logistic.jsonl |> print(n = 50 ); NA
 
 or.combined <- compare.model.logistic(model.logistic.jsonl)
 
+
+compare.model.logistic.or( model.logistic ) |>
+  select( term, or)  |>
+  inner_join(
+             compare.model.logistic.or.paper() |> select( term, or ),
+             by = 'term',
+             suffix = c('.model', '.paper')
+             ) |>
+  ( \(x) { cor(x$or.model, x$or.paper) } )()
+
+
 fig.compare.logistic <- plot.compare.logistic(or.combined)
 show(fig.compare.logistic)
 ggsave("figtab/anderson2015/compare.table_s7.or.png", width = 12, height = 8)
