@@ -36,15 +36,22 @@ model.logistic.jsonl |> print(n = 50 ); NA
 or.combined <- compare.model.logistic(model.logistic.jsonl)
 
 
-compare.model.logistic.or( model.logistic ) |>
+or.df <- compare.model.logistic.or( model.logistic ) |>
   select( term, or)  |>
   inner_join(
              compare.model.logistic.or.paper() |> select( term, or ),
              by = 'term',
              suffix = c('.model', '.paper')
-             ) |>
-  ( \(x) { cor(x$or.model, x$or.paper) } )()
+             )
 
+or.df |> with(cor(or.model, or.paper))
+
+pacman::p_load( blandr )
+
+blandr::blandr.draw(method1 = or.df$or.paper,
+                    method1name = 'Paper',
+                    method2 = or.df$or.model,
+                    method2name = 'Model')
 
 fig.compare.logistic <- plot.compare.logistic(or.combined)
 show(fig.compare.logistic)
