@@ -7,7 +7,12 @@ mkdir -p log
 JOB_PROCFILE=./log/job-procfile
 echo 3 > $JOB_PROCFILE
 
-export CTHIST_DOWNLOAD_CUTOFF_DATE=2024-04-30
+#export CTHIST_DOWNLOAD_CUTOFF_DATE=2024-04-30
+
+## Do not set `CTHIST_DOWNLOAD_CUTOFF_DATE` so that all record versions are
+## downloaded.
+unset CTHIST_DOWNLOAD_CUTOFF_DATE
+
 export PGDATABASE_LATEST=aact_20240430
 
 duckdb -noheader -csv -c "$(cat <<EOF
