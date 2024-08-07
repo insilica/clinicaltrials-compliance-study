@@ -24,10 +24,11 @@ generate_time_periods_yaml <- function(start_date,
                      glue("{prefix}"),
                      glue("n-{i}_{period_name.cutoff}")))
     periods[[period_name]] <- list(
+      n      = i,
       cutoff = format(period_cutoff, "%Y-%m-%d"),
-      start = format(period_start, "%Y-%m-%d"),
-      stop = format(period_stop, "%Y-%m-%d"),
-      dir  = period_path
+      start  = format(period_start, "%Y-%m-%d"),
+      stop   = format(period_stop, "%Y-%m-%d"),
+      dir    = period_path
     )
   }
 
@@ -37,6 +38,8 @@ generate_time_periods_yaml <- function(start_date,
     period <- periods[[period_name]]
     yaml_output <- glue("{yaml_output}
 {period_name}:
+  prefix: {prefix}
+  n: {period$n}
   date:
     cutoff: '{period$cutoff}'
     start:  '{period$start}'
