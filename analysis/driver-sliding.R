@@ -1,41 +1,118 @@
-# source('analysis/driver-sliding.R')
+# argv <- c('params.yaml', 'sliding-window'); source('analysis/driver-sliding.R')
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load( purrr, fs, dplyr, stringr, ggplot2 )
+pacman::p_load( purrr, fs, dplyr, stringr, ggplot2, yaml, patchwork )
 
 source('analysis/ctgov.R')
 
-# TODO remove this hack and read from the parameter file
-dirs <- fs::dir_ls('brick', type='directory') |>
-  keep(~ grepl('sliding-window', .x)) |>
-  sort()
-
-models.logistic <- list()
-
-for(dir in dirs) {
-  # TODO remove this hack and read from the parameter file
-  name <- fs::path_file(dir)
-  censor_date <- dir |> str_extract('\\d{8}$') |> ymd()
-
-  print(dir)#DEBUG
-  print(name)#DEBUG
-  print(censor_date)#DEBUG
-
-  all.path   <- path_join(c(dir, 'ctgov-studies-all.parquet'  ))
-  hlact.path <- path_join(c(dir, 'ctgov-studies-hlact.parquet'))
-
-  jsonl.studies <- arrow::read_parquet(hlact.path) |>
-    tibble()
-
-  jsonl.studies <- standardize.jsonl_derived(jsonl.studies) |>
-    preprocess_data.common(censor_date)
-
-  model.logistic <- logistic_regression(jsonl.studies, formula.jsonl_derived)
-  models.logistic[[name]] <- models.logistic
-  #print(jsonl.studies)#DEBUG
-
+if(!exists('argv')) {
+  argv <- commandArgs(trailingOnly = TRUE)
 }
+
+if (length(argv) != 2) {
+  stop("Usage: script.R <path_to_yaml_file> <key_to_search>", call. = FALSE)
+}
+
+params_file <- argv[1]
+prefix      <- argv[2]
+
+params <- yaml.load_file(params_file)
+
+windows <- params$param |>
+  keep( \(x) !is.null(x$prefix) && x$prefix == prefix )
+
+if( length(windows) == 0 ) {
+  stop("No windows!")
+}
+
+agg.windows <- list()
+
+for(w_name in names(windows)) {
+  window <- windows[[w_name]]
+  censor_date <- window$date$cutoff
+
+  print(w_name)#DEBUG
+
+  agg.windows[[w_name]]$window <- window
+
+  all.path   <- window$output$all
+  hlact.path <- window$output$`hlact-filtered`
+
+  agg.windows[[w_name]] <- within(agg.windows[[w_name]],{
+    all.studies <- arrow::read_parquet(all.path)
+
+    hlact.studies <- arrow::read_parquet(hlact.path) |>
+      tibble()
+
+    hlact.studies <-
+      standardize.jsonl_derived(hlact.studies) |>
+      preprocess_data.common(censor_date)
+
+    model.logistic <-
+      logistic_regression(hlact.studies,
+                          formula.jsonl_derived)
+  })
+}
+
+for(w_name in names(agg.windows)) {
+  agg.windows[[w_name]] <- within(agg.windows[[w_name]], {
+    all.studies.n <- nrow(all.studies)
+    hlact.studies.n <- nrow(hlact.studies)
+    surv.event.n <- sum(hlact.studies$surv.event)
+    rr.results_reported_12mo.n <- sum(hlact.studies$rr.results_reported_12mo)
+    rr.results_reported_5yr.n  <- sum(hlact.studies$rr.results_reported_5yr )
+  })
+}
+
+df <- agg.windows |>
+  map( ~ data.frame(
+           cutoff = .x$window$date$cutoff,
+           hlact.n    = .x$hlact.studies.n,
+           hlact.pct  = .x$hlact.studies.n / .x$all.studies.n,
+           rr.results_reported_12mo.n   =
+             .x$rr.results_reported_12mo.n,
+           rr.results_reported_12mo.pct =
+             .x$rr.results_reported_12mo.n / .x$hlact.studies.n,
+           rr.results_reported_5yr.n   =
+             .x$rr.results_reported_5yr.n,
+           rr.results_reported_5yr.pct =
+             .x$rr.results_reported_5yr.n / .x$hlact.studies.n
+           ) ) |>
+  list_rbind() |> tibble()
+df
+
+(
+( ggplot(df, aes(x = cutoff, y = rr.results_reported_12mo.pct, group = 1))
+  + geom_line()
+  + geom_point( size = 2)
+  + scale_y_continuous()
+  + labs(x = 'cut-off date', y = 'Percentage')
+  + ggtitle('Percentage results reported within 12 months')
+  + theme_minimal()
+)
++
+( ggplot(df, aes(x = cutoff, y = rr.results_reported_5yr.pct, group = 1))
+  + geom_line()
+  + geom_point( size = 2)
+  + scale_y_continuous()
+  + labs(x = 'cut-off date', y = 'Percentage')
+  + ggtitle('Percentage results reported within 5 years')
+  + theme_minimal()
+)
++
+  ( ggplot(df, aes(x = cutoff, y = hlact.pct, group = 1))
+  + geom_line()
+  + geom_point( size = 2)
+  + scale_y_continuous()
+  + labs(x = 'cut-off date', y = 'Percentage')
+  + ggtitle('Percentage HLACTs out of all studies')
+  + theme_minimal()
+)
+)
+
+
+stop()
 
 for(name in names(models.logistic)) {
   model <- models.logistic[[name]]

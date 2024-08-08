@@ -75,11 +75,12 @@
                             ggplot2 ggsurvfit gtsummary
                             here
                             lubridate
-                            pacman parsedate purrr
+                            pacman parsedate patchwork purrr
                             readr RPostgres
                             stringr survival survminer
                             this_path tidyr tidyverse
                             vroom
+                            yaml
                     ]);
             env = oldAttrs.env // {
               LC_ALL = "C";
