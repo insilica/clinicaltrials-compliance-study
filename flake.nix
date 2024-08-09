@@ -72,7 +72,7 @@
                             ComplexUpset cthist
                             DBI dotenv dplyr
                             forcats fs
-                            ggplot2 ggsurvfit gtsummary
+                            ggplot2 ggsurvfit glue gtsummary
                             here
                             logger lubridate
                             pacman parsedate patchwork purrr

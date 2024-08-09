@@ -2,7 +2,18 @@
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load( logger, rlang, purrr, fs, dplyr, stringr, ggplot2, yaml, patchwork )
+pacman::p_load(
+               dplyr,
+               fs,
+               ggplot2,
+               glue,
+               logger,
+               patchwork,
+               purrr,
+               rlang,
+               stringr,
+               yaml
+)
 
 log_layout(layout_glue_colors)
 log_threshold(TRACE)
@@ -109,18 +120,18 @@ plot.pct.scatterline <- function(data, y.var, title) {
                        'Percentage HLACTs out of all studies')
 )
 
-stop()
-
-for(name in names(models.logistic)) {
-  model <- models.logistic[[name]]
-  log_info(name)
-  log_info(model)
-  fig <- compare.model.logistic( model ) |>
-    plot.compare.logistic()
-  fig <- fig + labs(title = name )
-  show(fig)
-  #invisible(readline(prompt="Press [enter] to continue"))
-  plot.output.path <- fs::path(glue("figtab/{name}/compare.table_s7.or.png"))
-  fs::dir_create(path_dir(plot.output.path))
-  ggsave(plot.output.path, width = 12, height = 8)
+for(name in names(agg.windows)) {
+  with(agg.windows[[name]],{
+    model <- model.logistic
+    log_info(name)
+    log_info(str.print(model))
+    fig <- compare.model.logistic( model ) |>
+      plot.compare.logistic()
+    fig <- fig + labs(title = name)
+    show(fig)
+    #invisible(readline(prompt="Press [enter] to continue"))
+    plot.output.path <- fs::path(glue("figtab/{window$prefix}/{window$suffix}/compare.table_s7.or.png"))
+    fs::dir_create(path_dir(plot.output.path))
+    ggsave(plot.output.path, width = 12, height = 8)
+  })
 }
