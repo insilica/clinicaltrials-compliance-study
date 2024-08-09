@@ -1,4 +1,7 @@
 preprocess_data.common <- function(data, start_date, stop_date, censor_date) {
+  start_date  <- as.Date(start_date)
+  stop_date   <- as.Date(stop_date)
+  censor_date <- as.Date(censor_date)
   data <- data |>
     # Normalize phases
     mutate(common.phase.norm =

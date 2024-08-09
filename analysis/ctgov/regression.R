@@ -10,7 +10,12 @@ preprocess_data.common.regression <- function(data, start_date, stop_date) {
   #   - use of randomized assignment, and
   #   - use of masking.
   split.enrollment <- 32
-  split.pc_year <- 2010
+
+  halfway_date <- start_date + ( stop_date - start_date ) / 2
+  # This is 2010 for the original interval in Anderson 2015
+  split.pc_year <- year(halfway_date)
+  log_debug("Regression for {start_date}–{stop_date} window splits pc_year variable at {split.pc_year}")
+
   data <- data %>%
     # Define the variables for reporting by a particular time, either by
     mutate(
