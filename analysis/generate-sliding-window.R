@@ -20,11 +20,14 @@ generate_time_periods_yaml <- function(start_date,
     period_name.cutoff <- format(period_cutoff, '%Y%m%d')
 
     period_name <- glue("sliding-window_n-{i}_{period_name.cutoff}")
+    suffix      <- glue("n-{i}_{period_name.cutoff}")
     period_path <- fs::path_join(c(
                      glue("{prefix}"),
-                     glue("n-{i}_{period_name.cutoff}")))
+                     glue("{suffix}")))
     periods[[period_name]] <- list(
       n      = i,
+      prefix = prefix,
+      suffix = suffix,
       cutoff = format(period_cutoff, "%Y-%m-%d"),
       start  = format(period_start, "%Y-%m-%d"),
       stop   = format(period_stop, "%Y-%m-%d"),
@@ -38,7 +41,8 @@ generate_time_periods_yaml <- function(start_date,
     period <- periods[[period_name]]
     yaml_output <- glue("{yaml_output}
 {period_name}:
-  prefix: {prefix}
+  prefix: {period$prefix}
+  suffix: {period$suffix}
   n: {period$n}
   date:
     cutoff: '{period$cutoff}'
