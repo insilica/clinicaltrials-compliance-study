@@ -4,6 +4,10 @@ if (!require("pacman")) install.packages("pacman")
 library(pacman)
 pacman::p_load( logger, rlang, purrr, fs, dplyr, stringr, ggplot2, yaml, patchwork )
 
+log_layout(layout_glue_colors)
+log_threshold(TRACE)
+#log_threshold(DEBUG)
+
 source('analysis/ctgov.R')
 
 if(!exists('argv')) {
