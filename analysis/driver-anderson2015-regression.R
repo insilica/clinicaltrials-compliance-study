@@ -8,12 +8,16 @@ source('analysis/ctgov.R')
 hlact.studies <- arrow::read_parquet('brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet') |>
   tibble()
 log_info(str.print(hlact.studies))#DEBUG
+start_date <- as.Date('2008-01-01')
+stop_date  <- as.Date('2012-09-01')
 # Censoring date
 censor_date <- as.Date("2013-09-27")
 
 ### PREPROCESS
 hlact.studies <- standardize.anderson2015(hlact.studies) |>
-  preprocess_data.common(censor_date)
+  preprocess_data.common(start_date  = start_date,
+                         stop_date   = stop_date,
+                         censor_date = censor_date)
 
 assertion.anderson2015.results12(hlact.studies)
 
@@ -27,7 +31,9 @@ jsonl.studies <- arrow::read_parquet('brick/analysis-20130927/ctgov-studies-hlac
 log_info(str.print(jsonl.studies))#DEBUG
 
 jsonl.studies <- standardize.jsonl_derived(jsonl.studies) |>
-  preprocess_data.common(censor_date)
+  preprocess_data.common(start_date  = start_date,
+                         stop_date   = stop_date,
+                         censor_date = censor_date)
 
 model.logistic.jsonl <- logistic_regression(jsonl.studies, formula.jsonl_derived)
 

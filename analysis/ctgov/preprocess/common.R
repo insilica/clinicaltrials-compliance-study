@@ -1,4 +1,4 @@
-preprocess_data.common <- function(data, censor_date) {
+preprocess_data.common <- function(data, start_date, stop_date, censor_date) {
   data <- data |>
     # Normalize phases
     mutate(common.phase.norm =
@@ -17,7 +17,7 @@ preprocess_data.common <- function(data, censor_date) {
       common.pc_year_imputed = year(common.primary_completion_date_imputed),
     ) |>
     preprocess_data.common.survival(censor_date) |>
-    preprocess_data.common.regression()
+    preprocess_data.common.regression(start_date, stop_date)
 
   return(data)
 }

@@ -1,4 +1,4 @@
-preprocess_data.common.regression <- function(data) {
+preprocess_data.common.regression <- function(data, start_date, stop_date) {
   # From paper Table 3:
   # Regression models included the following covariates in addition to those
   # listed:

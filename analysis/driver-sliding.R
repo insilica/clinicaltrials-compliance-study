@@ -47,7 +47,9 @@ for(w_name in names(windows)) {
 
     hlact.studies <-
       standardize.jsonl_derived(hlact.studies) |>
-      preprocess_data.common(censor_date)
+      preprocess_data.common(start_date  = window$date$start,
+                             stop_date   = window$date$stop,
+                             censor_date = censor_date)
 
     model.logistic <-
       logistic_regression(hlact.studies,
