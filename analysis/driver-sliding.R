@@ -2,7 +2,7 @@
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load( purrr, fs, dplyr, stringr, ggplot2, yaml, patchwork )
+pacman::p_load( logger, purrr, fs, dplyr, stringr, ggplot2, yaml, patchwork )
 
 source('analysis/ctgov.R')
 
@@ -32,7 +32,7 @@ for(w_name in names(windows)) {
   window <- windows[[w_name]]
   censor_date <- window$date$cutoff
 
-  print(w_name)#DEBUG
+  log_info(w_name)
 
   agg.windows[[w_name]]$window <- window
 
@@ -116,8 +116,8 @@ stop()
 
 for(name in names(models.logistic)) {
   model <- models.logistic[[name]]
-  print(name)
-  print(model)
+  log_info(name)
+  log_info(model)
   fig <- compare.model.logistic( model ) |>
     plot.compare.logistic()
   fig <- fig + labs(title = name )

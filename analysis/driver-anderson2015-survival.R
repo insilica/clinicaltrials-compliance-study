@@ -1,6 +1,7 @@
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
 pacman::p_load(
+  logger,
   fs,
   parsedate,
   purrr,
@@ -15,7 +16,7 @@ debug_mode <- Sys.getenv("DEBUG") == "1"
 ### INPUT
 hlact.studies <- arrow::read_parquet('brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet') |>
   tibble()
-print(hlact.studies)#DEBUG
+log_info(str.print(hlact.studies))#DEBUG
 # Censoring date
 censor_date <- as.Date("2013-09-27")
 

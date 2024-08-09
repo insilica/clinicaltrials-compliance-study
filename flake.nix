@@ -74,7 +74,7 @@
                             forcats fs
                             ggplot2 ggsurvfit gtsummary
                             here
-                            lubridate
+                            logger lubridate
                             pacman parsedate patchwork purrr
                             readr RPostgres
                             stringr survival survminer
