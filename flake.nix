@@ -76,7 +76,7 @@
                             here
                             logger lubridate
                             pacman parsedate patchwork purrr
-                            readr RPostgres
+                            readr rlang RPostgres
                             stringr survival survminer
                             this_path tidyr tidyverse
                             vroom

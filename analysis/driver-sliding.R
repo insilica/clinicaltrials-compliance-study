@@ -2,7 +2,7 @@
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load( logger, purrr, fs, dplyr, stringr, ggplot2, yaml, patchwork )
+pacman::p_load( logger, rlang, purrr, fs, dplyr, stringr, ggplot2, yaml, patchwork )
 
 source('analysis/ctgov.R')
 
@@ -82,35 +82,26 @@ df <- agg.windows |>
   list_rbind() |> tibble()
 df
 
-(
-( ggplot(df, aes(x = cutoff, y = rr.results_reported_12mo.pct, group = 1))
-  + geom_line()
-  + geom_point( size = 2)
-  + scale_y_continuous()
-  + labs(x = 'cut-off date', y = 'Percentage')
-  + ggtitle('Percentage results reported within 12 months')
-  + theme_minimal()
-)
-+
-( ggplot(df, aes(x = cutoff, y = rr.results_reported_5yr.pct, group = 1))
-  + geom_line()
-  + geom_point( size = 2)
-  + scale_y_continuous()
-  + labs(x = 'cut-off date', y = 'Percentage')
-  + ggtitle('Percentage results reported within 5 years')
-  + theme_minimal()
-)
-+
-  ( ggplot(df, aes(x = cutoff, y = hlact.pct, group = 1))
-  + geom_line()
-  + geom_point( size = 2)
-  + scale_y_continuous()
-  + labs(x = 'cut-off date', y = 'Percentage')
-  + ggtitle('Percentage HLACTs out of all studies')
-  + theme_minimal()
-)
-)
+plot.pct.scatterline <- function(data, y.var, title) {
+  fig <- ( ggplot(df, aes(x = cutoff, y = {{y.var}}, group = 1))
+    + geom_line()
+    + geom_point( size = 2)
+    + scale_y_continuous()
+    + labs(x = 'cut-off date', y = 'Percentage')
+    + ggtitle(title)
+    + theme_minimal()
+  )
 
+  return(fig)
+}
+
+(  plot.pct.scatterline(df, rr.results_reported_12mo.pct,
+                      'Percentage results reported within 12 months')
+ + plot.pct.scatterline(df, rr.results_reported_5yr.pct,
+                       'Percentage results reported within 5 years')
+ + plot.pct.scatterline(df, hlact.pct,
+                       'Percentage HLACTs out of all studies')
+)
 
 stop()
 
