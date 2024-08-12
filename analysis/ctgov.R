@@ -14,6 +14,7 @@ pacman::p_load(
   ggsurvfit,
   forcats,
   stringr,
+  blandr,
   broom,
   tidyr,
   assertthat

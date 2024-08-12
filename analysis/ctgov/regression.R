@@ -212,3 +212,22 @@ plot.compare.logistic <- function(or.combined) {
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
   return(fig)
 }
+
+compare.model.df <- function(model.logistic) {
+  or.df <- compare.model.logistic.or( model.logistic ) |>
+    select( term, or)  |>
+    inner_join(
+               compare.model.logistic.or.paper() |> select( term, or ),
+               by = 'term',
+               suffix = c('.model', '.paper')
+               )
+  return(or.df)
+}
+
+plot.blandr.or.df <- function(or.df) {
+  fig <- blandr::blandr.draw(method1 = or.df$or.paper,
+                      method1name = 'Paper',
+                      method2 = or.df$or.model,
+                      method2name = 'Model')
+  return(fig)
+}

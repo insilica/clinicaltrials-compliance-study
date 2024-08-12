@@ -1,3 +1,5 @@
+# source('analysis/driver-anderson2015-regression.R')
+
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
 pacman::p_load( logger, purrr, dplyr, stringr, ggplot2 )
@@ -42,22 +44,10 @@ model.logistic.jsonl |> str.print(n = 50 ) |> log_info(); NA
 or.combined <- compare.model.logistic(model.logistic.jsonl)
 
 
-or.df <- compare.model.logistic.or( model.logistic ) |>
-  select( term, or)  |>
-  inner_join(
-             compare.model.logistic.or.paper() |> select( term, or ),
-             by = 'term',
-             suffix = c('.model', '.paper')
-             )
-
+or.df <- compare.model.df(model.logistic.jsonl)
+or.df <- compare.model.df(model.logistic)
 or.df |> with(cor(or.model, or.paper))
-
-pacman::p_load( blandr )
-
-blandr::blandr.draw(method1 = or.df$or.paper,
-                    method1name = 'Paper',
-                    method2 = or.df$or.model,
-                    method2name = 'Model')
+plot.blandr.or.df(or.df)
 
 fig.compare.logistic <- plot.compare.logistic(or.combined)
 show(fig.compare.logistic)

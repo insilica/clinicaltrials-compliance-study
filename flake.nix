@@ -68,7 +68,7 @@
               ++ [ (pkgs.python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
               ++ (with pkgs.rPackages; [
                             arrow assertthat
-                            broom
+                            blandr broom
                             ComplexUpset cthist
                             DBI dotenv dplyr
                             forcats fs
