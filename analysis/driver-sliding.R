@@ -104,7 +104,7 @@ plot.pct.scatterline <- function(data, y.var, title) {
     + geom_line()
     + geom_point( size = 2)
     + scale_y_continuous()
-    + labs(x = 'cut-off date', y = 'Percentage')
+    + labs(x = 'Cut-off date', y = 'Percentage')
     + ggtitle(title)
     + theme_minimal()
   )
@@ -112,6 +112,7 @@ plot.pct.scatterline <- function(data, y.var, title) {
   return(fig)
 }
 
+fig.pct.all <-
 (  plot.pct.scatterline(df, rr.results_reported_12mo.pct,
                       'Percentage results reported within 12 months')
  + plot.pct.scatterline(df, rr.results_reported_5yr.pct,
@@ -119,6 +120,10 @@ plot.pct.scatterline <- function(data, y.var, title) {
  + plot.pct.scatterline(df, hlact.pct,
                        'Percentage HLACTs out of all studies')
 )
+show(fig.pct.all)
+plot.output.path <- fs::path(glue("figtab/{window$prefix}/fig.percentage.all.png"))
+fs::dir_create(path_dir(plot.output.path))
+ggsave(plot.output.path)
 
 for(name in names(agg.windows)) {
   with(agg.windows[[name]],{
