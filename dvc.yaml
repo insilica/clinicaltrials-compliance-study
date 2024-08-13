@@ -69,3 +69,12 @@ stages:
         - download/aact/db-dump/20240430_clinical_trials.zip
       outs:
         - ${item.output.hlact-filtered}
+  analysis-driver-sliding_sliding-window:
+    cmd: |
+      Rscript analysis/driver-sliding.R params.yaml sliding-window
+    deps:
+      - brick/sliding-window
+      - params.yaml
+      - analysis/driver-sliding.R
+    outs:
+      - figtab/sliding-window

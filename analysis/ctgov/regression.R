@@ -1,4 +1,4 @@
-preprocess_data.common.regression <- function(data) {
+preprocess_data.common.regression <- function(data, start_date, stop_date) {
   # From paper Table 3:
   # Regression models included the following covariates in addition to those
   # listed:
@@ -10,7 +10,12 @@ preprocess_data.common.regression <- function(data) {
   #   - use of randomized assignment, and
   #   - use of masking.
   split.enrollment <- 32
-  split.pc_year <- 2010
+
+  halfway_date <- start_date + ( stop_date - start_date ) / 2
+  # This is 2010 for the original interval in Anderson 2015
+  split.pc_year <- year(halfway_date)
+  log_debug("Regression for {start_date}–{stop_date} window splits pc_year variable at {split.pc_year}")
+
   data <- data %>%
     # Define the variables for reporting by a particular time, either by
     mutate(
@@ -205,5 +210,24 @@ plot.compare.logistic <- function(or.combined) {
          y = "Odds Ratio") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  return(fig)
+}
+
+compare.model.df <- function(model.logistic) {
+  or.df <- compare.model.logistic.or( model.logistic ) |>
+    select( term, or)  |>
+    inner_join(
+               compare.model.logistic.or.paper() |> select( term, or ),
+               by = 'term',
+               suffix = c('.model', '.paper')
+               )
+  return(or.df)
+}
+
+plot.blandr.or.df <- function(or.df) {
+  fig <- blandr::blandr.draw(method1 = or.df$or.paper,
+                      method1name = 'Paper',
+                      method2 = or.df$or.model,
+                      method2name = 'Model')
   return(fig)
 }

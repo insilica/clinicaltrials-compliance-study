@@ -68,18 +68,19 @@
               ++ [ (pkgs.python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
               ++ (with pkgs.rPackages; [
                             arrow assertthat
-                            broom
+                            blandr broom
                             ComplexUpset cthist
                             DBI dotenv dplyr
                             forcats fs
-                            ggplot2 ggsurvfit gtsummary
+                            ggplot2 ggsurvfit glue gtsummary
                             here
-                            lubridate
-                            pacman parsedate purrr
-                            readr RPostgres
-                            stringr survival survminer
+                            logger lubridate
+                            pacman parsedate patchwork purrr
+                            readr rlang RPostgres
+                            scales stringr survival survminer
                             this_path tidyr tidyverse
                             vroom
+                            yaml
                     ]);
             env = oldAttrs.env // {
               LC_ALL = "C";

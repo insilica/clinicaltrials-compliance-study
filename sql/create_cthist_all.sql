@@ -76,9 +76,9 @@ COPY (
 
                     studyRecord ->> '$.study.protocolSection.identificationModule.nctId' AS nct_id,
 
-                    list_distinct(
+                    list_sort(list_distinct(
                         studyRecord ->> '$.study.protocolSection.contactsLocationsModule.locations[*].country'
-                    ) AS location_country,
+                    )) AS location_country,
                     TRY_CAST(
                         studyRecord ->> '$.study.protocolSection.oversightModule.oversightHasDmc' AS BOOLEAN
                     ) AS has_dmc,
@@ -116,9 +116,9 @@ COPY (
                     ) AS enrollment,
                     studyRecord ->> '$.study.protocolSection.statusModule.statusVerifiedDate' AS verification_date,
                     -- TODO Partial date type
-                    list_distinct(
+                    list_sort(list_distinct(
                         studyRecord ->> '$.study.protocolSection.armsInterventionsModule.interventions[*].type'
-                    ) AS intervention_type,
+                    )) AS intervention_type,
                     len(
                         studyRecord ->> '$.study.protocolSection.armsInterventionsModule.armGroups[*]'
                     ) AS number_of_arm_groups,
@@ -144,10 +144,11 @@ COPY (
             )
             SELECT
                 *,
-                -- Assume that the list `location_country` does not contain
-                -- `NULL` elements (but can still be `NULL` or `[]` itself).
+                -- `list_distinct()` ensures that the list `location_country`
+                -- does not contain `NULL` elements (but can still be `NULL` or
+                -- `[]` itself).
                 list_has_any(
-                    NULLIF(location_country, []),
+                    NULLIF(list_distinct(location_country), []),
                     [
                         'United States',
                         'Puerto Rico',
