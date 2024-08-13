@@ -109,6 +109,7 @@ plot.pct.scatterline <- function(data, y.var, title) {
     + labs(x = 'Cut-off date', y = 'Percentage')
     + ggtitle(title)
     + theme_minimal()
+    + theme(axis.text.x = element_text(angle = 45, hjust = 1))
   )
 
   return(fig)
@@ -125,7 +126,7 @@ fig.pct.all <-
 show(fig.pct.all)
 plot.output.path <- fs::path(glue("figtab/{window$prefix}/fig.percentage.all.png"))
 fs::dir_create(path_dir(plot.output.path))
-ggsave(plot.output.path)
+ggsave(plot.output.path, width = 12, height = 8)
 
 for(name in names(agg.windows)) {
   with(agg.windows[[name]],{
@@ -184,7 +185,7 @@ fig.result_reported_within.stacked_area <-
          aes(x = time, y = pct, fill = grp) ) +
     geom_bar(stat = "identity") +
     geom_text(aes(label = ifelse(pct > 0.01, sprintf("%.1f%%", 100*pct), '')),
-              position = position_stack(vjust = 0.5), size = 4,
+              position = position_stack(vjust = 0.5), size = 3,
               #color = "black"
               ) +
     scale_y_continuous(labels = label_percent()) +
@@ -200,4 +201,4 @@ fig.result_reported_within.stacked_area <-
 show(fig.result_reported_within.stacked_area)
 plot.output.path <- fs::path(glue("figtab/{window$prefix}/fig.result_reported_within.stacked_area.png"))
 fs::dir_create(path_dir(plot.output.path))
-ggsave(plot.output.path)
+ggsave(plot.output.path, width = 12, height = 8)
