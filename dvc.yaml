@@ -76,3 +76,5 @@ stages:
       - brick/sliding-window
       - params.yaml
       - analysis/driver-sliding.R
+    outs:
+      - figtab/sliding-window

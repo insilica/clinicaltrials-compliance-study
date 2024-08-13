@@ -4,6 +4,7 @@ if (!require("pacman")) install.packages("pacman")
 library(pacman)
 pacman::p_load(
                dplyr,
+               forcats,
                fs,
                ggplot2,
                glue,
@@ -11,6 +12,7 @@ pacman::p_load(
                patchwork,
                purrr,
                rlang,
+               scales,
                stringr,
                yaml
 )
@@ -140,3 +142,62 @@ for(name in names(agg.windows)) {
     ggsave(plot.output.path, width = 12, height = 8)
   })
 }
+
+
+for(w_name in names(windows)) {
+  agg.windows[[w_name]]$agg.interval.groups <-
+    agg.windows[[w_name]]$hlact.studies |>
+  mutate( agg.interval =
+            interval(common.primary_completion_date_imputed, common.results_received_date),
+       ) |>
+  mutate( agg.results_reported_within = case_when(
+             is.na(int_length(agg.interval)) ~ 'No results',
+             agg.interval < months(1*12) + days(1) ~ glue('{1*12} months'),
+             agg.interval < months(2*12) + days(1) ~ glue('{2*12} months'),
+             agg.interval < months(3*12) + days(1) ~ glue('{3*12} months'),
+             agg.interval < months(4*12) + days(1) ~ glue('{4*12} months'),
+             agg.interval < months(5*12) + days(1) ~ glue('{5*12} months'),
+             TRUE                                  ~ glue('{5*12}+ months')
+          ) |> as.factor()
+       ) |>
+  group_by( agg.results_reported_within ) |>
+  summarize( agg.results_reported_within.count = n() ) |>
+  mutate( agg.results_reported_within.pct =
+           agg.results_reported_within.count / sum(agg.results_reported_within.count) )
+}
+
+windows.result_reported_within <-
+  agg.windows |>
+  map( ~ .x$agg.interval.groups |>
+      mutate( cutoff = .x$window$date$cutoff ) ) |>
+  list_rbind()
+
+
+fig.result_reported_within.stacked_area <-
+  ggplot(
+         windows.result_reported_within |>
+           mutate(
+              time = as.character(cutoff),
+              pct  = agg.results_reported_within.pct,
+              grp  = forcats::fct_rev(agg.results_reported_within)
+           ),
+         aes(x = time, y = pct, fill = grp) ) +
+    geom_bar(stat = "identity") +
+    geom_text(aes(label = ifelse(pct > 0.01, sprintf("%.1f%%", 100*pct), '')),
+              position = position_stack(vjust = 0.5), size = 4,
+              #color = "black"
+              ) +
+    scale_y_continuous(labels = label_percent()) +
+    labs(
+      title = "Percentage of Studies Reporting Results Within Different Time Frames",
+      x = "Cut-off date",
+      y = "Percentage",
+      fill = "Reporting Within Time Frame"
+    ) +
+    scale_fill_brewer(type = 'qual', palette = 1, direction = -1) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+show(fig.result_reported_within.stacked_area)
+plot.output.path <- fs::path(glue("figtab/{window$prefix}/fig.result_reported_within.stacked_area.png"))
+fs::dir_create(path_dir(plot.output.path))
+ggsave(plot.output.path)
