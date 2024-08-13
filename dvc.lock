@@ -405,14 +405,20 @@ stages:
     deps:
     - path: analysis/driver-sliding.R
       hash: md5
-      md5: 75f408794335ff7b673e30cc7eecde96
-      size: 3974
+      md5: 13f0a0bedfa9cb5015ccf11cdfb29c0e
+      size: 6598
     - path: brick/sliding-window
       hash: md5
-      md5: 7af6dae367750cdb950a2d44eee2fa70.dir
-      size: 68916818
+      md5: 8a4493ab5c508ad74a96b8362c26b017.dir
+      size: 68661228
       nfiles: 10
     - path: params.yaml
       hash: md5
       md5: 6e630751b74fbf44aeac447079d8c76a
       size: 2495
+    outs:
+    - path: figtab/sliding-window
+      hash: md5
+      md5: eba4bfdc1d469353c56263afbf81516f.dir
+      size: 1859248
+      nfiles: 7
