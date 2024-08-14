@@ -78,3 +78,12 @@ stages:
       - analysis/driver-sliding.R
     outs:
       - figtab/sliding-window
+  analysis-driver-sliding_long-observe:
+    cmd: |
+      Rscript analysis/driver-sliding.R params.yaml long-observe
+    deps:
+      - brick/long-observe
+      - params.yaml
+      - analysis/driver-sliding.R
+    outs:
+      - figtab/long-observe
