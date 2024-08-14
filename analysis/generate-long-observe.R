@@ -1,13 +1,13 @@
-# source('analysis/generate-sliding-window.R')
+# source('analysis/generate-long-observe.R')
 
 source('analysis/ctgov/sliding_window.R')
 
-start_date <- '2008-01-01'
-slide_months <- 56/2
-n_iterations <- 5
-period_length_months <- 56
-cutoff_addend <- months(12)
-prefix <- 'sliding-window'
+start_date <- '2013-01-01'
+slide_months <- 2*12
+n_iterations <- 3
+period_length_months <- 2*12
+cutoff_addend <- months(5*12)
+prefix <- 'long-observe'
 
 yaml_output <-
   generate_time_periods_yaml(start_date           = start_date,
