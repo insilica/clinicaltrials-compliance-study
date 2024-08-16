@@ -25,6 +25,18 @@ standardize.jsonl_derived.type <- function(data) {
       across(c(schema1.phase, schema1.overall_status,
                schema1.funding_source, schema1.primary_purpose,
                schema1.allocation, schema1.masking), as.factor),
+    ) |>
+    mutate(schema1.primary_purpose =
+           fct_expand(schema1.primary_purpose
+                     ,           "BASIC_SCIENCE"
+                     ,              "DIAGNOSTIC"
+                     ,                     "ECT"
+                     ,"HEALTH_SERVICES_RESEARCH"
+                     ,              "PREVENTION"
+                     ,               "SCREENING"
+                     ,         "SUPPORTIVE_CARE"
+                     ,               "TREATMENT"
+           )
     )
 }
 
