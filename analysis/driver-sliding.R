@@ -171,7 +171,9 @@ for(w_name in names(windows)) {
 windows.result_reported_within <-
   agg.windows |>
   map( ~ .x$agg.interval.groups |>
-      mutate( cutoff = .x$window$date$cutoff ) ) |>
+      mutate(start  = .x$window$date$start,
+             stop   = .x$window$date$stop,
+             cutoff = .x$window$date$cutoff,)) |>
   list_rbind()
 
 
@@ -179,7 +181,7 @@ fig.result_reported_within.stacked_area <-
   ggplot(
          windows.result_reported_within |>
            mutate(
-              time = as.character(cutoff),
+              time = glue("{start}\n–{stop}\n({cutoff})"),
               pct  = agg.results_reported_within.pct,
               grp  = forcats::fct_rev(agg.results_reported_within)
            ),
@@ -197,8 +199,8 @@ fig.result_reported_within.stacked_area <-
       fill = "Reporting Within Time Frame"
     ) +
     scale_fill_brewer(type = 'qual', palette = 1, direction = -1) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme_minimal()# +
+    #theme(axis.text.x = element_text(angle = 45, hjust = 1))
 show(fig.result_reported_within.stacked_area)
 plot.output.path <- fs::path(glue("figtab/{window$prefix}/fig.result_reported_within.stacked_area.png"))
 fs::dir_create(path_dir(plot.output.path))
