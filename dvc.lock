@@ -422,10 +422,10 @@ stages:
       md5: 5c1cbae40bca02e2c8e7f240bb5d7a12.dir
       size: 1891218
       nfiles: 7
-  build-ctgov-studies-all@long-observe_n-1_20200101:
+  build-ctgov-studies-all@long-observe_n-1_20170101:
     cmd:
-    - mkdir -p $(dirname brick/long-observe/n-1_20200101/ctgov-studies-all.parquet)
-    - script/tt-render-by-param long-observe_n-1_20200101 sql/create_cthist_all.sql
+    - mkdir -p $(dirname brick/long-observe/n-1_20170101/ctgov-studies-all.parquet)
+    - script/tt-render-by-param long-observe_n-1_20170101 sql/create_cthist_all.sql
       | duckdb
     deps:
     - path: download/ctgov/historical
@@ -438,14 +438,14 @@ stages:
       md5: c98c01d4acd0f12fa5b90ca355af8037
       size: 8389
     outs:
-    - path: brick/long-observe/n-1_20200101/ctgov-studies-all.parquet
+    - path: brick/long-observe/n-1_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: d02037aae89da163a50bc07dc8a6b29e
-      size: 14514130
-  build-ctgov-studies-all@long-observe_n-2_20220101:
+      md5: c86aebe976c10a6975d03231e264d9ac
+      size: 9706858
+  build-ctgov-studies-all@long-observe_n-2_20190101:
     cmd:
-    - mkdir -p $(dirname brick/long-observe/n-2_20220101/ctgov-studies-all.parquet)
-    - script/tt-render-by-param long-observe_n-2_20220101 sql/create_cthist_all.sql
+    - mkdir -p $(dirname brick/long-observe/n-2_20190101/ctgov-studies-all.parquet)
+    - script/tt-render-by-param long-observe_n-2_20190101 sql/create_cthist_all.sql
       | duckdb
     deps:
     - path: download/ctgov/historical
@@ -458,14 +458,14 @@ stages:
       md5: c98c01d4acd0f12fa5b90ca355af8037
       size: 8389
     outs:
-    - path: brick/long-observe/n-2_20220101/ctgov-studies-all.parquet
+    - path: brick/long-observe/n-2_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: ad00954a0667600fc79958b33e5880c8
-      size: 18143818
-  build-ctgov-studies-all@long-observe_n-3_20240101:
+      md5: 69afac82dcd2982aedd61a102fabbcd9
+      size: 12944321
+  build-ctgov-studies-all@long-observe_n-3_20210101:
     cmd:
-    - mkdir -p $(dirname brick/long-observe/n-3_20240101/ctgov-studies-all.parquet)
-    - script/tt-render-by-param long-observe_n-3_20240101 sql/create_cthist_all.sql
+    - mkdir -p $(dirname brick/long-observe/n-3_20210101/ctgov-studies-all.parquet)
+    - script/tt-render-by-param long-observe_n-3_20210101 sql/create_cthist_all.sql
       | duckdb
     deps:
     - path: download/ctgov/historical
@@ -478,21 +478,41 @@ stages:
       md5: c98c01d4acd0f12fa5b90ca355af8037
       size: 8389
     outs:
-    - path: brick/long-observe/n-3_20240101/ctgov-studies-all.parquet
+    - path: brick/long-observe/n-3_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: b0c49fbaa0369bc93c0289afe5009957
-      size: 21736082
-  build-ctgov-studies-hlact-filtered@long-observe_n-1_20200101:
+      md5: bad7defc68c0469e8b202359d085e8e3
+      size: 16252169
+  build-ctgov-studies-all@long-observe_n-4_20230101:
     cmd:
-    - make docker-compose-up
-    - mkdir -p $(dirname brick/long-observe/n-1_20200101/ctgov-studies-hlact.parquet)
-    - . .env; script/tt-render-by-param long-observe_n-1_20200101 sql/create_cthist_hlact.sql
+    - mkdir -p $(dirname brick/long-observe/n-4_20230101/ctgov-studies-all.parquet)
+    - script/tt-render-by-param long-observe_n-4_20230101 sql/create_cthist_all.sql
       | duckdb
     deps:
-    - path: brick/long-observe/n-1_20200101/ctgov-studies-all.parquet
+    - path: download/ctgov/historical
       hash: md5
-      md5: d02037aae89da163a50bc07dc8a6b29e
-      size: 14514130
+      md5: e040593bab918704633877b9b5c89197.dir
+      size: 72594385446
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: c98c01d4acd0f12fa5b90ca355af8037
+      size: 8389
+    outs:
+    - path: brick/long-observe/n-4_20230101/ctgov-studies-all.parquet
+      hash: md5
+      md5: b198288a82145ff29c1bb5806dd02128
+      size: 19903201
+  build-ctgov-studies-hlact-filtered@long-observe_n-1_20170101:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/long-observe/n-1_20170101/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param long-observe_n-1_20170101 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/long-observe/n-1_20170101/ctgov-studies-all.parquet
+      hash: md5
+      md5: c86aebe976c10a6975d03231e264d9ac
+      size: 9706858
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -502,21 +522,21 @@ stages:
       md5: a6a598b2d9b875dfd0abd5aae6170915
       size: 4300
     outs:
-    - path: brick/long-observe/n-1_20200101/ctgov-studies-hlact.parquet
+    - path: brick/long-observe/n-1_20170101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: bcfd3c0850dbe5852e195990445e3ea6
-      size: 630678
-  build-ctgov-studies-hlact-filtered@long-observe_n-2_20220101:
+      md5: 66a05f0bdef6f19b255b896a87ebfcf7
+      size: 954063
+  build-ctgov-studies-hlact-filtered@long-observe_n-2_20190101:
     cmd:
     - make docker-compose-up
-    - mkdir -p $(dirname brick/long-observe/n-2_20220101/ctgov-studies-hlact.parquet)
-    - . .env; script/tt-render-by-param long-observe_n-2_20220101 sql/create_cthist_hlact.sql
+    - mkdir -p $(dirname brick/long-observe/n-2_20190101/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param long-observe_n-2_20190101 sql/create_cthist_hlact.sql
       | duckdb
     deps:
-    - path: brick/long-observe/n-2_20220101/ctgov-studies-all.parquet
+    - path: brick/long-observe/n-2_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: ad00954a0667600fc79958b33e5880c8
-      size: 18143818
+      md5: 69afac82dcd2982aedd61a102fabbcd9
+      size: 12944321
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -526,21 +546,21 @@ stages:
       md5: a6a598b2d9b875dfd0abd5aae6170915
       size: 4300
     outs:
-    - path: brick/long-observe/n-2_20220101/ctgov-studies-hlact.parquet
+    - path: brick/long-observe/n-2_20190101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 31391998bafdba0cc54493f07fbc4e89
-      size: 714097
-  build-ctgov-studies-hlact-filtered@long-observe_n-3_20240101:
+      md5: 822321799e13b3aa9aa048318d2bf0be
+      size: 1066943
+  build-ctgov-studies-hlact-filtered@long-observe_n-3_20210101:
     cmd:
     - make docker-compose-up
-    - mkdir -p $(dirname brick/long-observe/n-3_20240101/ctgov-studies-hlact.parquet)
-    - . .env; script/tt-render-by-param long-observe_n-3_20240101 sql/create_cthist_hlact.sql
+    - mkdir -p $(dirname brick/long-observe/n-3_20210101/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param long-observe_n-3_20210101 sql/create_cthist_hlact.sql
       | duckdb
     deps:
-    - path: brick/long-observe/n-3_20240101/ctgov-studies-all.parquet
+    - path: brick/long-observe/n-3_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: b0c49fbaa0369bc93c0289afe5009957
-      size: 21736082
+      md5: bad7defc68c0469e8b202359d085e8e3
+      size: 16252169
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -550,29 +570,53 @@ stages:
       md5: a6a598b2d9b875dfd0abd5aae6170915
       size: 4300
     outs:
-    - path: brick/long-observe/n-3_20240101/ctgov-studies-hlact.parquet
+    - path: brick/long-observe/n-3_20210101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 2b86bf5ccb371f9cd783cfd22b99abb1
-      size: 810644
+      md5: cf1f204b95fa78579bc8861c4ac17bc0
+      size: 1169245
+  build-ctgov-studies-hlact-filtered@long-observe_n-4_20230101:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/long-observe/n-4_20230101/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param long-observe_n-4_20230101 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/long-observe/n-4_20230101/ctgov-studies-all.parquet
+      hash: md5
+      md5: b198288a82145ff29c1bb5806dd02128
+      size: 19903201
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/long-observe/n-4_20230101/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: b0e487bf0dfcedfa1658ae2c027d41c0
+      size: 1338857
   analysis-driver-sliding_long-observe:
     cmd: "Rscript analysis/driver-sliding.R params.yaml long-observe\n"
     deps:
     - path: analysis/driver-sliding.R
       hash: md5
-      md5: 62e4be02b6c535b8c6b6ec6c250430ca
-      size: 6709
+      md5: c74dce1ec75b421a2fde9426460d2022
+      size: 7469
     - path: brick/long-observe
       hash: md5
-      md5: 9fa01fc23c6747c1e3909b0204ab1aa9.dir
-      size: 56549449
-      nfiles: 6
+      md5: 0f60740937307662185545d5143bca28.dir
+      size: 119885106
+      nfiles: 14
     - path: params.yaml
       hash: md5
-      md5: 8a3e78f684c5d24b264f290221bde6c7
-      size: 3685
+      md5: 5addf42e81a2fdae7e3e4a23484d43b9
+      size: 4095
     outs:
     - path: figtab/long-observe
       hash: md5
-      md5: ba5b181ab6ad7fda39d9693b71d7c8bc.dir
-      size: 1227980
-      nfiles: 5
+      md5: da79633d46d0f1074fc97b50cfdf0483.dir
+      size: 1580051
+      nfiles: 6
