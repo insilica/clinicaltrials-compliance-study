@@ -176,21 +176,29 @@ windows.result_reported_within <-
              cutoff = .x$window$date$cutoff,)) |>
   list_rbind()
 
-
-fig.result_reported_within.stacked_area <-
-  ggplot(
-         windows.result_reported_within |>
-           mutate(
-              time = glue("{start}\n–{stop}\n({cutoff})"),
-              pct  = agg.results_reported_within.pct,
-              grp  = forcats::fct_rev(agg.results_reported_within)
-           ),
+fig.result_reported_within.stacked_area <- {
+  df <-
+    windows.result_reported_within |>
+      mutate(
+             n          = agg.results_reported_within.count,
+             time       = cutoff,
+             pct        = agg.results_reported_within.pct,
+             grp        = forcats::fct_rev(agg.results_reported_within)
+      )
+  time.label <- df |>
+    group_by(start,stop,cutoff) |>
+    summarize(n = sum(agg.results_reported_within.count)) |>
+    mutate(
+         label = glue("  {start}\n–{stop}\n({cutoff})\nn = {n}"),
+    ) |> getElement('label')
+  ggplot(df,
          aes(x = time, y = pct, fill = grp) ) +
     geom_bar(stat = "identity") +
     geom_text(aes(label = ifelse(pct > 0.01, sprintf("%.1f%%", 100*pct), '')),
               position = position_stack(vjust = 0.5), size = 3,
               #color = "black"
               ) +
+    scale_x_discrete(labels = time.label) +
     scale_y_continuous(labels = label_percent()) +
     labs(
       title = "Percentage of Studies Reporting Results Within Different Time Frames",
@@ -201,7 +209,9 @@ fig.result_reported_within.stacked_area <-
     scale_fill_brewer(type = 'qual', palette = 1, direction = -1) +
     theme_minimal()# +
     #theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
 show(fig.result_reported_within.stacked_area)
+
 plot.output.path <- fs::path(glue("figtab/{window$prefix}/fig.result_reported_within.stacked_area.png"))
 fs::dir_create(path_dir(plot.output.path))
 ggsave(plot.output.path, width = 12, height = 8)
