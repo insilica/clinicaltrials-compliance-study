@@ -162,7 +162,7 @@ for(w_name in names(windows)) {
              TRUE                                  ~ glue('{5*12}+ months')
           ) |> as.factor()
        ) |>
-  group_by( agg.results_reported_within ) |>
+  group_by( common.funding, agg.results_reported_within ) |>
   summarize( agg.results_reported_within.count = n() ) |>
   mutate( agg.results_reported_within.pct =
            agg.results_reported_within.count / sum(agg.results_reported_within.count) )
@@ -183,21 +183,34 @@ fig.result_reported_within.stacked_area <- {
              n          = agg.results_reported_within.count,
              time       = cutoff,
              pct        = agg.results_reported_within.pct,
-             grp        = forcats::fct_rev(agg.results_reported_within)
+             grp        = forcats::fct_rev(agg.results_reported_within),
+             facet      = common.funding,
       )
-  time.label <- df |>
-    group_by(start,stop,cutoff) |>
+  #print(df)
+  time.label <- agg.windows |>
+    map_chr( ~ with(.x$window$date, {
+                  glue("  {start}\n–{stop}\n({cutoff})")
+             })) |> unname()
+  count.label.df <- df |>
+    group_by(facet,start,stop,cutoff) |>
     summarize(n = sum(agg.results_reported_within.count)) |>
     mutate(
-         label = glue("  {start}\n–{stop}\n({cutoff})\nn = {n}"),
-    ) |> getElement('label')
+         label = glue("n = {n}"),
+    ) |> ungroup() |> select(cutoff, facet, label)
   ggplot(df,
          aes(x = time, y = pct, fill = grp) ) +
+    facet_wrap(~ facet, strip.position = "bottom") +
     geom_bar(stat = "identity") +
     geom_text(aes(label = ifelse(pct > 0.01, sprintf("%.1f%%", 100*pct), '')),
               position = position_stack(vjust = 0.5), size = 3,
               #color = "black"
               ) +
+    geom_text(data = count.label.df,
+              aes(x = cutoff, y = 0, label = label),
+              #position = position_dodge(width = 0.9),
+              vjust = 3.5,
+              #vjust = 4.0,
+              inherit.aes=FALSE) +
     scale_x_discrete(labels = time.label) +
     scale_y_continuous(labels = label_percent()) +
     labs(
