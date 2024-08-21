@@ -165,7 +165,7 @@ for(w_name in names(windows)) {
   group_by( common.funding, agg.results_reported_within ) |>
   summarize( agg.results_reported_within.count = n() ) |>
   mutate( agg.results_reported_within.pct =
-           agg.results_reported_within.count / sum(agg.results_reported_within.count) )
+           proportions(agg.results_reported_within.count) )
 }
 
 windows.result_reported_within <-
