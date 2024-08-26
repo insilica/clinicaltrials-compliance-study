@@ -6,20 +6,8 @@ pacman::p_load( logger, purrr, dplyr, stringr, ggplot2 )
 
 source('analysis/ctgov.R')
 
-### INPUT
-hlact.studies <- arrow::read_parquet('brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet') |>
-  tibble()
-log_info(str.print(hlact.studies))#DEBUG
-start_date <- as.Date('2008-01-01')
-stop_date  <- as.Date('2012-09-01')
-# Censoring date
-censor_date <- as.Date("2013-09-27")
-
-### PREPROCESS
-hlact.studies <- standardize.anderson2015(hlact.studies) |>
-  preprocess_data.common(start_date  = start_date,
-                         stop_date   = stop_date,
-                         censor_date = censor_date)
+### INPUT & PREPROCESS
+hlact.studies <- anderson2015.read_and_process()
 
 assertion.anderson2015.results12(hlact.studies)
 
@@ -28,6 +16,11 @@ model.logistic <- logistic_regression(hlact.studies, formula.anderson2015)
 
 model.logistic |> str.print(n = 50) |> log_info(); NA
 
+window <- anderson2015.window()
+start_date <- window$date$start
+stop_date  <- window$date$stop
+# Censoring date
+censor_date <- window$date$cutoff
 jsonl.studies <- arrow::read_parquet('brick/analysis-20130927/ctgov-studies-hlact.parquet') |>
   tibble()
 log_info(str.print(jsonl.studies))#DEBUG

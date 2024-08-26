@@ -15,20 +15,8 @@ source('analysis/ctgov.R')
 
 debug_mode <- Sys.getenv("DEBUG") == "1"
 
-### INPUT
-hlact.studies <- arrow::read_parquet('brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet') |>
-  tibble()
-log_info(str.print(hlact.studies))#DEBUG
-start_date <- as.Date('2008-01-01')
-stop_date  <- as.Date('2012-09-01')
-# Censoring date
-censor_date <- as.Date("2013-09-27")
-
-### PREPROCESS
-hlact.studies <- standardize.anderson2015(hlact.studies) |>
-  preprocess_data.common(start_date  = start_date,
-                         stop_date   = stop_date,
-                         censor_date = censor_date)
+### INPUT & PREPROCESS
+hlact.studies <- anderson2015.read_and_process()
 
 ### DEFINE BREAKS
 time_months.max <- max(hlact.studies$surv.time_months, na.rm = TRUE)

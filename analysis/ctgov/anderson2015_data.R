@@ -9,10 +9,15 @@ anderson2015.window <- function() {
   return(window)
 }
 
-anderson2015.read_and_process <- function() {
+anderson2015.read_raw <- function() {
   hlact.studies <- arrow::read_parquet('brick/anderson2015/proj_results_reporting_studies_Analysis_Data.parquet') |>
     tibble()
   log_info(str.print(hlact.studies))#DEBUG
+  return(hlact.studies)
+}
+
+anderson2015.read_and_process <- function() {
+  hlact.studies <- anderson2015.read_raw()
 
   window <- anderson2015.window()
 
