@@ -270,4 +270,8 @@ plot.windows.compare.logistic(agg.windows)
 
 plot.windows.stacked.chart(agg.windows)
 
+anderson2015 <- c(
+  window        = anderson2015.window(),
+  hlact.studies = anderson2015.read_and_process()
+)
 
