@@ -150,11 +150,9 @@ plot.windows.compare.logistic <- function(agg.windows) {
 
 #### Plot stacked chart of intervals {{{
 
-# plot.windows.stacked.chart(agg.windows)
-plot.windows.stacked.chart <- function(agg.windows) {
-  for(w_name in names(agg.windows)) {
-    agg.windows[[w_name]]$agg.interval.groups <-
-      agg.windows[[w_name]]$hlact.studies |>
+process.single.agg.window.amend.agg.interval.groups <- function(agg.window.single) {
+    agg.window.single$agg.interval.groups <-
+      agg.window.single$hlact.studies |>
     mutate( agg.interval =
               interval(common.primary_completion_date_imputed, common.results_received_date),
          ) |>
@@ -172,6 +170,15 @@ plot.windows.stacked.chart <- function(agg.windows) {
     summarize( agg.results_reported_within.count = n() ) |>
     mutate( agg.results_reported_within.pct =
              proportions(agg.results_reported_within.count) )
+
+    return(agg.window.single)
+}
+
+# plot.windows.stacked.chart(agg.windows)
+plot.windows.stacked.chart <- function(agg.windows) {
+  for(w_name in names(agg.windows)) {
+    agg.windows[[w_name]] <- agg.windows[[w_name]] |>
+      process.single.agg.window.amend.agg.interval.groups()
   }
   agg.windows[[1]]$agg.interval.groups |> names()
 
