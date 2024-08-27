@@ -122,7 +122,7 @@ plot.windows.pct.scatterline <- function(agg.windows) {
                          'Percentage HLACTs out of all studies')
   )
   show(fig.pct.all)
-  plot.output.path <- fs::path(glue("figtab/{window$prefix}/fig.percentage.all.png"))
+  plot.output.path <- fs::path(glue("figtab/{agg.windows[[1]]$window$prefix}/fig.percentage.all.png"))
   fs::dir_create(path_dir(plot.output.path))
   ggsave(plot.output.path, width = 12, height = 8)
 }
@@ -140,7 +140,7 @@ plot.windows.compare.logistic <- function(agg.windows) {
       fig <- fig + labs(title = name)
       show(fig)
       #invisible(readline(prompt="Press [enter] to continue"))
-      plot.output.path <- fs::path(glue("figtab/{window$prefix}/{window$suffix}/compare.table_s7.or.png"))
+      plot.output.path <- fs::path(glue("figtab/{agg.windows[[1]]$window$prefix}/{window$suffix}/compare.table_s7.or.png"))
       fs::dir_create(path_dir(plot.output.path))
       ggsave(plot.output.path, width = 12, height = 8)
     })
