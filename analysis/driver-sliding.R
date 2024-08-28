@@ -227,8 +227,10 @@ plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
       geom_text(data = count.label.df,
                 aes(x = cutoff, y = 0, label = label),
                 #position = position_dodge(width = 0.9),
-                vjust = 3.5,
+                #vjust = 3.5,
                 #vjust = 4.0,
+                vjust = 2.0,
+                size = 2,
                 inherit.aes=FALSE) +
       scale_x_discrete(labels = time.label) +
       scale_y_continuous(labels = label_percent()) +
@@ -239,7 +241,8 @@ plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
         fill = "Reporting Within Time Frame"
       ) +
       scale_fill_brewer(type = 'qual', palette = 1, direction = -1) +
-      theme_minimal()# +
+      theme_minimal() +
+      theme(axis.text.x = element_text(size = 6))
       #theme(axis.text.x = element_text(angle = 45, hjust = 1))
   }
   show(fig.result_reported_within.stacked_area)
