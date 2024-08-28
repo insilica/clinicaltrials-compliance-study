@@ -1,9 +1,10 @@
 anderson2015.window <- function() {
+  # Leave the dates as characters. No `as.Date()`.
   date <- list(
-    start  = as.Date('2008-01-01'),
-    stop   = as.Date('2012-09-01'),
+    start  = '2008-01-01',
+    stop   = '2012-09-01',
     # Censoring date
-    cutoff = as.Date("2013-09-27")
+    cutoff = "2013-09-27"
   )
   window <- list( date = date )
   return(window)
