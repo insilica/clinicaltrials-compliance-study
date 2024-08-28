@@ -175,7 +175,7 @@ process.single.agg.window.amend.agg.interval.groups <- function(agg.window.singl
 }
 
 # plot.windows.stacked.chart(agg.windows)
-plot.windows.stacked.chart <- function(agg.windows) {
+plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
   for(w_name in names(agg.windows)) {
     agg.windows[[w_name]] <- agg.windows[[w_name]] |>
       process.single.agg.window.amend.agg.interval.groups()
@@ -201,9 +201,14 @@ plot.windows.stacked.chart <- function(agg.windows) {
                facet      = common.funding,
         )
     #print(df)
+    if( with_names ) {
+      time.label.glue_format <- "{.y}\n  {start}\n–{stop}\n({cutoff})"
+    } else {
+      time.label.glue_format <- "  {start}\n–{stop}\n({cutoff})"
+    }
     time.label <- agg.windows |>
-      map_chr( ~ with(.x$window$date, {
-                    glue("  {start}\n–{stop}\n({cutoff})")
+      imap_chr( ~ with(.x$window$date, {
+                    glue(time.label.glue_format)
                })) |> unname()
     count.label.df <- df |>
       group_by(facet,start,stop,cutoff) |>
