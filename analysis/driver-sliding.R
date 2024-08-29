@@ -198,6 +198,9 @@ plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
   }
   agg.windows[[1]]$agg.interval.groups |> names()
 
+  #agg.windows |>
+  #  map( ~ .x$agg.interval.groups |> print() )
+
   windows.result_reported_within <-
     agg.windows |>
     map( ~ .x$agg.interval.groups |>
@@ -325,3 +328,19 @@ plot.compare.anderson2015.agg.window <- function() {
 
 
 plot.compare.anderson2015.agg.window()
+
+plot.compare.rule_effective.agg.window <- function() {
+  windows <- params$param[
+               grepl('^rule-effective-date-(before|after)$',
+                     names(params$param),
+                     perl = TRUE )
+             ]
+  for(w_name in names(windows)) {
+    windows[[w_name]]$prefix <- 'rule-effective'
+  }
+  agg.windows <- process.windows.init(windows) |>
+    process.windows.amend.results_reported()
+  print(names(windows))
+  plot.windows.stacked.chart(agg.windows, with_names = TRUE)
+}
+plot.compare.rule_effective.agg.window()
