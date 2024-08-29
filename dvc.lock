@@ -603,8 +603,8 @@ stages:
     deps:
     - path: analysis/driver-sliding.R
       hash: md5
-      md5: c74dce1ec75b421a2fde9426460d2022
-      size: 7469
+      md5: 8bdcd099a2c2ec3cf35489c649f1e9af
+      size: 10683
     - path: brick/long-observe
       hash: md5
       md5: 0f60740937307662185545d5143bca28.dir
@@ -612,11 +612,99 @@ stages:
       nfiles: 14
     - path: params.yaml
       hash: md5
-      md5: 5addf42e81a2fdae7e3e4a23484d43b9
-      size: 4095
+      md5: e06b7cfc64e936b80e3e0d27e348c329
+      size: 4875
     outs:
     - path: figtab/long-observe
       hash: md5
-      md5: da79633d46d0f1074fc97b50cfdf0483.dir
-      size: 1580051
-      nfiles: 6
+      md5: 49bc6b08977237246c1bf190087a2774.dir
+      size: 507700
+      nfiles: 2
+  build-ctgov-studies-all@rule-effective-date-before:
+    cmd:
+    - mkdir -p $(dirname brick/rule-effective-date-before/ctgov-studies-all.parquet)
+    - script/tt-render-by-param rule-effective-date-before sql/create_cthist_all.sql
+      | duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: e040593bab918704633877b9b5c89197.dir
+      size: 72594385446
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: c98c01d4acd0f12fa5b90ca355af8037
+      size: 8389
+    outs:
+    - path: brick/rule-effective-date-before/ctgov-studies-all.parquet
+      hash: md5
+      md5: 5ef61d4b09815bbad007d62643aa5a22
+      size: 10261045
+  build-ctgov-studies-all@rule-effective-date-after:
+    cmd:
+    - mkdir -p $(dirname brick/rule-effective-date-after/ctgov-studies-all.parquet)
+    - script/tt-render-by-param rule-effective-date-after sql/create_cthist_all.sql
+      | duckdb
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: e040593bab918704633877b9b5c89197.dir
+      size: 72594385446
+      nfiles: 492953
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: c98c01d4acd0f12fa5b90ca355af8037
+      size: 8389
+    outs:
+    - path: brick/rule-effective-date-after/ctgov-studies-all.parquet
+      hash: md5
+      md5: a0a6b4334eb26e705929d8bd3e30e6f1
+      size: 22440417
+  build-ctgov-studies-hlact-filtered@rule-effective-date-before:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/rule-effective-date-before/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param rule-effective-date-before sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/rule-effective-date-before/ctgov-studies-all.parquet
+      hash: md5
+      md5: 5ef61d4b09815bbad007d62643aa5a22
+      size: 10261045
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/rule-effective-date-before/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: aa96c3600529cdb6d20496dd59cc03d3
+      size: 988837
+  build-ctgov-studies-hlact-filtered@rule-effective-date-after:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/rule-effective-date-after/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param rule-effective-date-after sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/rule-effective-date-after/ctgov-studies-all.parquet
+      hash: md5
+      md5: a0a6b4334eb26e705929d8bd3e30e6f1
+      size: 22440417
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: a6a598b2d9b875dfd0abd5aae6170915
+      size: 4300
+    outs:
+    - path: brick/rule-effective-date-after/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: 7d9eb985ae29cdd891c272d9b92743ce
+      size: 1586280
