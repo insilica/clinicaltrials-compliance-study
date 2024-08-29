@@ -4,6 +4,7 @@
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
 pacman::p_load(
+               assertthat,
                dplyr,
                forcats,
                fs,
@@ -150,28 +151,58 @@ plot.windows.compare.logistic <- function(agg.windows) {
 
 #### Plot stacked chart of intervals {{{
 
-process.single.agg.window.amend.agg.interval.groups <- function(agg.window.single) {
-    agg.window.single$agg.interval.groups <-
-      agg.window.single$hlact.studies |>
-    mutate( agg.interval =
-              interval(common.primary_completion_date_imputed, common.results_received_date),
-         ) |>
-    mutate( agg.results_reported_within = case_when(
-               is.na(int_length(agg.interval)) ~ 'No results',
-               agg.interval < months(1*12) + days(1) ~ glue('{1*12} months'),
-               agg.interval < months(2*12) + days(1) ~ glue('{2*12} months'),
-               agg.interval < months(3*12) + days(1) ~ glue('{3*12} months'),
-               agg.interval < months(4*12) + days(1) ~ glue('{4*12} months'),
-               agg.interval < months(5*12) + days(1) ~ glue('{5*12} months'),
-               TRUE                                  ~ glue('{5*12}+ months')
-            ) |> as.factor()
-         ) |>
-    group_by( common.funding, agg.results_reported_within ) |>
-    summarize( agg.results_reported_within.count = n() ) |>
-    mutate( agg.results_reported_within.pct =
-             proportions(agg.results_reported_within.count) )
+categorize_intervals <- function(interval_length, breakpoints) {
+  labels <- c(paste0(breakpoints, " months"),
+              paste0(max(breakpoints), "+ months"))
 
-    return(agg.window.single)
+  # Create bins for cut() function including an Inf for the upper bound of the last interval
+  bins <- c(-Inf, as.numeric(months(breakpoints) + days(1)), Inf)
+
+  # Vectorized interval categorization using if_else and cut
+  result <- if_else(
+    is.na(interval_length),
+    "No results",
+    cut(interval_length, bins, labels = labels, right = FALSE)
+  ) |> as.factor()
+
+  # This is to check against when breakpoints is for 5 years.
+  result.old_method <- case_when(
+               is.na(int_length(interval_length)) ~ 'No results',
+               interval_length < months(1*12) + days(1) ~ glue('{1*12} months'),
+               interval_length < months(2*12) + days(1) ~ glue('{2*12} months'),
+               interval_length < months(3*12) + days(1) ~ glue('{3*12} months'),
+               interval_length < months(4*12) + days(1) ~ glue('{4*12} months'),
+               interval_length < months(5*12) + days(1) ~ glue('{5*12} months'),
+               TRUE                                     ~ glue('{5*12}+ months')
+            ) |> as.factor()
+
+  assert_that(   all( result == result.old_method )
+              && all( names(result) == names(result.old_method) ),
+              msg = 'Output from categorize_intervals is the same as before (result, result.old_method)')
+
+  return(result)
+}
+
+
+process.single.agg.window.amend.agg.interval.groups <- function(agg.window.single) {
+  # Define breakpoints in months
+  breakpoints <- 12*sequence(5)
+  # c(12, 24, 36, 48, 60)
+
+  agg.window.single$agg.interval.groups <-
+    agg.window.single$hlact.studies |>
+  mutate( agg.interval =
+            interval(common.primary_completion_date_imputed, common.results_received_date),
+       ) |>
+  mutate( agg.results_reported_within =
+            categorize_intervals(agg.interval, breakpoints)
+       ) |>
+  group_by( common.funding, agg.results_reported_within ) |>
+  summarize( agg.results_reported_within.count = n() ) |>
+  mutate( agg.results_reported_within.pct =
+           proportions(agg.results_reported_within.count) )
+
+  return(agg.window.single)
 }
 
 # plot.windows.stacked.chart(agg.windows)
