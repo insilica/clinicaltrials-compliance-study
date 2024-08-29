@@ -165,21 +165,6 @@ categorize_intervals <- function(interval_length, breakpoints) {
     cut(interval_length, bins, labels = labels, right = FALSE)
   ) |> as.factor()
 
-  # This is to check against when breakpoints is for 5 years.
-  result.old_method <- case_when(
-               is.na(int_length(interval_length)) ~ 'No results',
-               interval_length < months(1*12) + days(1) ~ glue('{1*12} months'),
-               interval_length < months(2*12) + days(1) ~ glue('{2*12} months'),
-               interval_length < months(3*12) + days(1) ~ glue('{3*12} months'),
-               interval_length < months(4*12) + days(1) ~ glue('{4*12} months'),
-               interval_length < months(5*12) + days(1) ~ glue('{5*12} months'),
-               TRUE                                     ~ glue('{5*12}+ months')
-            ) |> as.factor()
-
-  assert_that(   all( result == result.old_method )
-              && all( names(result) == names(result.old_method) ),
-              msg = 'Output from categorize_intervals is the same as before (result, result.old_method)')
-
   return(result)
 }
 
