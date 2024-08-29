@@ -171,8 +171,8 @@ categorize_intervals <- function(interval_length, breakpoints) {
 
 process.single.agg.window.amend.agg.interval.groups <- function(agg.window.single) {
   # Define breakpoints in months
-  breakpoints <- 12*sequence(5)
-  # c(12, 24, 36, 48, 60)
+  breakpoints <- 12*sequence(3)
+  # ( 12*sequence(5) == c(12, 24, 36, 48, 60) ) |> all()
 
   agg.window.single$agg.interval.groups <-
     agg.window.single$hlact.studies |>
