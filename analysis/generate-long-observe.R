@@ -1,11 +1,11 @@
-# source('analysis/generate-long-observe.R')
+# if(!sys.nframe()) { source('analysis/generate-long-observe.R') }
 
 source('analysis/ctgov/sliding_window.R')
 
-start_date <- '2013-01-01'
+start_date <- '2008-01-01'
 slide_months <- 2*12
-n_iterations <- 3
-period_length_months <- 2*12
+n_iterations <- 4
+period_length_months <- 4*12
 cutoff_addend <- months(5*12)
 prefix <- 'long-observe'
 
