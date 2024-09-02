@@ -169,7 +169,9 @@ categorize_intervals <- function(interval_length, breakpoints) {
 }
 
 
-process.single.agg.window.amend.agg.interval.groups <- function(agg.window.single) {
+process.single.agg.window.amend.agg.interval.groups <-
+    function(agg.window.single,
+             with_facet = "common.funding" ) {
   # Define breakpoints in months
   breakpoints <- 12*sequence(3)
   # ( 12*sequence(5) == c(12, 24, 36, 48, 60) ) |> all()
@@ -182,7 +184,9 @@ process.single.agg.window.amend.agg.interval.groups <- function(agg.window.singl
   mutate( agg.results_reported_within =
             categorize_intervals(agg.interval, breakpoints)
        ) |>
-  group_by( common.funding, agg.results_reported_within ) |>
+  group_by(across(c(
+                    (if(!is.null(with_facet))  with_facet ),
+                    "agg.results_reported_within"))) |>
   summarize( agg.results_reported_within.count = n() ) |>
   mutate( agg.results_reported_within.pct =
            proportions(agg.results_reported_within.count) )
@@ -191,10 +195,22 @@ process.single.agg.window.amend.agg.interval.groups <- function(agg.window.singl
 }
 
 # plot.windows.stacked.chart(agg.windows)
-plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
+plot.windows.stacked.chart <-
+    function(agg.windows,
+             with_names = FALSE,
+             with_facet = "common.funding" ) {
+
+  faceted_by.label <- with_facet
+  if( is.null(with_facet) ) {
+    faceted_by.label <- 'overall'
+  }
+  faceted_by.label <- gsub("^common\\.", "", faceted_by.label)
+
   for(w_name in names(agg.windows)) {
     agg.windows[[w_name]] <- agg.windows[[w_name]] |>
-      process.single.agg.window.amend.agg.interval.groups()
+      process.single.agg.window.amend.agg.interval.groups(
+        with_facet = with_facet
+      )
   }
   agg.windows[[1]]$agg.interval.groups |> names()
 
@@ -217,8 +233,13 @@ plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
                time       = cutoff,
                pct        = agg.results_reported_within.pct,
                grp        = forcats::fct_rev(agg.results_reported_within),
-               facet      = common.funding,
         )
+    if(!is.null(with_facet)) {
+      df <- df |>
+        mutate(
+               facet = !!rlang::sym(with_facet)
+        )
+    }
     #print(df)
     if( with_names ) {
       time.label.glue_format <- "{.y}\n  {start}\n–{stop}\n({cutoff})"
@@ -230,14 +251,28 @@ plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
                     glue(time.label.glue_format)
                })) |> unname()
     count.label.df <- df |>
-      group_by(facet,start,stop,cutoff) |>
+      group_by(across(c(
+                        (if(!is.null(with_facet)) "facet" ),
+                        "start",
+                        "stop",
+                        "cutoff"))) |>
       summarize(n = sum(agg.results_reported_within.count)) |>
       mutate(
            label = glue("n = {n}"),
-      ) |> ungroup() |> select(cutoff, facet, label)
-    ggplot(df,
-           aes(x = time, y = pct, fill = grp) ) +
-      facet_wrap(~ facet, strip.position = "bottom") +
+      ) |> ungroup() |>
+      select(c(
+                  (if(!is.null(with_facet)) "facet" ),
+                  "cutoff",
+                  "label"))
+
+    fig <- ggplot(df,
+           aes(x = time, y = pct, fill = grp) )
+
+    if(!is.null(with_facet)) {
+      fig <- fig + facet_wrap(~ facet, strip.position = "bottom")
+    }
+
+    fig <- fig +
       geom_bar(stat = "identity") +
       geom_text(aes(label = ifelse(pct > 0.01, sprintf("%.1f%%", 100*pct), '')),
                 position = position_stack(vjust = 0.5), size = 3,
@@ -254,7 +289,7 @@ plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
       scale_x_discrete(labels = time.label) +
       scale_y_continuous(labels = label_percent()) +
       labs(
-        title = "Percentage of Studies Reporting Results Within Different Time Frames",
+        title = glue("Percentage of Studies Reporting Results Within Different Time Frames ({faceted_by.label})"),
         x = "Cut-off date",
         y = "Percentage",
         fill = "Reporting Within Time Frame"
@@ -263,10 +298,14 @@ plot.windows.stacked.chart <- function(agg.windows, with_names = FALSE ) {
       theme_minimal() +
       theme(axis.text.x = element_text(size = 6))
       #theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+    fig
   }
   show(fig.result_reported_within.stacked_area)
 
-  plot.output.path <- fs::path(glue("figtab/{agg.windows[[1]]$window$prefix}/fig.result_reported_within.stacked_area.png"))
+  faceted_by.file_part <- gsub('\\.', '-', faceted_by.label)
+  plot.output.path <- fs::path(glue(
+      "figtab/{agg.windows[[1]]$window$prefix}/fig.result_reported_within.facet_{faceted_by.file_part}.stacked_area.png"))
   fs::dir_create(path_dir(plot.output.path))
   ggsave(plot.output.path, width = 12, height = 8)
 }
@@ -307,6 +346,8 @@ plot.windows.compare.logistic(agg.windows)
 
 plot.windows.stacked.chart(agg.windows)
 
+plot.windows.stacked.chart(agg.windows, with_facet = NULL)
+
 plot.compare.anderson2015.agg.window <- function() {
   anderson2015.original <- list(
     window        = anderson2015.window(),
@@ -329,7 +370,7 @@ plot.compare.anderson2015.agg.window <- function() {
 
 plot.compare.anderson2015.agg.window()
 
-plot.compare.rule_effective.agg.window <- function() {
+process.compare.rule_effective.agg.window <- function() {
   windows <- params$param[
                grepl('^rule-effective-date-(before|after)$',
                      names(params$param),
@@ -338,9 +379,14 @@ plot.compare.rule_effective.agg.window <- function() {
   for(w_name in names(windows)) {
     windows[[w_name]]$prefix <- 'rule-effective'
   }
+  print(names(windows))
   agg.windows <- process.windows.init(windows) |>
     process.windows.amend.results_reported()
-  print(names(windows))
-  plot.windows.stacked.chart(agg.windows, with_names = TRUE)
+  return(agg.windows)
 }
+
+agg.window.compare.rule_effective <- process.compare.rule_effective.agg.window()
+plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE)
+plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE, with_facet = NULL)
+
 plot.compare.rule_effective.agg.window()
