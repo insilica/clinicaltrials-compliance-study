@@ -3,21 +3,7 @@
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load(
-               assertthat,
-               dplyr,
-               forcats,
-               fs,
-               ggplot2,
-               glue,
-               logger,
-               patchwork,
-               purrr,
-               rlang,
-               scales,
-               stringr,
-               yaml
-)
+pacman::p_load( logger )
 
 log_layout(layout_glue_colors)
 log_threshold(TRACE)

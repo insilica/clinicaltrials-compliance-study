@@ -17,7 +17,15 @@ pacman::p_load(
   blandr,
   broom,
   tidyr,
-  assertthat
+  assertthat,
+  fs,
+  glue,
+  logger,
+  patchwork,
+  purrr,
+  rlang,
+  scales,
+  yaml
 )
 
 source('analysis/ctgov/dateutil.R')
