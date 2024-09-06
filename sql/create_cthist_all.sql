@@ -31,19 +31,8 @@ COPY (
                     CAST(json_extract(change, '$.version') AS INTEGER) AS change_version,
                     studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS change_nct_id,
                     *
-                FROM (
-                    SELECT
-                            change::JSON      AS change,
-                            studyRecord::JSON AS studyRecord,
-                    FROM
-                        read_ndjson_auto(
-                            'download/ctgov/historical/NCT*/*.jsonl',
-                            maximum_sample_files = 32768,
-                            ignore_errors = true
-                        )
-                    WHERE
-                            studyRecord IS NOT NULL
-                        AND change      IS NOT NULL
+                FROM read_parquet(
+                    'brick/ctgov/historical/records.parquet'
                 )
                 WHERE
 --%%                FILTER replace('2013-09-27', date.cutoff)

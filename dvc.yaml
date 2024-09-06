@@ -45,6 +45,15 @@ stages:
       - download/ctgov/historical:
           # Allow the stage to avoid downloading unchanged files
           persist: true
+  build-ctgov-historical-records:
+    cmd:
+      - mkdir -p brick/ctgov/historical
+      - duckdb < sql/create_cthist_preproc.sql
+    deps:
+      - sql/create_cthist_preproc.sql
+      - download/ctgov/historical
+    outs:
+      - brick/ctgov/historical/records.parquet
   build-ctgov-studies-all:
     foreach: ${param}
     do:
@@ -53,7 +62,7 @@ stages:
         - script/tt-render-by-param ${key} sql/create_cthist_all.sql | duckdb
       deps:
         - sql/create_cthist_all.sql
-        - download/ctgov/historical
+        - brick/ctgov/historical/records.parquet
       outs:
         - ${item.output.all}
   build-ctgov-studies-hlact-filtered:
