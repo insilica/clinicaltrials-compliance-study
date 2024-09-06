@@ -27,4 +27,4 @@ COPY (
     WHERE
             studyRecord IS NOT NULL
         AND change      IS NOT NULL
-) TO 'brick/ctgov/historical/records.parquet' (FORMAT PARQUET)
+) TO 'brick/ctgov/historical/records.parquet' (FORMAT PARQUET, ROW_GROUP_SIZE 100_000)

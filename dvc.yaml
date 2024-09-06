@@ -59,7 +59,19 @@ stages:
     do:
       cmd:
         - mkdir -p $(dirname ${item.output.all})
-        - script/tt-render-by-param ${key} sql/create_cthist_all.sql | duckdb
+        - |
+          . .env;
+          (
+            if [ -n "$MY_DUCKDB_TEMP_DIR" ] && [ -d "$MY_DUCKDB_TEMP_DIR" ]; then
+              echo "Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR" >&2 ;
+              echo "SET temp_directory='$MY_DUCKDB_TEMP_DIR';" ;
+            fi;
+            if [ -n "$MY_DUCKDB_MEMORY_LIMIT" ]; then
+              echo "Setting the DuckDB memory_limit to $MY_DUCKDB_MEMORY_LIMIT" >&2 ;
+              echo "SET memory_limit = '$MY_DUCKDB_MEMORY_LIMIT';" ;
+            fi;
+            script/tt-render-by-param ${key} sql/create_cthist_all.sql
+          ) | duckdb
       deps:
         - sql/create_cthist_all.sql
         - brick/ctgov/historical/records.parquet
