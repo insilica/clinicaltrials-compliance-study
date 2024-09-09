@@ -19,6 +19,60 @@ INSTALL json;
 
 LOAD json;
 
+-- funding_source_class_map
+--
+-- @param `class` VARCHAR
+-- @returns VARCHAR
+CREATE MACRO funding_source_class_map(class) AS (
+       CASE
+           WHEN class = 'INDUSTRY' THEN 'Industry'
+           WHEN class = 'NIH'      THEN 'NIH'
+                                   ELSE 'Other'
+       END
+);
+
+
+-- remove_other_if_needed
+--
+-- Removes 'Other' from a list if there are also values that are not 'Other'.
+--
+-- @param distinct_classes VARCHAR[]
+--        Precondition: Must be distinct (`list_distinct()`).
+--
+-- @returns VARCHAR[]
+CREATE MACRO remove_other_if_needed(distinct_classes) AS (
+    CASE
+        WHEN list_contains(distinct_classes, 'Other') AND len(distinct_classes) > 1
+        THEN list_filter(distinct_classes, x -> x != 'Other')
+        ELSE distinct_classes
+    END
+);
+
+-- consolidate_funding_source_classes
+--
+-- Creates a list after:
+--   * Combining the lead sponsor and collaborator class list,
+--   * Applying `funding_source_class_map()` to each element,
+--   * Applying `remove_other_if_needed()` to the list.
+--
+-- @returns VARCHAR[]
+CREATE MACRO consolidate_funding_source_classes(
+    lead_sponsor_funding_source,
+    collaborators_classes) AS (
+    remove_other_if_needed(
+        list_sort(list_distinct(
+                list_transform(
+                    list_concat(
+                        [lead_sponsor_funding_source],
+                        collaborators_classes
+                    ),
+                    x -> funding_source_class_map(x)
+                )
+        ))
+    )
+);
+
+
 COPY (
     SELECT
         *
@@ -151,6 +205,10 @@ COPY (
                     phases,
                     (acc, val) -> concat(acc, '; ', val)
                 ) AS phase,
+                consolidate_funding_source_classes(
+                    lead_sponsor_funding_source,
+                    collaborators_classes
+                ) AS funding_source_classes,
             FROM
                 _extract
         )
