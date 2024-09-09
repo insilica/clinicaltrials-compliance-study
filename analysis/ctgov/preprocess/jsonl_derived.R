@@ -123,11 +123,9 @@ standardize.jsonl_derived.norm <- function(data) {
            factor(levels = c("Device", "Biological", "Drug", "Other"))
     ) |>
     mutate(common.funding =
-           case_when(
-               schema1.lead_sponsor_funding_source == "INDUSTRY" ~ "Industry",
-               schema1.lead_sponsor_funding_source == "NIH"      ~ "NIH",
-               .default                             = "Other"
-           ) |> factor()
+           standardize.jsonl_derived.norm.funding_source(
+             schema1.lead_sponsor_funding_source
+           )
     ) |>
     mutate(common.overall_status =
            fct_recode(schema1.overall_status
@@ -137,4 +135,14 @@ standardize.jsonl_derived.norm <- function(data) {
     )
 
   return(data)
+}
+
+standardize.jsonl_derived.norm.funding_source <- function(funding_source) {
+  funding_source.norm <-
+           case_when(
+               funding_source == "INDUSTRY" ~ "Industry",
+               funding_source == "NIH"      ~ "NIH",
+               .default                     = "Other"
+           ) |> factor()
+  return(funding_source.norm)
 }
