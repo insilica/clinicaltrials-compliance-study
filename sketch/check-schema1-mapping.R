@@ -71,12 +71,12 @@ jsonl.studies |>
 # Get list of funding levels
 c(
   one = c(hlact.studies$common.funding |> levels()),
-  two = c(jsonl.studies$schema1.funding_source |> levels())
+  two = c(jsonl.studies$schema1.lead_sponsor_funding_source |> levels())
 )
 
 # Check funding via group_by()
 jsonl.studies |>
-	group_by( schema1.funding_source, common.funding ) |>
+	group_by( schema1.lead_sponsor_funding_source, common.funding ) |>
 	count() |> arrange(desc(n)) |> print(n = 50)
 
 ########

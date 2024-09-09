@@ -115,8 +115,11 @@ COPY (
                         studyRecord ->> '$.study.protocolSection.armsInterventionsModule.interventions[*]'
                     ) AS number_of_interventions,
                     studyRecord ->> '$.study.hasResults' as has_results,
-                    studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.class' AS funding_source,
-                    studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.name' AS sponsor_name,
+                    studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.class' AS lead_sponsor_funding_source,
+                    studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.name' AS lead_sponsor_name,
+                    list_sort(list_distinct(
+                        studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.collaborators[*].class'
+                    )) AS collaborators_classes,
                     studyRecord ->> '$.study.protocolSection.statusModule.resultsFirstPostDateStruct.date' AS results_date,
                     studyRecord ->> '$.study.protocolSection.statusModule.resultsFirstSubmitDate' AS results_rec_date,
                     TRY_CAST(

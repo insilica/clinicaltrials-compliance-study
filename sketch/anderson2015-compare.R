@@ -65,7 +65,7 @@ df.intersect.new  <- anderson2015.new$hlact.studies[ new.nctids %in% intersect.n
 # Table of input data
 table(
       df.intersect.orig$schema0.funding,
-      df.intersect.new$schema1.funding_source
+      df.intersect.new$schema1.lead_sponsor_funding_source
 ) |> addmargins()
 # Table of data normalization
 table(

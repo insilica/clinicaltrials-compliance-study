@@ -23,7 +23,8 @@ standardize.jsonl_derived.type <- function(data) {
     mutate(
       # These are all factor variables.
       across(c(schema1.phase, schema1.overall_status,
-               schema1.funding_source, schema1.primary_purpose,
+               schema1.lead_sponsor_funding_source,
+               schema1.primary_purpose,
                schema1.allocation, schema1.masking), as.factor),
     ) |>
     mutate(schema1.primary_purpose =
@@ -123,8 +124,8 @@ standardize.jsonl_derived.norm <- function(data) {
     ) |>
     mutate(common.funding =
            case_when(
-               schema1.funding_source == "INDUSTRY" ~ "Industry",
-               schema1.funding_source == "NIH"      ~ "NIH",
+               schema1.lead_sponsor_funding_source == "INDUSTRY" ~ "Industry",
+               schema1.lead_sponsor_funding_source == "NIH"      ~ "NIH",
                .default                             = "Other"
            ) |> factor()
     ) |>
