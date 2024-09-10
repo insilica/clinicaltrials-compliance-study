@@ -19,6 +19,51 @@ INSTALL json;
 
 LOAD json;
 
+-- normalize_funding_source
+--
+-- @param lead_sponsor_funding_source VARCHAR
+-- @param collaborators_classes VARCHAR[]
+--
+-- Creates a single funding source based on the definition from the
+-- data dictionary:
+--
+-- > Derived from Sponsor and Collaborator information. If Sponsor is from NIH,
+-- > or at least one collaborator is from NIH with no Industry sponsor then
+-- > funding=NIH. Otherwise if Sponsor is from Industry or at least one
+-- > collaborator is from Industry then funding=Industry. Studies with no
+-- > Industry or NIH Sponsor or collaborators are assigned funding=Other.
+--
+-- @returns VARCHAR
+CREATE MACRO normalize_funding_source(
+    lead_sponsor_funding_source,
+    collaborators_classes) AS (
+    CASE
+        WHEN
+        --  If lead sponsor is from 'NIH'
+            lead_sponsor_funding_source = 'NIH'
+        --  Or if if the collaborators contains 'NIH',
+        --  but not 'INDUSTRY'.
+        --
+        --  NOTE: And the lead sponsor is not 'INDUSTRY' either.
+             OR (
+                         list_contains(collaborators_classes, 'NIH')
+                 AND NOT list_contains(collaborators_classes, 'INDUSTRY')
+                 AND     lead_sponsor_funding_source != 'INDUSTRY'
+             )
+        THEN 'NIH'
+
+        WHEN
+        --      If the lead sponsor is from 'INDUSTRY'
+                lead_sponsor_funding_source = 'INDUSTRY'
+        --      Or any of the collaborators are from 'INDUSTRY'
+             OR list_contains(collaborators_classes, 'INDUSTRY')
+        THEN 'Industry'
+
+        -- Default to Other if neither 'NIH' nor 'INDUSTRY' are found
+        ELSE 'Other'
+    END
+);
+
 COPY (
     SELECT
         *
@@ -31,19 +76,8 @@ COPY (
                     CAST(json_extract(change, '$.version') AS INTEGER) AS change_version,
                     studyRecord->>'$.study.protocolSection.identificationModule.nctId' AS change_nct_id,
                     *
-                FROM (
-                    SELECT
-                            change::JSON      AS change,
-                            studyRecord::JSON AS studyRecord,
-                    FROM
-                        read_ndjson_auto(
-                            'download/ctgov/historical/NCT*/*.jsonl',
-                            maximum_sample_files = 32768,
-                            ignore_errors = true
-                        )
-                    WHERE
-                            studyRecord IS NOT NULL
-                        AND change      IS NOT NULL
+                FROM read_parquet(
+                    'brick/ctgov/historical/records.parquet'
                 )
                 WHERE
 --%%                FILTER replace('2013-09-27', date.cutoff)
@@ -126,8 +160,11 @@ COPY (
                         studyRecord ->> '$.study.protocolSection.armsInterventionsModule.interventions[*]'
                     ) AS number_of_interventions,
                     studyRecord ->> '$.study.hasResults' as has_results,
-                    studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.class' AS funding_source,
-                    studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.name' AS sponsor_name,
+                    studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.class' AS lead_sponsor_funding_source,
+                    studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.leadSponsor.name' AS lead_sponsor_name,
+                    list_sort(list_distinct(
+                        studyRecord ->> '$.study.protocolSection.sponsorCollaboratorsModule.collaborators[*].class'
+                    )) AS collaborators_classes,
                     studyRecord ->> '$.study.protocolSection.statusModule.resultsFirstPostDateStruct.date' AS results_date,
                     studyRecord ->> '$.study.protocolSection.statusModule.resultsFirstSubmitDate' AS results_rec_date,
                     TRY_CAST(
@@ -159,6 +196,10 @@ COPY (
                     phases,
                     (acc, val) -> concat(acc, '; ', val)
                 ) AS phase,
+                normalize_funding_source(
+                    lead_sponsor_funding_source,
+                    collaborators_classes
+                ) AS norm_funding_source_class,
             FROM
                 _extract
         )

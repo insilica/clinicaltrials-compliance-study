@@ -17,7 +17,15 @@ pacman::p_load(
   blandr,
   broom,
   tidyr,
-  assertthat
+  assertthat,
+  fs,
+  glue,
+  logger,
+  patchwork,
+  purrr,
+  rlang,
+  scales,
+  yaml
 )
 
 source('analysis/ctgov/dateutil.R')
@@ -41,3 +49,8 @@ source('analysis/ctgov/regression.R')
 source('analysis/ctgov/preprocess/common.R')
 
 source('analysis/ctgov/anderson2015_data.R')
+
+source('analysis/ctgov/process_windows.R')
+source('analysis/ctgov/plot_scatterline.R')
+source('analysis/ctgov/plot_compare_logistic.R')
+source('analysis/ctgov/plot_stacked_chart.R')

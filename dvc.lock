@@ -88,42 +88,51 @@ stages:
   build-ctgov-studies-all@anderson2015_2008-2012:
     cmd:
     - mkdir -p $(dirname brick/analysis-20130927/ctgov-studies-all.parquet)
-    - script/tt-render-by-param anderson2015_2008-2012 sql/create_cthist_all.sql |
-      duckdb
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param anderson2015_2008-2012
+      sql/create_cthist_all.sql\n) | duckdb\n"
     deps:
-    - path: download/ctgov/historical
+    - path: brick/ctgov/historical/records.parquet
       hash: md5
-      md5: e040593bab918704633877b9b5c89197.dir
-      size: 72594385446
-      nfiles: 492953
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
     - path: sql/create_cthist_all.sql
       hash: md5
-      md5: c98c01d4acd0f12fa5b90ca355af8037
-      size: 8389
+      md5: bbab96def9beb1d8f2400fd9ee2ae734
+      size: 9961
     outs:
     - path: brick/analysis-20130927/ctgov-studies-all.parquet
       hash: md5
-      md5: 19da8beecb1f7ece7952125cfa648823
-      size: 6214494
+      md5: 58f3116c69ae66b86352fb8d19781ddd
+      size: 7113531
   build-ctgov-studies-all@stanford_2019-2023:
     cmd:
     - mkdir -p $(dirname brick/analysis-20240430/ctgov-studies-all.parquet)
-    - script/tt-render-by-param stanford_2019-2023 sql/create_cthist_all.sql | duckdb
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param stanford_2019-2023
+      sql/create_cthist_all.sql\n) | duckdb\n"
     deps:
-    - path: download/ctgov/historical
+    - path: brick/ctgov/historical/records.parquet
       hash: md5
-      md5: e040593bab918704633877b9b5c89197.dir
-      size: 72594385446
-      nfiles: 492953
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
     - path: sql/create_cthist_all.sql
       hash: md5
-      md5: c98c01d4acd0f12fa5b90ca355af8037
-      size: 8389
+      md5: bbab96def9beb1d8f2400fd9ee2ae734
+      size: 9961
     outs:
     - path: brick/analysis-20240430/ctgov-studies-all.parquet
       hash: md5
-      md5: 89074fdb6b83002d8a42ce155cff55ca
-      size: 22440417
+      md5: d4745810b2c47af2da2e50ef4f4d6c8c
+      size: 25882077
   build-ctgov-studies-hlact-filtered@anderson2015_2008-2012:
     cmd:
     - make docker-compose-up
@@ -133,8 +142,8 @@ stages:
     deps:
     - path: brick/analysis-20130927/ctgov-studies-all.parquet
       hash: md5
-      md5: 19da8beecb1f7ece7952125cfa648823
-      size: 6214494
+      md5: 58f3116c69ae66b86352fb8d19781ddd
+      size: 7113531
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -146,8 +155,8 @@ stages:
     outs:
     - path: brick/analysis-20130927/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 8657fb6e917a517aada6e7c3db724f40
-      size: 965624
+      md5: 744aad92ed9677df2e9ac4486ada7945
+      size: 997632
   build-ctgov-studies-hlact-filtered@stanford_2019-2023:
     cmd:
     - make docker-compose-up
@@ -157,8 +166,8 @@ stages:
     deps:
     - path: brick/analysis-20240430/ctgov-studies-all.parquet
       hash: md5
-      md5: 89074fdb6b83002d8a42ce155cff55ca
-      size: 22440417
+      md5: d4745810b2c47af2da2e50ef4f4d6c8c
+      size: 25882077
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -170,8 +179,8 @@ stages:
     outs:
     - path: brick/analysis-20240430/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 06b759a066819431d7f7076e247965f5
-      size: 1641713
+      md5: bffed8257857ce3479d2dd3b98437087
+      size: 1690787
   build-ctgov-studies-all@sliding-window_n-1_20130901:
     cmd:
     - mkdir -p $(dirname brick/sliding-window/n-1_20130901/ctgov-studies-all.parquet)
@@ -425,83 +434,99 @@ stages:
   build-ctgov-studies-all@long-observe_n-1_20170101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-1_20170101/ctgov-studies-all.parquet)
-    - script/tt-render-by-param long-observe_n-1_20170101 sql/create_cthist_all.sql
-      | duckdb
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param long-observe_n-1_20170101
+      sql/create_cthist_all.sql\n) | duckdb\n"
     deps:
-    - path: download/ctgov/historical
+    - path: brick/ctgov/historical/records.parquet
       hash: md5
-      md5: e040593bab918704633877b9b5c89197.dir
-      size: 72594385446
-      nfiles: 492953
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
     - path: sql/create_cthist_all.sql
       hash: md5
-      md5: c98c01d4acd0f12fa5b90ca355af8037
-      size: 8389
+      md5: bbab96def9beb1d8f2400fd9ee2ae734
+      size: 9961
     outs:
     - path: brick/long-observe/n-1_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: c86aebe976c10a6975d03231e264d9ac
-      size: 9706858
+      md5: 5a7e99227ac732da42bd7a9aa4259c8d
+      size: 11207676
   build-ctgov-studies-all@long-observe_n-2_20190101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-2_20190101/ctgov-studies-all.parquet)
-    - script/tt-render-by-param long-observe_n-2_20190101 sql/create_cthist_all.sql
-      | duckdb
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param long-observe_n-2_20190101
+      sql/create_cthist_all.sql\n) | duckdb\n"
     deps:
-    - path: download/ctgov/historical
+    - path: brick/ctgov/historical/records.parquet
       hash: md5
-      md5: e040593bab918704633877b9b5c89197.dir
-      size: 72594385446
-      nfiles: 492953
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
     - path: sql/create_cthist_all.sql
       hash: md5
-      md5: c98c01d4acd0f12fa5b90ca355af8037
-      size: 8389
+      md5: bbab96def9beb1d8f2400fd9ee2ae734
+      size: 9961
     outs:
     - path: brick/long-observe/n-2_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: 69afac82dcd2982aedd61a102fabbcd9
-      size: 12944321
+      md5: 5c8fafdf98cf052c9e2ed35a5dd1724e
+      size: 14977042
   build-ctgov-studies-all@long-observe_n-3_20210101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-3_20210101/ctgov-studies-all.parquet)
-    - script/tt-render-by-param long-observe_n-3_20210101 sql/create_cthist_all.sql
-      | duckdb
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param long-observe_n-3_20210101
+      sql/create_cthist_all.sql\n) | duckdb\n"
     deps:
-    - path: download/ctgov/historical
+    - path: brick/ctgov/historical/records.parquet
       hash: md5
-      md5: e040593bab918704633877b9b5c89197.dir
-      size: 72594385446
-      nfiles: 492953
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
     - path: sql/create_cthist_all.sql
       hash: md5
-      md5: c98c01d4acd0f12fa5b90ca355af8037
-      size: 8389
+      md5: bbab96def9beb1d8f2400fd9ee2ae734
+      size: 9961
     outs:
     - path: brick/long-observe/n-3_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: bad7defc68c0469e8b202359d085e8e3
-      size: 16252169
+      md5: a665bede4e1564b3d64cbfd93b6e87b8
+      size: 18946327
   build-ctgov-studies-all@long-observe_n-4_20230101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-4_20230101/ctgov-studies-all.parquet)
-    - script/tt-render-by-param long-observe_n-4_20230101 sql/create_cthist_all.sql
-      | duckdb
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param long-observe_n-4_20230101
+      sql/create_cthist_all.sql\n) | duckdb\n"
     deps:
-    - path: download/ctgov/historical
+    - path: brick/ctgov/historical/records.parquet
       hash: md5
-      md5: e040593bab918704633877b9b5c89197.dir
-      size: 72594385446
-      nfiles: 492953
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
     - path: sql/create_cthist_all.sql
       hash: md5
-      md5: c98c01d4acd0f12fa5b90ca355af8037
-      size: 8389
+      md5: bbab96def9beb1d8f2400fd9ee2ae734
+      size: 9961
     outs:
     - path: brick/long-observe/n-4_20230101/ctgov-studies-all.parquet
       hash: md5
-      md5: b198288a82145ff29c1bb5806dd02128
-      size: 19903201
+      md5: 364abec4d5d59370a39bd8b630c66363
+      size: 23042871
   build-ctgov-studies-hlact-filtered@long-observe_n-1_20170101:
     cmd:
     - make docker-compose-up
@@ -511,8 +536,8 @@ stages:
     deps:
     - path: brick/long-observe/n-1_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: c86aebe976c10a6975d03231e264d9ac
-      size: 9706858
+      md5: 5a7e99227ac732da42bd7a9aa4259c8d
+      size: 11207676
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -524,8 +549,8 @@ stages:
     outs:
     - path: brick/long-observe/n-1_20170101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 66a05f0bdef6f19b255b896a87ebfcf7
-      size: 954063
+      md5: b265dd03bf5370ec3377f9266dc9feb0
+      size: 984157
   build-ctgov-studies-hlact-filtered@long-observe_n-2_20190101:
     cmd:
     - make docker-compose-up
@@ -535,8 +560,8 @@ stages:
     deps:
     - path: brick/long-observe/n-2_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: 69afac82dcd2982aedd61a102fabbcd9
-      size: 12944321
+      md5: 5c8fafdf98cf052c9e2ed35a5dd1724e
+      size: 14977042
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -548,8 +573,8 @@ stages:
     outs:
     - path: brick/long-observe/n-2_20190101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 822321799e13b3aa9aa048318d2bf0be
-      size: 1066943
+      md5: 54dbcc29ba0fe89a9cf8f71c08e5ad20
+      size: 1103602
   build-ctgov-studies-hlact-filtered@long-observe_n-3_20210101:
     cmd:
     - make docker-compose-up
@@ -559,8 +584,8 @@ stages:
     deps:
     - path: brick/long-observe/n-3_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: bad7defc68c0469e8b202359d085e8e3
-      size: 16252169
+      md5: a665bede4e1564b3d64cbfd93b6e87b8
+      size: 18946327
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -572,8 +597,8 @@ stages:
     outs:
     - path: brick/long-observe/n-3_20210101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: cf1f204b95fa78579bc8861c4ac17bc0
-      size: 1169245
+      md5: e5f2a0cf9c81a312cb9301380c4381e3
+      size: 1211055
   build-ctgov-studies-hlact-filtered@long-observe_n-4_20230101:
     cmd:
     - make docker-compose-up
@@ -583,8 +608,8 @@ stages:
     deps:
     - path: brick/long-observe/n-4_20230101/ctgov-studies-all.parquet
       hash: md5
-      md5: b198288a82145ff29c1bb5806dd02128
-      size: 19903201
+      md5: 364abec4d5d59370a39bd8b630c66363
+      size: 23042871
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -596,19 +621,19 @@ stages:
     outs:
     - path: brick/long-observe/n-4_20230101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: b0e487bf0dfcedfa1658ae2c027d41c0
-      size: 1338857
+      md5: 6b2342a03f7afc67d530624bafcaa1b7
+      size: 1383247
   analysis-driver-sliding_long-observe:
     cmd: "Rscript analysis/driver-sliding.R params.yaml long-observe\n"
     deps:
     - path: analysis/driver-sliding.R
       hash: md5
-      md5: 8bdcd099a2c2ec3cf35489c649f1e9af
-      size: 10683
+      md5: 7de93bd9e23e3a25ff8413b03b586687
+      size: 1170
     - path: brick/long-observe
       hash: md5
-      md5: 0f60740937307662185545d5143bca28.dir
-      size: 119885106
+      md5: a2fb27353f19e8b5cf44a9d9bff7035b.dir
+      size: 129405426
       nfiles: 14
     - path: params.yaml
       hash: md5
@@ -617,49 +642,57 @@ stages:
     outs:
     - path: figtab/long-observe
       hash: md5
-      md5: 49bc6b08977237246c1bf190087a2774.dir
-      size: 507700
-      nfiles: 2
+      md5: 35e1eb1d087f0bce7044308344dbcf22.dir
+      size: 609550
+      nfiles: 3
   build-ctgov-studies-all@rule-effective-date-before:
     cmd:
     - mkdir -p $(dirname brick/rule-effective-date-before/ctgov-studies-all.parquet)
-    - script/tt-render-by-param rule-effective-date-before sql/create_cthist_all.sql
-      | duckdb
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param rule-effective-date-before
+      sql/create_cthist_all.sql\n) | duckdb\n"
     deps:
-    - path: download/ctgov/historical
+    - path: brick/ctgov/historical/records.parquet
       hash: md5
-      md5: e040593bab918704633877b9b5c89197.dir
-      size: 72594385446
-      nfiles: 492953
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
     - path: sql/create_cthist_all.sql
       hash: md5
-      md5: c98c01d4acd0f12fa5b90ca355af8037
-      size: 8389
+      md5: bbab96def9beb1d8f2400fd9ee2ae734
+      size: 9961
     outs:
     - path: brick/rule-effective-date-before/ctgov-studies-all.parquet
       hash: md5
-      md5: 5ef61d4b09815bbad007d62643aa5a22
-      size: 10261045
+      md5: 8b0d1d87db55cc729be4329a7bf6fe18
+      size: 11909050
   build-ctgov-studies-all@rule-effective-date-after:
     cmd:
     - mkdir -p $(dirname brick/rule-effective-date-after/ctgov-studies-all.parquet)
-    - script/tt-render-by-param rule-effective-date-after sql/create_cthist_all.sql
-      | duckdb
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param rule-effective-date-after
+      sql/create_cthist_all.sql\n) | duckdb\n"
     deps:
-    - path: download/ctgov/historical
+    - path: brick/ctgov/historical/records.parquet
       hash: md5
-      md5: e040593bab918704633877b9b5c89197.dir
-      size: 72594385446
-      nfiles: 492953
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
     - path: sql/create_cthist_all.sql
       hash: md5
-      md5: c98c01d4acd0f12fa5b90ca355af8037
-      size: 8389
+      md5: bbab96def9beb1d8f2400fd9ee2ae734
+      size: 9961
     outs:
     - path: brick/rule-effective-date-after/ctgov-studies-all.parquet
       hash: md5
-      md5: a0a6b4334eb26e705929d8bd3e30e6f1
-      size: 22440417
+      md5: 5aaeb212bb2b11fcc4d7b0fc5ac5f3fe
+      size: 25875278
   build-ctgov-studies-hlact-filtered@rule-effective-date-before:
     cmd:
     - make docker-compose-up
@@ -669,8 +702,8 @@ stages:
     deps:
     - path: brick/rule-effective-date-before/ctgov-studies-all.parquet
       hash: md5
-      md5: 5ef61d4b09815bbad007d62643aa5a22
-      size: 10261045
+      md5: 8b0d1d87db55cc729be4329a7bf6fe18
+      size: 11909050
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -682,8 +715,8 @@ stages:
     outs:
     - path: brick/rule-effective-date-before/ctgov-studies-hlact.parquet
       hash: md5
-      md5: aa96c3600529cdb6d20496dd59cc03d3
-      size: 988837
+      md5: 73a8414a83b1e220b1772f3b1d8fcc3a
+      size: 1023767
   build-ctgov-studies-hlact-filtered@rule-effective-date-after:
     cmd:
     - make docker-compose-up
@@ -693,8 +726,8 @@ stages:
     deps:
     - path: brick/rule-effective-date-after/ctgov-studies-all.parquet
       hash: md5
-      md5: a0a6b4334eb26e705929d8bd3e30e6f1
-      size: 22440417
+      md5: 5aaeb212bb2b11fcc4d7b0fc5ac5f3fe
+      size: 25875278
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -706,5 +739,24 @@ stages:
     outs:
     - path: brick/rule-effective-date-after/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 7d9eb985ae29cdd891c272d9b92743ce
-      size: 1586280
+      md5: 03bd544490d872b8a2183886ddd2203a
+      size: 1632521
+  build-ctgov-historical-records:
+    cmd:
+    - mkdir -p brick/ctgov/historical
+    - duckdb < sql/create_cthist_preproc.sql
+    deps:
+    - path: download/ctgov/historical
+      hash: md5
+      md5: e040593bab918704633877b9b5c89197.dir
+      size: 72594385446
+      nfiles: 492953
+    - path: sql/create_cthist_preproc.sql
+      hash: md5
+      md5: 4fd82a3d7cb02bd8c66f6b2398a78083
+      size: 801
+    outs:
+    - path: brick/ctgov/historical/records.parquet
+      hash: md5
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
