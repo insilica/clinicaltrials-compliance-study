@@ -41,6 +41,7 @@ anderson2015.new$hlact.studies <-
            nctid = schema1.nct_id
     )
 
+{
 original.nctids <- anderson2015.original$hlact.studies$nctid
 new.nctids <- anderson2015.new$hlact.studies$nctid
 
@@ -57,49 +58,87 @@ setdiff(new.nctids, original.nctids) |> length()
 #| > setdiff(new.nctids, original.nctids) |> length()           |
 #| [1] 3436                                                     |
 #----------------------------------------------------------------
+}
 
+# Join dataframes
+df.joined <- ( anderson2015.original$hlact.studies
+  |> inner_join( anderson2015.new$hlact.studies, by = 'nctid' )
+)
 
-df.intersect.orig <- anderson2015.original$hlact.studies[ original.nctids %in% intersect.nctids , ]
-df.intersect.new  <- anderson2015.new$hlact.studies[ new.nctids %in% intersect.nctids , ]
-
-# Table of input data
+# Compare original and new: on the lead sponsors variable.
+# This is expected to align closely because there is no processing other than
+# mapping to "Other" here.
 table(
-      df.intersect.orig$schema0.funding,
-      df.intersect.new$schema1.lead_sponsor_funding_source
+  df.joined$schema0.agency_classc,
+  df.joined$schema1.lead_sponsor_funding_source
+    |> standardize.jsonl_derived.norm.funding_source()
 ) |> addmargins()
-# Table of data normalization
-table(
-      df.intersect.orig$common.funding,
-      df.intersect.new$common.funding
-) |> addmargins()
-#-----------------------------------------------------------------------
-#| # Table of data+ ) |> addmargins()                                  |
-#|  normalization                                                      |
-#| table(                                                              |
-#|       df.intersect.orig$common.funding,                             |
-#|       df.intersect.new$common.funding                               |
-#| ) |> addmarg                                                        |
-#|              FED INDIV INDUSTRY NETWORK   NIH OTHER OTHER_GOV   Sum |
-#|   Industry   113    34     3803     151   393  2750         7  7251 |
-#|   NIH         33     5      948      44    92   663         0  1785 |
-#|   Other       32    11     1113      55   127   862         1  2201 |
-#|   Sum        178    50     5864     250   612  4275         8 11237 |
-#| > # Table of data normalization                                     |
-#| > table(                                                            |
-#| +       df.intersect.orig$common.funding,                           |
-#| +       df.intersect.new$common.funding                             |
-#| + ) |> addmargins()                                                 |
-#|                                                                     |
-#|            Industry   NIH Other   Sum                               |
-#|   Industry     3803   393  3055  7251                               |
-#|   NIH           948    92   745  1785                               |
-#|   Other        1113   127   961  2201                               |
-#|   Sum          5864   612  4761 11237                               |
-#| >                                                                   |
-#-----------------------------------------------------------------------
+############################################################
+# > table(                                                 #
+# +   df.joined$schema0.agency_classc,                     #
+# +   df.joined$schema1.lead_sponsor_funding_source        #
+# +     |> standardize.jsonl_derived.norm.funding_source() #
+# + ) |> addmargins()                                      #
+#                                                          #
+#            Industry   NIH Other   Sum                    #
+#   Industry     5854     0     1  5855                    #
+#   NIH             1   608     5   614                    #
+#   Other           9     4  4583  4596                    #
+#   U.S. Fed        0     0   172   172                    #
+#   Sum          5864   612  4761 11237                    #
+############################################################
 
-( df.intersect.orig
-  |> inner_join( df.intersect.new, by = 'nctid' )
+# Compare original and new: after data normalization
+# (lead sponsor + collaborators).
+# There is processing here. This is to test that the processing done is
+# replicated.
+table(
+      df.joined$common.funding.x,
+      df.joined$common.funding.y
+) |> addmargins()
+#########################################
+# > table(                              #
+# +       df.joined$common.funding.x,   #
+# +       df.joined$common.funding.y    #
+# + ) |> addmargins()                   #
+#                                       #
+#            Industry   NIH Other   Sum #
+#   Industry     7249     1     1  7251 #
+#   NIH           104  1681     0  1785 #
+#   Other          24     1  2176  2201 #
+#   Sum          7377  1683  2177 11237 #
+#########################################
+
+
+################################################################################
+
+# Compare new with itself: lead sponsor variable with normalized data from lead
+# sponsor and collaborators.
+#
+# This is to show how many are reassigned from "Other" in the
+# `schema1.lead_sponsor_funding_source` to "Industry" or "NIH" due to
+# the `schema1.collaborators_classes`.
+table(
+      df.joined$schema1.lead_sponsor_funding_source
+        |> standardize.jsonl_derived.norm.funding_source(),
+      df.joined$common.funding.y
+) |> addmargins()
+#################################################################
+# > table(                                                      #
+# +       df.joined$schema1.lead_sponsor_funding_source         #
+# +         |> standardize.jsonl_derived.norm.funding_source(), #
+# +       df.joined$common.funding.y                            #
+# + ) |> addmargins()                                           #
+#                                                               #
+#            Industry   NIH Other   Sum                         #
+#   Industry     5864     0     0  5864                         #
+#   NIH             0   612     0   612                         #
+#   Other        1513  1071  2177  4761                         #
+#   Sum          7377  1683  2177 11237                         #
+#################################################################
+
+# This shows the off-diagnoals (where original and new disagree).
+( df.joined
   #
   |> filter(
     common.funding.x != common.funding.y
@@ -109,45 +148,72 @@ table(
   #
   |> (\(x) table(x$common.funding.x, x$common.funding.y) )()
 )
-#--------------------------------------------------------------------
-#| > ( df.intersect.orig                                            |
-#| +   |> inner_join( df.intersect.new, by = 'nctid' )              |
-#| +   #                                                            |
-#| +   |> filter(                                                   |
-#| +     common.funding.x != common.funding.y                       |
-#| +   )                                                            |
-#| +   #                                                            |
-#| +   |> select( 'nctid', 'common.funding.x', 'common.funding.y' ) |
-#| +   #                                                            |
-#| +   |> (\(x) table(x$common.funding.x, x$common.funding.y) )()   |
-#| + )                                                              |
-#|                                                                  |
-#|            Industry  NIH Other                                   |
-#|   Industry        0    1  1394                                   |
-#|   NIH             1    0  1174                                   |
-#|   Other           7    1     0                                   |
-#| >                                                                |
-#--------------------------------------------------------------------
 
 
-# Join dataframes
-( df.intersect.orig
-  |> inner_join( df.intersect.new, by = 'nctid' )
+# The off-diagnoals that were not reassigned from "Other" are likely due to the
+# `schema1.collaborators_classes` in the new data not being the same.
+( df.joined
   #
-  |> filter(
-    #!( common.funding.x == 'NIH' | common.funding.y == 'NIH' ),
-    #!( common.funding.x == 'Other' | common.funding.y == 'Other' ),
-    #common.funding.x != 'Other',
-    common.funding.y != 'Other',
-    common.funding.x != common.funding.y
+  |> mutate(
+      str.collaborator_classes =
+        schema1.collaborators_classes
+          |> map_chr( ~ paste(.x, collapse = '-') )
+          |> as.factor(),
+      str.lead_sponsor_funding =
+        schema1.lead_sponsor_funding_source
+          |> standardize.jsonl_derived.norm.funding_source()
   )
   #
-  |> select( 'nctid', 'common.funding.x', 'common.funding.y' )
+  |> filter(
+    common.funding.x != common.funding.y,
+    schema0.agency_classc     != 'Other',
+    schema1.lead_sponsor_funding_source  != 'OTHER',
+  )
+  |> select(
+            'nctid',
+            'common.funding.x',
+            'schema0.agency_classc',
+            #'schema0.sponsor_name',
+            #'schema0.collaborator_names',
+            'common.funding.y',
+            'schema1.lead_sponsor_funding_source',
+            #'str.lead_sponsor_funding',
+            #'schema1.lead_sponsor_name',
+            'str.collaborator_classes',
+  )
   #
-)
+) |> print(n=30, width = 800)
+
+### Comment: There are only 3 where this is the case.
+###
+### For one of these (NCT00422201), the lead sponsors do not match.
+###
+### For two of these (NCT00470418, NCT01076452),
+### the original data assigns these to NIH, but since they
+### have an INDUSTRY collaborator, `common.funding.y` = "Industry".
+#########################################################################
+# # A tibble: 3 × 6                                                     #
+#   nctid       common.funding.x schema0.agency_classc common.funding.y #
+#   <chr>       <fct>            <chr>                 <fct>            #
+# 1 NCT00422201 NIH              NIH                   Industry         #
+# 2 NCT00470418 NIH              U.S. Fed              Industry         #
+# 3 NCT01076452 NIH              U.S. Fed              Industry         #
+#   schema1.lead_sponsor_funding_source str.collaborator_classes        #
+#   <fct>                               <fct>                           #
+# 1 INDUSTRY                            ""                              #
+# 2 FED                                 "INDUSTRY-NIH"                  #
+# 3 FED                                 "INDUSTRY-NIH"                  #
+#########################################################################
+
+
+
 
   #|> filter(
   #  common.funding.x == common.funding.y
+  # !( common.funding.x == 'NIH' | common.funding.y == 'NIH' ),
+  # !( common.funding.x == 'Other' | common.funding.y == 'Other' ),
+  #  common.funding.x != 'Other',
+  #  common.funding.y != 'Other',
   #)
 
   #|> nrow()
@@ -155,47 +221,3 @@ table(
   #|> names() %>% grep('funding', ., value = TRUE)
 
   #|> summary()
-
-# Compare the the Anderson et al funding
-table(
-      df.intersect.orig$schema0.funding,
-      df.intersect.new$schema1.funding_source_classes
-        |>  map_chr( ~ paste(.x, collapse='-') )
-) |> addmargins()
-
-# Compare the lead sponsor in the new data with the consolidated sponsor in the
-# new data.  This essentially shows which ones have Other as the lead sponsor,
-# but non-Other sponsors as collaborators.
-table(
-      df.intersect.new$schema1.lead_sponsor_funding_source
-        |> standardize.jsonl_derived.norm.funding_source()
-      ,
-      df.intersect.new$schema1.funding_source_classes
-        |>  map_chr( ~ paste(.x, collapse='-') )
-) |> addmargins()
-
-(
-id.intersect.new.both_funding <-
-  df.intersect.new
-  |> filter(
-            'Industry-NIH' == schema1.funding_source_classes |>
-                map_chr( ~ paste(.x, collapse='-') )
-            )
-  |> getElement( 'schema1.nct_id' )
-)
-
-table(
-      ( df.intersect.orig
-        |> filter(
-                  schema0.nct_id %in% id.intersect.new.both_funding
-                 )
-        |> getElement('schema0.funding')
-      )
-      ,
-      df.intersect.new
-        |> filter(
-                  schema1.nct_id %in% id.intersect.new.both_funding
-                 )
-        |> getElement('schema1.funding_source_classes')
-        |> map_chr( ~ paste(.x, collapse='-') )
-)
