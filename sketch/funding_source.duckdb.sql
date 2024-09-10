@@ -1,3 +1,5 @@
+-- SQL dialect: DuckDB
+
 -- funding_source_class_map
 --
 -- @param `class` VARCHAR
@@ -24,6 +26,48 @@ CREATE MACRO remove_other_if_needed(distinct_classes) AS (
         WHEN list_contains(distinct_classes, 'Other') AND len(distinct_classes) > 1
         THEN list_filter(distinct_classes, x -> x != 'Other')
         ELSE distinct_classes
+    END
+);
+
+-- normalize_funding_source
+--
+-- @param lead_sponsor_funding_source VARCHAR
+-- @param collaborators_classes VARCHAR[]
+--
+-- Creates a single funding source based on the definition from the
+-- data dictionary:
+--
+-- > Derived from Sponsor and Collaborator information. If Sponsor is from NIH,
+-- > or at least one collaborator is from NIH with no Industry sponsor then
+-- > funding=NIH. Otherwise if Sponsor is from Industry or at least one
+-- > collaborator is from Industry then funding=Industry. Studies with no
+-- > Industry or NIH Sponsor or collaborators are assigned funding=Other.
+--
+-- @returns VARCHAR
+CREATE MACRO normalize_funding_source(
+    lead_sponsor_funding_source,
+    collaborators_classes) AS (
+    CASE
+        WHEN
+        --  If lead sponsor is from 'NIH'
+            lead_sponsor_funding_source = 'NIH'
+        --  Or if if the collaborators contains 'NIH',
+        --  but not 'INDUSTRY'.
+             OR (
+                         list_contains(collaborators_classes, 'NIH')
+                 AND NOT list_contains(collaborators_classes, 'INDUSTRY')
+             )
+        THEN 'NIH'
+
+        WHEN
+        --      If the lead sponsor is from 'INDUSTRY'
+                lead_sponsor_funding_source = 'INDUSTRY'
+        --      Or any of the collaborators are from 'INDUSTRY'
+             OR list_contains(collaborators_classes, 'INDUSTRY')
+        THEN 'Industry'
+
+        -- Default to Other if neither 'NIH' nor 'INDUSTRY' are found
+        ELSE 'Other'
     END
 );
 
@@ -58,6 +102,14 @@ mapped_classes_collapse_other AS (
 			AS classes
 	FROM mapped_classes
 ),
+mapped_classes_norm AS (
+	SELECT
+		normalize_funding_source(
+				lead_sponsor_funding_source,
+				collaborators_classes
+		) AS norm_class
+	FROM 'brick/analysis-20130927/ctgov-studies-hlact.parquet'
+),
 stat_count_of_lead_sponsor_class AS (
 	SELECT
 		COUNT(class) AS class_count,
@@ -77,6 +129,15 @@ stat_count_of_distinct_class_lists AS (
 	GROUP BY classes
 	ORDER BY classes_count
 ),
+stat_count_of_norm_classes AS (
+	SELECT
+		COUNT(norm_class) AS norm_class_count,
+		norm_class
+	FROM
+		mapped_classes_norm
+	GROUP BY norm_class
+	ORDER BY norm_class_count
+),
 stat_count_of_length_of_distinct_class_lists AS (
 	SELECT
 		len(distinct_classes)
@@ -94,8 +155,9 @@ stat_count_of_length_of_distinct_class_lists AS (
 SELECT *
 FROM
 	-- stat_count_of_lead_sponsor_class
-	stat_count_of_distinct_class_lists
+	-- stat_count_of_distinct_class_lists
 	-- stat_count_of_length_of_distinct_class_lists
+	stat_count_of_norm_classes
 ;
 
 
@@ -129,3 +191,14 @@ FROM
 -- | │          7708 │ [[Industry]]           │ |
 -- | └───────────────┴────────────────────────┘ |
 -- ----------------------------------------------
+
+-- -------------------------------------
+-- | ┌──────────────────┬────────────┐ |
+-- | │ norm_class_count │ norm_class │ |
+-- | │      int64       │  varchar   │ |
+-- | ├──────────────────┼────────────┤ |
+-- | │             2668 │ NIH        │ |
+-- | │             4178 │ Other      │ |
+-- | │             7827 │ Industry   │ |
+-- | └──────────────────┴────────────┘ |
+-- -------------------------------------

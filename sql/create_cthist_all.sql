@@ -19,59 +19,47 @@ INSTALL json;
 
 LOAD json;
 
--- funding_source_class_map
+-- normalize_funding_source
 --
--- @param `class` VARCHAR
+-- @param lead_sponsor_funding_source VARCHAR
+-- @param collaborators_classes VARCHAR[]
+--
+-- Creates a single funding source based on the definition from the
+-- data dictionary:
+--
+-- > Derived from Sponsor and Collaborator information. If Sponsor is from NIH,
+-- > or at least one collaborator is from NIH with no Industry sponsor then
+-- > funding=NIH. Otherwise if Sponsor is from Industry or at least one
+-- > collaborator is from Industry then funding=Industry. Studies with no
+-- > Industry or NIH Sponsor or collaborators are assigned funding=Other.
+--
 -- @returns VARCHAR
-CREATE MACRO funding_source_class_map(class) AS (
-       CASE
-           WHEN class = 'INDUSTRY' THEN 'Industry'
-           WHEN class = 'NIH'      THEN 'NIH'
-                                   ELSE 'Other'
-       END
-);
-
-
--- remove_other_if_needed
---
--- Removes 'Other' from a list if there are also values that are not 'Other'.
---
--- @param distinct_classes VARCHAR[]
---        Precondition: Must be distinct (`list_distinct()`).
---
--- @returns VARCHAR[]
-CREATE MACRO remove_other_if_needed(distinct_classes) AS (
-    CASE
-        WHEN list_contains(distinct_classes, 'Other') AND len(distinct_classes) > 1
-        THEN list_filter(distinct_classes, x -> x != 'Other')
-        ELSE distinct_classes
-    END
-);
-
--- consolidate_funding_source_classes
---
--- Creates a list after:
---   * Combining the lead sponsor and collaborator class list,
---   * Applying `funding_source_class_map()` to each element,
---   * Applying `remove_other_if_needed()` to the list.
---
--- @returns VARCHAR[]
-CREATE MACRO consolidate_funding_source_classes(
+CREATE MACRO normalize_funding_source(
     lead_sponsor_funding_source,
     collaborators_classes) AS (
-    remove_other_if_needed(
-        list_sort(list_distinct(
-                list_transform(
-                    list_concat(
-                        [lead_sponsor_funding_source],
-                        collaborators_classes
-                    ),
-                    x -> funding_source_class_map(x)
-                )
-        ))
-    )
-);
+    CASE
+        WHEN
+        --  If lead sponsor is from 'NIH'
+            lead_sponsor_funding_source = 'NIH'
+        --  Or if if the collaborators contains 'NIH',
+        --  but not 'INDUSTRY'.
+             OR (
+                         list_contains(collaborators_classes, 'NIH')
+                 AND NOT list_contains(collaborators_classes, 'INDUSTRY')
+             )
+        THEN 'NIH'
 
+        WHEN
+        --      If the lead sponsor is from 'INDUSTRY'
+                lead_sponsor_funding_source = 'INDUSTRY'
+        --      Or any of the collaborators are from 'INDUSTRY'
+             OR list_contains(collaborators_classes, 'INDUSTRY')
+        THEN 'Industry'
+
+        -- Default to Other if neither 'NIH' nor 'INDUSTRY' are found
+        ELSE 'Other'
+    END
+);
 
 COPY (
     SELECT
@@ -205,10 +193,10 @@ COPY (
                     phases,
                     (acc, val) -> concat(acc, '; ', val)
                 ) AS phase,
-                consolidate_funding_source_classes(
+                normalize_funding_source(
                     lead_sponsor_funding_source,
                     collaborators_classes
-                ) AS funding_source_classes,
+                ) AS norm_funding_source_class,
             FROM
                 _extract
         )
