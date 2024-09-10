@@ -24,6 +24,7 @@ standardize.jsonl_derived.type <- function(data) {
       # These are all factor variables.
       across(c(schema1.phase, schema1.overall_status,
                schema1.lead_sponsor_funding_source,
+               schema1.norm_funding_source_class,
                schema1.primary_purpose,
                schema1.allocation, schema1.masking), as.factor),
     ) |>
@@ -123,9 +124,7 @@ standardize.jsonl_derived.norm <- function(data) {
            factor(levels = c("Device", "Biological", "Drug", "Other"))
     ) |>
     mutate(common.funding =
-           standardize.jsonl_derived.norm.funding_source(
-             schema1.lead_sponsor_funding_source
-           )
+           schema1.norm_funding_source_class
     ) |>
     mutate(common.overall_status =
            fct_recode(schema1.overall_status
