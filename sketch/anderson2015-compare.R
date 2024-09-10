@@ -155,3 +155,47 @@ table(
   #|> names() %>% grep('funding', ., value = TRUE)
 
   #|> summary()
+
+# Compare the the Anderson et al funding
+table(
+      df.intersect.orig$schema0.funding,
+      df.intersect.new$schema1.funding_source_classes
+        |>  map_chr( ~ paste(.x, collapse='-') )
+) |> addmargins()
+
+# Compare the lead sponsor in the new data with the consolidated sponsor in the
+# new data.  This essentially shows which ones have Other as the lead sponsor,
+# but non-Other sponsors as collaborators.
+table(
+      df.intersect.new$schema1.lead_sponsor_funding_source
+        |> standardize.jsonl_derived.norm.funding_source()
+      ,
+      df.intersect.new$schema1.funding_source_classes
+        |>  map_chr( ~ paste(.x, collapse='-') )
+) |> addmargins()
+
+(
+id.intersect.new.both_funding <-
+  df.intersect.new
+  |> filter(
+            'Industry-NIH' == schema1.funding_source_classes |>
+                map_chr( ~ paste(.x, collapse='-') )
+            )
+  |> getElement( 'schema1.nct_id' )
+)
+
+table(
+      ( df.intersect.orig
+        |> filter(
+                  schema0.nct_id %in% id.intersect.new.both_funding
+                 )
+        |> getElement('schema0.funding')
+      )
+      ,
+      df.intersect.new
+        |> filter(
+                  schema1.nct_id %in% id.intersect.new.both_funding
+                 )
+        |> getElement('schema1.funding_source_classes')
+        |> map_chr( ~ paste(.x, collapse='-') )
+)
