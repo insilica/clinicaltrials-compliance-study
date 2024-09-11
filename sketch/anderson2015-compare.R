@@ -221,3 +221,48 @@ table(
   #|> names() %>% grep('funding', ., value = TRUE)
 
   #|> summary()
+
+#########################################################################
+
+# Correlation between primary completion date and results received date.
+
+cor(as.numeric(df.joined$common.primary_completion_date_imputed.x),
+    as.numeric(df.joined$common.primary_completion_date_imputed.y))
+#########################################################################
+# > cor(as.numeric(df.joined$common.primary_completion_date_imputed.x), #
+# +     as.numeric(df.joined$common.primary_completion_date_imputed.y)) #
+# [1] 0.9999405                                                         #
+#########################################################################
+
+cor(as.numeric(df.joined$common.results_received_date.x),
+    as.numeric(df.joined$common.results_received_date.y),
+    use='pairwise.complete.obs' )
+###############################################################
+# > cor(as.numeric(df.joined$common.results_received_date.x), #
+# +     as.numeric(df.joined$common.results_received_date.y), #
+# +     use='pairwise.complete.obs' )                         #
+# [1] 0.9997875                                               #
+###############################################################
+
+( df.joined
+  #
+  |> filter(
+      (
+        common.primary_completion_date_imputed.x !=
+          common.primary_completion_date_imputed.y
+        | (common.results_received_date.x) !=
+          floor_date(common.results_received_date.y, 'month')
+      )
+  )
+  |> select(
+            'nctid',
+            common.primary_completion_date_imputed.x,
+            common.primary_completion_date_imputed.y,
+            #common.results_received_date.x,
+            #common.results_received_date.y,
+  )
+  |> drop_na(
+            any_of('common.results_received_date.x')
+  )
+  #
+) |> print(n=30, width = 800)
