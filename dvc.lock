@@ -760,3 +760,62 @@ stages:
       hash: md5
       md5: 395ca67eea0f3859eea87ec3970ce96e
       size: 16627732062
+  analysis-driver-anderson2015-compare-stacked:
+    cmd: "Rscript analysis/driver-anderson2015-compare-stacked.R\n"
+    deps:
+    - path: analysis/driver-anderson2015-compare-stacked.R
+      hash: md5
+      md5: 71ad3bb0abbd3b3b998a8b1fdad1059a
+      size: 1184
+    - path: brick/analysis-20130927
+      hash: md5
+      md5: bece4df4f8ffb2dca1a06e6e445a7ce1.dir
+      size: 8111163
+      nfiles: 2
+    - path: brick/anderson2015
+      hash: md5
+      md5: 1395cc31b50eca34bf0a57f5a4ed9d0f.dir
+      size: 1387361
+      nfiles: 4
+    - path: params.yaml
+      hash: md5
+      md5: e06b7cfc64e936b80e3e0d27e348c329
+      size: 4875
+    outs:
+    - path: figtab/anderson2015.new
+      hash: md5
+      md5: 2f75c1609c6d0880e60f88a7e2183f3e.dir
+      size: 163293
+      nfiles: 1
+    - path: figtab/anderson2015.original
+      hash: md5
+      md5: 209334ac2e75583ffe2cd910e013b066.dir
+      size: 166244
+      nfiles: 1
+  analysis-driver-rule-effective-date:
+    cmd: "Rscript analysis/driver-rule-effective-date.R\n"
+    deps:
+    - path: analysis/driver-rule-effective-date.R
+      hash: md5
+      md5: 7b3229f08e7a60095207c379217821cf
+      size: 993
+    - path: brick/rule-effective-date-after
+      hash: md5
+      md5: b96bccca35ccf4febeb75a07579e1ce2.dir
+      size: 27507799
+      nfiles: 2
+    - path: brick/rule-effective-date-before
+      hash: md5
+      md5: a4304b88e609a42a81ddfa46e6fa7e84.dir
+      size: 12932817
+      nfiles: 2
+    - path: params.yaml
+      hash: md5
+      md5: e06b7cfc64e936b80e3e0d27e348c329
+      size: 4875
+    outs:
+    - path: figtab/rule-effective
+      hash: md5
+      md5: 864029803b3b0feb369e5b0cebf6a2e7.dir
+      size: 365623
+      nfiles: 2
