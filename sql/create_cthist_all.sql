@@ -41,13 +41,10 @@ CREATE MACRO normalize_funding_source(
         WHEN
         --  If lead sponsor is from 'NIH'
             lead_sponsor_funding_source = 'NIH'
-        --  Or if if the collaborators contains 'NIH',
-        --  but not 'INDUSTRY'.
-        --
-        --  NOTE: And the lead sponsor is not 'INDUSTRY' either.
+        --  Or if if the collaborators contains 'NIH'
+        --  and the lead sponsor is not 'INDUSTRY'.
              OR (
                          list_contains(collaborators_classes, 'NIH')
-                 AND NOT list_contains(collaborators_classes, 'INDUSTRY')
                  AND     lead_sponsor_funding_source != 'INDUSTRY'
              )
         THEN 'NIH'
