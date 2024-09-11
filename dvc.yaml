@@ -108,3 +108,24 @@ stages:
       - analysis/driver-sliding.R
     outs:
       - figtab/long-observe
+  analysis-driver-anderson2015-compare-stacked:
+    cmd: |
+      Rscript analysis/driver-anderson2015-compare-stacked.R
+    deps:
+      - brick/anderson2015
+      - brick/analysis-20130927
+      - params.yaml
+      - analysis/driver-anderson2015-compare-stacked.R
+    outs:
+      - figtab/anderson2015.original
+      - figtab/anderson2015.new
+  analysis-driver-rule-effective-date:
+    cmd: |
+      Rscript analysis/driver-rule-effective-date.R
+    deps:
+      - brick/rule-effective-date-before
+      - brick/rule-effective-date-after
+      - params.yaml
+      - analysis/driver-rule-effective-date.R
+    outs:
+      - figtab/rule-effective
