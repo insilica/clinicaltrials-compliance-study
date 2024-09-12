@@ -104,9 +104,9 @@ table(
 #                                       #
 #            Industry   NIH Other   Sum #
 #   Industry     7249     1     1  7251 #
-#   NIH           104  1681     0  1785 #
+#   NIH             1  1784     0  1785 #
 #   Other          24     1  2176  2201 #
-#   Sum          7377  1683  2177 11237 #
+#   Sum          7274  1786  2177 11237 #
 #########################################
 
 
@@ -133,11 +133,11 @@ table(
 #            Industry   NIH Other   Sum                         #
 #   Industry     5864     0     0  5864                         #
 #   NIH             0   612     0   612                         #
-#   Other        1513  1071  2177  4761                         #
-#   Sum          7377  1683  2177 11237                         #
+#   Other        1410  1174  2177  4761                         #
+#   Sum          7274  1786  2177 11237                         #
 #################################################################
 
-# This shows the off-diagnoals (where original and new disagree).
+# This shows the off-diagonals (where original and new disagree).
 ( df.joined
   #
   |> filter(
@@ -184,27 +184,19 @@ table(
   #
 ) |> print(n=30, width = 800)
 
-### Comment: There are only 3 where this is the case.
+### Comment: There is only one (1) where this is the case.
 ###
-### For one of these (NCT00422201), the lead sponsors do not match.
+### For this one (NCT00422201), the lead sponsors do not match.
 ###
-### For two of these (NCT00470418, NCT01076452),
-### the original data assigns these to NIH, but since they
-### have an INDUSTRY collaborator, `common.funding.y` = "Industry".
 #########################################################################
-# # A tibble: 3 × 6                                                     #
+# # A tibble: 1 × 6                                                     #
 #   nctid       common.funding.x schema0.agency_classc common.funding.y #
 #   <chr>       <fct>            <chr>                 <fct>            #
 # 1 NCT00422201 NIH              NIH                   Industry         #
-# 2 NCT00470418 NIH              U.S. Fed              Industry         #
-# 3 NCT01076452 NIH              U.S. Fed              Industry         #
 #   schema1.lead_sponsor_funding_source str.collaborator_classes        #
 #   <fct>                               <fct>                           #
 # 1 INDUSTRY                            ""                              #
-# 2 FED                                 "INDUSTRY-NIH"                  #
-# 3 FED                                 "INDUSTRY-NIH"                  #
 #########################################################################
-
 
 
 
@@ -221,3 +213,48 @@ table(
   #|> names() %>% grep('funding', ., value = TRUE)
 
   #|> summary()
+
+#########################################################################
+
+# Correlation between primary completion date and results received date.
+
+cor(as.numeric(df.joined$common.primary_completion_date_imputed.x),
+    as.numeric(df.joined$common.primary_completion_date_imputed.y))
+#########################################################################
+# > cor(as.numeric(df.joined$common.primary_completion_date_imputed.x), #
+# +     as.numeric(df.joined$common.primary_completion_date_imputed.y)) #
+# [1] 0.9999405                                                         #
+#########################################################################
+
+cor(as.numeric(df.joined$common.results_received_date.x),
+    as.numeric(df.joined$common.results_received_date.y),
+    use='pairwise.complete.obs' )
+###############################################################
+# > cor(as.numeric(df.joined$common.results_received_date.x), #
+# +     as.numeric(df.joined$common.results_received_date.y), #
+# +     use='pairwise.complete.obs' )                         #
+# [1] 0.9997875                                               #
+###############################################################
+
+( df.joined
+  #
+  |> filter(
+      (
+        common.primary_completion_date_imputed.x !=
+          common.primary_completion_date_imputed.y
+        | (common.results_received_date.x) !=
+          floor_date(common.results_received_date.y, 'month')
+      )
+  )
+  |> select(
+            'nctid',
+            common.primary_completion_date_imputed.x,
+            common.primary_completion_date_imputed.y,
+            #common.results_received_date.x,
+            #common.results_received_date.y,
+  )
+  |> drop_na(
+            any_of('common.results_received_date.x')
+  )
+  #
+) |> print(n=30, width = 800)
