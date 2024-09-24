@@ -61,7 +61,7 @@ COPY (
                     AND phase NOT IN ('EARLY_PHASE1', 'PHASE1')
                     AND overall_status IN ('TERMINATED', 'COMPLETED')
                     AND (
-                        try_parse_date(primary_completion_date) :: DATE <= '2012-09-01'
+                        try_parse_date(primary_completion_date) :: DATE < '2012-09-01'
                         OR primary_completion_date IS NULL
                         AND (
                             try_parse_date(completion_date) :: DATE < '2012-09-01'
