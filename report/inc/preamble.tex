@@ -9,6 +9,11 @@
 \usepackage[style=nejm,backend=biber]{biblatex}
 
 \usepackage{newunicodechar}
+%% Warning: Missing character: There is no … (U+2026) in font rm-lmtt8!
 \newunicodechar{^^^^2026}{\ldots} % Mapping character: …
+%% Warning: Missing character: There is no – (U+2013) in font rm-lmtt8!
+\newunicodechar{^^^^2013}{--} % Mapping character: –
+%% Warning: Missing character: There is no — (U+2014) in font rm-lmr10!
+\newunicodechar{^^^^2014}{---} % Mapping character: —
 
 \input{report/inc/listings/main.tex}
