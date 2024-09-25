@@ -323,17 +323,21 @@ package CTGovAPI {
 		return $json->decode( $res->decoded_content );
 	}
 
+## {{ begin:ctgov_api_endpoint_version_history }}
 	signature_for _get_versions_url => (
 		pos => [ NCT_ID ] );
 	sub _get_versions_url($nctid) {
 		return "https://clinicaltrials.gov/api/int/studies/${nctid}/history";
 	}
+## {{ end:ctgov_api_endpoint_version_history }}
 
+## {{ begin:ctgov_api_endpoint_study_record_version }}
 	signature_for _get_study_record_version_url => (
 		pos => [ NCT_ID, VersionNumber ] );
 	sub _get_study_record_version_url($nctid, $version) {
 		return "https://clinicaltrials.gov/api/int/studies/${nctid}/history/${version}";
 	}
+## {{ end:ctgov_api_endpoint_study_record_version }}
 
 	signature_for _get_study_record_latest_url => (
 		pos => [ NCT_ID ] );

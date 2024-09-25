@@ -1,3 +1,4 @@
+## {{ begin:preprocess_data.common.survival }}
 preprocess_data.common.survival <- function(data, censor_date) {
   data <- data %>%
     # Define the event and time variables
@@ -11,6 +12,7 @@ preprocess_data.common.survival <- function(data, censor_date) {
     )
   return(data)
 }
+## {{ end:preprocess_data.common.survival }}
 
 # Function to fit the Kaplan-Meier models
 create_survfit_models <- function(data) {
