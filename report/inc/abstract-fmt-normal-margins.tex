@@ -1,0 +1,7 @@
+%% For the article class
+\usepackage{etoolbox}
+%% Redefine the abstract environment to use normal margins
+\makeatletter
+\patchcmd{\abstract}{\quotation}{}{}{}
+\patchcmd{\endabstract}{\endquotation}{}{}{}
+\makeatother

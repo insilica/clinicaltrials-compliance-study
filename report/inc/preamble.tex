@@ -16,4 +16,14 @@
 %% Warning: Missing character: There is no — (U+2014) in font rm-lmr10!
 \newunicodechar{^^^^2014}{---} % Mapping character: —
 
+\usepackage{enumitem}
+\newenvironment{abstractdesc}{%
+	\begin{description}[align=left, labelindent=0pt, leftmargin=0pt, style=nextline]
+	}{%
+	\end{description}
+	}
+
 \input{report/inc/listings/main.tex}
+\input{report/inc/abstract-fmt-normal-margins.tex}
+
+\input{report/inc/meta.tex}
