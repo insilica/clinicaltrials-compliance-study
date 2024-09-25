@@ -115,3 +115,8 @@ WHERE
 endef
 psql-list-aact-databases:
 	psql -c "$${AACT_DB_SQL}"
+
+
+.PHONY: build-docs
+build-docs:
+	latexmk -outdir=_build report/code-review.tex

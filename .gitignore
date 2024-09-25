@@ -3,3 +3,4 @@
 /work
 *.parquet
 /log
+/_build
