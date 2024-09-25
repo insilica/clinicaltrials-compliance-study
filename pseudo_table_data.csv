@@ -1,0 +1,30 @@
+﻿id,position,number,label
+trials_registered_sept_2013,1,"152,611","Trials that were registered with ClinicalTrials.gov as of Sept. 27, 2013, from 50 U.S. states and 185 countries were included."
+e_total_1,2,"119,955",Were excluded
+e_no_patients,2,2462,Were withdrawn because no patients were recruited
+e_primary_completion_date,2,27364,Had primary completion date in or before December 2007
+e_noninterventional,2,25155,Had a noninterventional study design
+e_wrong_phase,2,14503,Were phase 0 or phase 1 studies
+e_prespecified_criteria,2,50471,Did not meet prespecified criteria for intervention or FDA oversight
+trials_HLACT,3,32656,Trials were considered to be highly likely applicable clinical trials (HLACTs)
+e_total_2,4,"19,329",Were excluded
+e_recruitment_status,4,"16,397","Did not have ""completed"" or ""terminated"" recruitment status"
+e_completion_post_2012,4,"1,801",Had primary completion date in or after September 2012
+e_verif_date_pre_2008_post_2012,4,"1,131",Had missing data for primary completion date and completion date and last verification date was before  2008 or after September 2012
+trials_HLACT_timeframe,5,"13,327",HLACTs that were completed or terminated before September 2012 were included in the analysis
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
