@@ -1,0 +1,71 @@
+\section{Code review}
+
+\subsection{Fetching data}
+
+%\lstinputlisting[style=RvPerl,caption={Code to fetch JSONL from ClinicalTrials.gov API}]{stages/fetch-cthist-json.pl}
+\lstinputlisting[style=RvPerl,
+	caption={Endpoint to retrieve versions for a given NCT ID via ClinicalTrials.gov API},
+	linerange=begin:ctgov_api_endpoint_version_history-end:ctgov_api_endpoint_version_history,
+	%framexleftmargin=-10pt,numbersep=-8pt,xleftmargin=-12pt
+]{stages/fetch-cthist-json.pl}
+
+\lstinputlisting[style=RvPerl,
+	caption={Endpoint to a particular study version via ClinicalTrials.gov API},
+	linerange=begin:ctgov_api_endpoint_study_record_version-end:ctgov_api_endpoint_study_record_version
+]{stages/fetch-cthist-json.pl}
+
+\subsection{Processing \ctgov{} API data}
+
+\begin{comment}
+\lstinputlisting[style=RvSQL,caption={Process the JSONL into a Parquet file}]{sql/create_cthist_preproc.sql}
+\end{comment}
+
+\begin{comment}
+\lstinputlisting[style=RvSQL,caption={Get all studies for a given cut-off date}]{sql/create_cthist_all.sql}
+\end{comment}
+
+\lstinputlisting[
+	style=RvSQL,
+	caption={Macro for processing funding source},
+	linerange=begin:normalize_funding_source_macro-end:normalize_funding_source_all
+]{sql/create_cthist_all.sql}
+
+\lstinputlisting[style=RvSQL,
+	caption={Processing location countries to determine if a trial has a US facility},
+	linerange=begin:process_has_us_facility-end:process_has_us_facility
+]{sql/create_cthist_all.sql}
+
+
+\begin{comment}
+\lstinputlisting[style=RvSQL,caption={HLACT filtering}]{sql/create_cthist_hlact.sql}
+\end{comment}
+
+\subsection{Processing for analysis}
+
+\subsubsection{Mapping data to a common schema}
+
+\lstinputlisting[style=RvR,
+	caption={Mapping from \textcite{anderson_compliance_2015} data to common schema},
+]{analysis/ctgov/preprocess/anderson2015.R}
+
+\lstinputlisting[style=RvR,
+	caption={Mapping from ClinicalTrials.gov API data to common schema},
+]{analysis/ctgov/preprocess/jsonl_derived.R}
+
+\subsubsection{Processing the common schema for further analysis}
+
+\lstinputlisting[style=RvR,caption={Common preprocessing}]{analysis/ctgov/preprocess/common.R}
+
+\lstinputlisting[style=RvR,
+	caption={Preprocess survival},
+	linerange=begin:preprocess_data.common.survival-end:preprocess_data.common.survival
+]{analysis/ctgov/survival.R}
+
+\lstinputlisting[style=RvR,
+	caption={Preprocess regression},
+	linerange=begin:preprocess_data.common.regression-end:preprocess_data.common.regression
+]{analysis/ctgov/regression.R}
+
+\lstinputlisting[style=RvYAML,
+	linerange=begin:rule_effective-end:rule_effective
+]{params.yaml}
