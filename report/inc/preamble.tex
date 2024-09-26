@@ -30,6 +30,12 @@
 	\end{description}
 	}
 
+\usepackage[en-US]{datetime2}
+\newcommand{\ISOtoLocaleDisplayDate}[1]{%
+  \DTMsavedate{tempdate}{#1}% Save the date from ISO format
+  \DTMusedate{tempdate}% Output the date in the current regional format
+}
+
 \input{report/inc/listings/main.tex}
 \input{report/inc/abstract-fmt-normal-margins.tex}
 \input{report/inc/abbrev.tex}
