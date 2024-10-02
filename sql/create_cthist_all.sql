@@ -19,6 +19,7 @@ INSTALL json;
 
 LOAD json;
 
+--## {{ begin:normalize_funding_source_top }}
 -- normalize_funding_source
 --
 -- @param lead_sponsor_funding_source VARCHAR
@@ -34,6 +35,7 @@ LOAD json;
 -- > Industry or NIH Sponsor or collaborators are assigned funding=Other.
 --
 -- @returns VARCHAR
+--## {{ begin:normalize_funding_source_macro }}
 CREATE MACRO normalize_funding_source(
     lead_sponsor_funding_source,
     collaborators_classes) AS (
@@ -60,6 +62,7 @@ CREATE MACRO normalize_funding_source(
         ELSE 'Other'
     END
 );
+--## {{ end:normalize_funding_source_all }}
 
 COPY (
     SELECT
@@ -181,6 +184,7 @@ COPY (
                 -- `list_distinct()` ensures that the list `location_country`
                 -- does not contain `NULL` elements (but can still be `NULL` or
                 -- `[]` itself).
+--## {{ begin:process_has_us_facility }}
                 list_has_any(
                     NULLIF(list_distinct(location_country), []),
                     [
@@ -189,6 +193,7 @@ COPY (
                         'American Samoa',
                     ]
                 ) AS has_us_facility,
+--## {{ end:process_has_us_facility }}
                 list_reduce(
                     phases,
                     (acc, val) -> concat(acc, '; ', val)

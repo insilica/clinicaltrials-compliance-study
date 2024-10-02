@@ -1,0 +1,72 @@
+\documentclass[10pt]{article}
+
+\input{report/inc/preamble.tex}
+
+\addbibresource{report/biblio.bib}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent
+\begin{abstractdesc}
+\item[Background] TODO
+%
+\item[Methods] TODO
+%
+\item[Results] TODO
+%
+\item[Conclusions] TODO
+\end{abstractdesc}
+\end{abstract}
+
+\tableofcontents
+
+
+\section{Background}
+
+The establishment of the clinical trial submission requirements in
+Section 801 of the Food and Drug Administration Amendments Act of 2007
+(FDAAA 801)~\cite{publiclaw_fdaa_2007_s801}
+mandated that any applicable clinical trials (ACTs) must
+submit their summary results to the \ctgov{} data bank one year from study completion.
+This regulation went into effect on \ISOtoLocaleDisplayDate{2017-01-18}
+and compliance was required starting 90 days later on
+\ISOtoLocaleDisplayDate{2017-04-18} for all responsible
+parties~\cite{ctgov_fdaaa801_final_rule_2024,zarin_trial_2016}.
+
+\section{Methods}
+
+\textcite{anderson_compliance_2015} present an algorithm to
+determine which trials are likely to be ACTs which they term as
+highly likely applicable clinical trials (HLACTs).
+
+To ensure that similar methods are used, the replicated HLACTs
+algorithm is compared against the \textcite{anderson_compliance_2015}
+shared dataset~\cite{anderson_data_20130927}.
+
+\section{Results}
+
+
+\begin{figure}
+	\includegraphics[width=0.95\textwidth]{figtab/rule-effective/fig.result_reported_within.facet_overall.stacked_area.png}
+	\label{fig:results-reported-rule-effective-overall}
+	\caption{Results before and after the effective rule date (overall)}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=0.95\textwidth]{figtab/rule-effective/fig.result_reported_within.facet_funding.stacked_area.png}
+	\label{fig:results-reported-rule-effective-funding}
+	\caption{Results before and after the effective rule date by funding source}
+\end{figure}
+
+
+\section{Discussion}
+
+\printbibliography
+
+
+%\input{report/section/code.tex}
+
+\end{document}

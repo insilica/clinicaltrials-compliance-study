@@ -1,0 +1,44 @@
+\usepackage{hyperref}
+
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{comment}
+
+\usepackage[
+	style=nejm,
+	backend=biber,
+	doi=true,
+	maxcitenames=1,mincitenames=1,
+]{biblatex}
+
+\usepackage{newunicodechar}
+%% Warning: Missing character: There is no … (U+2026) in font rm-lmtt8!
+\newunicodechar{^^^^2026}{\ldots} % Mapping character: …
+%% Warning: Missing character: There is no – (U+2013) in font rm-lmtt8!
+\newunicodechar{^^^^2013}{--} % Mapping character: –
+%% Warning: Missing character: There is no — (U+2014) in font rm-lmr10!
+\newunicodechar{^^^^2014}{---} % Mapping character: —
+
+\newunicodechar{^^^^00a7}{\S} % Mapping character: §
+
+\usepackage{enumitem}
+\newenvironment{abstractdesc}{%
+	\begin{description}[align=left, labelindent=0pt, leftmargin=0pt, style=nextline]
+	}{%
+	\end{description}
+	}
+
+\usepackage[en-US]{datetime2}
+\newcommand{\ISOtoLocaleDisplayDate}[1]{%
+  \DTMsavedate{tempdate}{#1}% Save the date from ISO format
+  \DTMusedate{tempdate}% Output the date in the current regional format
+}
+
+\input{report/inc/listings/main.tex}
+\input{report/inc/abstract-fmt-normal-margins.tex}
+\input{report/inc/abbrev.tex}
+
+
+\input{report/inc/meta.tex}
