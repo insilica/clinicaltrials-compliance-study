@@ -77,8 +77,8 @@ stages:
       size: 952
     - path: stages/fetch-cthist-json.pl
       hash: md5
-      md5: e9cc9af2851ee15b912f6658d4d38752
-      size: 12768
+      md5: 23dba35a9c8dc9e086465328e53805d5
+      size: 12974
     outs:
     - path: download/ctgov/historical
       hash: md5
