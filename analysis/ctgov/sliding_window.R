@@ -3,6 +3,33 @@ library(pacman)
 pacman::p_load( lubridate, glue )
 
 # Generate sliding time periods and format as YAML
+
+#' Generate Sliding Time Periods and Format as YAML
+#'
+#' This function generates a list of sliding time periods, formats them as YAML, and returns
+#' the formatted output. Each time period is defined by a start date, duration, and a cutoff date.
+#' The function creates period names and paths dynamically and includes output file paths.
+#'
+#' @param start_date A string representing the starting date for the first period.
+#'   It should be in a format parseable by `ymd` (from the `lubridate` package).
+#' @param slide_months A numeric value indicating the number of months the sliding window
+#'   moves forward for each iteration.
+#' @param n_iterations An integer specifying the number of time periods (iterations) to generate.
+#' @param period_length_months A numeric value representing the length of each time period in months.
+#'   Defaults to 56 months.
+#' @param cutoff_addend A duration (from the `lubridate` package), added to the stop date of each period
+#'   to determine the cutoff date. Defaults to `months(12)`.
+#' @param prefix A string used as the prefix in the generated period names and directory paths.
+#'   Defaults to 'sliding-window'.
+#'
+#' @return A YAML-formatted string with the sliding time periods, including the start, stop, and
+#'   cutoff dates, as well as file paths for output data.
+#'
+#' @examples
+#' \dontrun{
+#'   generate_time_periods_yaml("2023-01-01", 6, 5)
+#' }
+#'
 generate_time_periods_yaml <- function(start_date,
                                        slide_months,
                                        n_iterations,
