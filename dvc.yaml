@@ -108,6 +108,15 @@ stages:
       - analysis/driver-sliding.R
     outs:
       - figtab/long-observe
+  analysis-driver-sliding_yearly:
+    cmd: |
+      Rscript analysis/driver-sliding.R params.yaml yearly
+    deps:
+      - brick/yearly
+      - params.yaml
+      - analysis/driver-sliding.R
+    outs:
+      - figtab/yearly
   analysis-driver-anderson2015-compare-stacked:
     cmd: |
       Rscript analysis/driver-anderson2015-compare-stacked.R
