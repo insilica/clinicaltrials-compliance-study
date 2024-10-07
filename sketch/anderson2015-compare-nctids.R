@@ -7,22 +7,22 @@ pacman::p_load( logger )
 source('analysis/ctgov.R')
 
 ### Prepare the data {{{
-params_file <- 'params.yaml'
-params <- yaml.load_file(params_file)
+params <- window.params.read()
 
-anderson2015.original <- list(
-  window        = anderson2015.window(),
-  hlact.studies = anderson2015.read_and_process()
-)
-anderson2015.original$window['prefix'] <- 'anderson2015.original'
+anderson2015.original <- anderson2015.window.create()
 agg.windows.original <- list(
      anderson2015.original = anderson2015.original
 )
-anderson2015.new.windows <- params$param['anderson2015_2008-2012']
-anderson2015.new.agg.windows <- process.windows.init(anderson2015.new.windows) |>
+
+anderson2015.original$hlact.studies$rr.primary_purpose |> summary()
+anderson2015.original$hlact.studies$rr.primary_purpose |>
+  fct_collapse( Other = c('Diagnostic', 'Other') ) |> summary()
+
+anderson2015.new.params <- params |>
+  window.params.filter.by.name('^anderson2015_2008-2012$') |>
+  window.params.apply.prefix('anderson2015.new')
+anderson2015.new.agg.windows <- process.windows.init(anderson2015.new.params) |>
   process.windows.amend.results_reported()
-anderson2015.new.agg.windows[[1]]$window$prefix <- 'anderson2015.new'
-print(names( anderson2015.new.agg.windows ))
 names(anderson2015.new.agg.windows) <- c('anderson2015.new')
 anderson2015.new <- anderson2015.new.agg.windows[[1]]
 ### }}}

@@ -1,6 +1,44 @@
 
 #### Window processing {{{
 
+
+# Read `window.params` list from YAML file.
+window.params.read <- function( params_file = 'params.yaml' ) {
+  params <- yaml.load_file(params_file)
+  return(params)
+}
+
+# Return a filtered `window.params` list.
+window.params.filter.by.prefix <- function(params, prefix) {
+  params.filtered <- params$param |>
+    keep( \(x) !is.null(x$prefix) && x$prefix == prefix )
+
+  if( length(params.filtered) == 0 ) {
+    stop("No windows!")
+  }
+
+  return(params.filtered)
+}
+
+window.params.filter.by.name <- function(params, name.regex) {
+  params.filtered <- params$param[
+               grepl(name.regex,
+                     names(params$param),
+                     perl = TRUE )
+             ]
+  return(params.filtered)
+}
+
+
+# Set the prefix for all the `window.params` list.
+window.params.apply.prefix <- function(params, prefix) {
+  for(w_name in names(params)) {
+    params[[w_name]]$prefix <- prefix
+  }
+  return(params)
+}
+
+
 process.windows.init <- function(windows) {
   agg.windows <- list()
   for(w_name in names(windows)) {
