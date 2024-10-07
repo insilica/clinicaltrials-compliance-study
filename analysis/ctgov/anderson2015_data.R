@@ -30,3 +30,12 @@ anderson2015.read_and_process <- function() {
 
   return(hlact.studies)
 }
+
+anderson2015.window.create <- function() {
+  anderson2015.original <- list(
+    window        = anderson2015.window(),
+    hlact.studies = anderson2015.read_and_process()
+  )
+  anderson2015.original$window['prefix'] <- 'anderson2015.original'
+  return(anderson2015.original)
+}
