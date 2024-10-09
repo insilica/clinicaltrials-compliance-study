@@ -4,10 +4,11 @@ source('analysis/ctgov/sliding_window.R')
 
 start_date <- '2008-01-01'
 slide_months <- 12
-n_iterations <- 2024-2008 - 2
+years_after_stop <- 3 
+n_iterations <- 2024-2008 - years_after_stop
 period_length_months <- 12
-cutoff_addend <- months(2*12)
-prefix <- 'yearly'
+cutoff_addend <- months(years_after_stop*12)
+prefix <- 'yearly_36'
 
 yaml_output <-
   generate_time_periods_yaml(start_date           = start_date,
