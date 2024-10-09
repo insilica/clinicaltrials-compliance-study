@@ -85,7 +85,6 @@ COPY (
                     any_value(v.has_us_facility) as has_us_facility,
                     any_value(disposition_first_submitted_date) as extension_date2,
                     any_value(f.country) as country,
-                    any_value(v.months_to_report_results) as months_to_report_results
                 FROM
                     pg.ctgov.calculated_values v
                     JOIN pg.ctgov.facilities f ON v.nct_id = f.nct_id
