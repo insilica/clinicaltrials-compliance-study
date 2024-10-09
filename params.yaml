@@ -293,3 +293,4 @@ param:
     output:
       all:            brick/yearly_obs36/n-13_20240101/ctgov-studies-all.parquet
       hlact-filtered: brick/yearly_obs36/n-13_20240101/ctgov-studies-hlact.parquet
+  #### yearly: end }}}
