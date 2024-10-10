@@ -294,3 +294,27 @@ param:
       all:            brick/yearly_obs36/n-13_20240101/ctgov-studies-all.parquet
       hlact-filtered: brick/yearly_obs36/n-13_20240101/ctgov-studies-hlact.parquet
   #### yearly: end }}}
+
+
+  pre-post-2017_n-1_20200101:
+    prefix: pre-post-2017
+    suffix: n-1_20200101
+    n: 1
+    date:
+      cutoff: '2020-01-01'
+      start:  '2013-01-01'
+      stop:   '2017-01-01'
+    output:
+      all:            brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet
+      hlact-filtered: brick/pre-post-2017/n-1_20200101/ctgov-studies-hlact.parquet
+  pre-post-2017_n-2_20240101:
+    prefix: pre-post-2017
+    suffix: n-2_20240101
+    n: 2
+    date:
+      cutoff: '2024-01-01'
+      start:  '2017-01-01'
+      stop:   '2021-01-01'
+    output:
+      all:            brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet
+      hlact-filtered: brick/pre-post-2017/n-2_20240101/ctgov-studies-hlact.parquet
