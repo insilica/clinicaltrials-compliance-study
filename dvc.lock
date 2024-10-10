@@ -1465,3 +1465,99 @@ stages:
       md5: 5e8be4523900a4d02b70853726e6d2d8.dir
       size: 1141644
       nfiles: 3
+  build-ctgov-studies-all@pre-post-2017_n-1_20200101:
+    cmd:
+    - mkdir -p $(dirname brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet)
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param pre-post-2017_n-1_20200101
+      sql/create_cthist_all.sql\n) | duckdb\n"
+    deps:
+    - path: brick/ctgov/historical/records.parquet
+      hash: md5
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 4f72841767ed5eb80e48274cc84fd491
+      size: 10048
+    outs:
+    - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet
+      hash: md5
+      md5: 53f6d36ad394ea0168b40bfc8e287804
+      size: 16877581
+  build-ctgov-studies-all@pre-post-2017_n-2_20240101:
+    cmd:
+    - mkdir -p $(dirname brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet)
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param pre-post-2017_n-2_20240101
+      sql/create_cthist_all.sql\n) | duckdb\n"
+    deps:
+    - path: brick/ctgov/historical/records.parquet
+      hash: md5
+      md5: 395ca67eea0f3859eea87ec3970ce96e
+      size: 16627732062
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 4f72841767ed5eb80e48274cc84fd491
+      size: 10048
+    outs:
+    - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet
+      hash: md5
+      md5: 68a013b46f96bbc3f38a336787c07fe3
+      size: 25130758
+  build-ctgov-studies-hlact-filtered@pre-post-2017_n-1_20200101:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/pre-post-2017/n-1_20200101/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param pre-post-2017_n-1_20200101 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet
+      hash: md5
+      md5: 53f6d36ad394ea0168b40bfc8e287804
+      size: 16877581
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: 120c21cda19be08ad3cc7f65ee1cb111
+      size: 4299
+    outs:
+    - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: 986ec25381b5c5a21ffc4746034add18
+      size: 1224846
+  build-ctgov-studies-hlact-filtered@pre-post-2017_n-2_20240101:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/pre-post-2017/n-2_20240101/ctgov-studies-hlact.parquet)
+    - . .env; script/tt-render-by-param pre-post-2017_n-2_20240101 sql/create_cthist_hlact.sql
+      | duckdb
+    deps:
+    - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet
+      hash: md5
+      md5: 68a013b46f96bbc3f38a336787c07fe3
+      size: 25130758
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: 120c21cda19be08ad3cc7f65ee1cb111
+      size: 4299
+    outs:
+    - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: 7ad06feeac7e10ff0361c95edc2e01d0
+      size: 1617149
