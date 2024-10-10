@@ -124,9 +124,9 @@ plot.windows.stacked.chart <-
 
     fig <- fig +
       geom_bar(stat = "identity") +
-      geom_text(aes(label = ifelse(pct > 0.01, sprintf("%.1f%%", 100*pct), '')),
-                position = position_stack(vjust = 0.5), size = 3,
-                #color = "black"
+      geom_text(aes(label = ifelse(pct > 0.01, sprintf("%1.0f%%", 100*pct), '')),
+                position = position_stack(vjust = 0.5), size = 6, family='mono',
+                color = "black" # "#fdfdfd" "black"
                 ) +
       geom_text(data = count.label.df,
                 aes(x = cutoff, y = 0, label = label),
@@ -134,7 +134,7 @@ plot.windows.stacked.chart <-
                 #vjust = 3.5,
                 #vjust = 4.0,
                 vjust = 2.0,
-                size = 2,
+                size = 4,
                 inherit.aes=FALSE) +
       scale_x_discrete(labels = time.label) +
       scale_y_continuous(labels = label_percent()) +
@@ -144,9 +144,15 @@ plot.windows.stacked.chart <-
         y = "Percentage",
         fill = "Reporting Within Time Frame"
       ) +
-      scale_fill_brewer(type = 'qual', palette = 1, direction = -1) +
+      # scale_fill_brewer(type = 'qual', palette = 1, direction = -1) +
+      scale_fill_manual(
+        values = c( "#CDCDCD",  "#E69E86", "#CCDB6F", "#34AF92")
+        # values = c( "#CDCDCD",  "#CC8181","#E69E86", "#CCDB6F", "#34AF92")
+        # values = c( "#B6B6B6",  "#CCBA5A", "#A7B647", "#12684E")
+        ) +
       theme_minimal() +
-      theme(axis.text.x = element_text(size = 6))
+      theme(axis.text.x = element_text(size = 8))+
+      theme(axis.text.y = element_text(size = 8)) 
       #theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
     fig
@@ -160,3 +166,5 @@ plot.windows.stacked.chart <-
   ggsave(plot.output.path, width = 12, height = 8)
 }
 # }}}
+
+plot.windows.stacked.chart(agg.windows, with_facet=NULL)
