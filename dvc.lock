@@ -797,8 +797,8 @@ stages:
     deps:
     - path: analysis/driver-rule-effective-date.R
       hash: md5
-      md5: 7b3229f08e7a60095207c379217821cf
-      size: 993
+      md5: 03ac7cf94096bd24c6d221ecf6ab9a1c
+      size: 2934
     - path: brick/rule-effective-date-after
       hash: md5
       md5: 4d1dc6a90f6d2ceeabfac30dd11c87c4.dir
@@ -816,9 +816,9 @@ stages:
     outs:
     - path: figtab/rule-effective
       hash: md5
-      md5: 91cefa49b7444117fbfd8d1b4dfa36c4.dir
-      size: 364724
-      nfiles: 2
+      md5: fbe1269877febe1e55fc2cffffbb4725.dir
+      size: 808876
+      nfiles: 4
   build-ctgov-studies-all@yearly_n-1_20110101:
     cmd:
     - mkdir -p $(dirname brick/yearly/n-1_20110101/ctgov-studies-all.parquet)
