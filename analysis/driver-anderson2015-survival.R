@@ -39,12 +39,21 @@ if(debug_mode) {
 }
 
 plot_survfit_with_title <- function(fit, title) {
-  f <- plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
-    ggtitle(str_wrap(title, 72)) +
-    theme(
-          legend.text         = element_text(size = rel(1.0),
-                                             margin = margin(r = 20, unit = "pt"))
-    )
+  f <- ( plot_survfit(fit, breaks.fig, breaks.risktable.less_than) +
+    ggtitle(str_wrap(title, 72))
+    #theme(
+    #      legend.text         = element_text(size = rel(1.0),
+    #                                         margin = margin(r = 20, unit = "pt"))
+    #)
+          +
+          # Position the legend inside the plot
+          theme(
+            legend.position = c(0.20, 0.95),  # Adjust these values as needed
+            legend.justification = c("right", "top"),  # This aligns the legend box's corner to the position
+            legend.background = element_rect(fill = "white", color = "NA", size = 0.5),  # Optional: make background semi-transparent or solid
+            legend.key = element_rect(fill = "white", colour = "white")  # Adjust key background
+          )
+  )
 
   if(debug_mode) {
     f <- f + labs(caption = output_plot_caption)
@@ -55,7 +64,7 @@ plot_survfit_with_title <- function(fit, title) {
 
 dir_create('figtab/anderson2015')
 ggsave.partial <- partial(ggsave, ... = ,
-                          dpi = 300, width = 10 )
+                          dpi = 300, width = 8, height = 8 )
 
 # Fig 2
 show(fig.surv.funding <- plot_survfit_with_title(fits$fit.funding,

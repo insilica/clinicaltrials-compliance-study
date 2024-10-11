@@ -14,7 +14,10 @@ window.titles <- list(
 )
 
 strat.var.labels <- list(
-  'fit.funding' = 'Funding'
+  fit.funding       = 'Funding',
+  fit.phase         = 'Phase',
+  fit.interventions = 'Intervention Type',
+  fit.status        = 'Trial Status'#,
 )
 
 process.compare.rule_effective.agg.window <- function() {
@@ -43,9 +46,11 @@ plot_survifit_wrap <- function(data, fit) {
   return(f)
 }
 
+for(strat.var in names(strat.var.labels)) {
 for(window.name in names(survival.fits)) {
   print(window.name)
-  strat.var <- 'fit.funding'
+  #strat.var <- 'fit.funding'
+  print(strat.var)
   fig <- (
           plot_survifit_wrap(
            agg.window.compare.rule_effective[[window.name]],
@@ -74,4 +79,5 @@ for(window.name in names(survival.fits)) {
       "figtab/{agg.window.compare.rule_effective[[1]]$window$prefix}/fig.window-{window.name}.surv.strat-{strat.var}.png"))
   fs::dir_create(path_dir(plot.output.path))
   ggsave(plot.output.path, width = 8, height = 8)
+}
 }
