@@ -22,14 +22,8 @@ if (length(argv) != 2) {
 params_file <- argv[1]
 prefix      <- argv[2]
 
-params <- yaml.load_file(params_file)
-
-windows <- params$param |>
-  keep( \(x) !is.null(x$prefix) && x$prefix == prefix )
-
-if( length(windows) == 0 ) {
-  stop("No windows!")
-}
+params <- window.params.read( params_file = params_file )
+windows <- window.params.filter.by.prefix(params, prefix)
 
 agg.windows <- process.windows.init(windows) |>
   process.windows.amend.results_reported()

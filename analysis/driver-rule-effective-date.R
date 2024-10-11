@@ -6,20 +6,23 @@ pacman::p_load( logger )
 
 source('analysis/ctgov.R')
 
-params_file <- 'params.yaml'
-params <- yaml.load_file(params_file)
+params <- window.params.read()
+
+window.titles <- list(
+  'rule-effective-date-before' = 'Before Rule Effective Date',
+  'rule-effective-date-after'  = 'After Rule Effective Date'
+)
+
+strat.var.labels <- list(
+  'fit.funding' = 'Funding'
+)
 
 process.compare.rule_effective.agg.window <- function() {
-  windows <- params$param[
-               grepl('^rule-effective-date-(before|after)$',
-                     names(params$param),
-                     perl = TRUE )
-             ]
-  for(w_name in names(windows)) {
-    windows[[w_name]]$prefix <- 'rule-effective'
-  }
-  print(names(windows))
-  agg.windows <- process.windows.init(windows) |>
+  params.filtered <- params |>
+    window.params.filter.by.name('^rule-effective-date-(before|after)$') |>
+    window.params.apply.prefix('rule-effective')
+  print(names(params.filtered))
+  agg.windows <- process.windows.init(params.filtered) |>
     process.windows.amend.results_reported()
   return(agg.windows)
 }
@@ -27,3 +30,48 @@ process.compare.rule_effective.agg.window <- function() {
 agg.window.compare.rule_effective <- process.compare.rule_effective.agg.window()
 plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE)
 plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE, with_facet = NULL)
+
+survival.fits <- map(agg.window.compare.rule_effective,
+    ~ create_survfit_models(.x$hlact.studies))
+
+plot_survifit_wrap <- function(data, fit) {
+  time_months.max <- max(data$hlact.studies$surv.time_months, na.rm = TRUE)
+  breaks.risktable.less_than <- seq(0, time_months.max, by = 12) - 1
+  breaks.risktable.less_than[1] <- 0
+  breaks.fig <- seq(0, time_months.max, by = 6)
+  f <- plot_survfit(fit, breaks.fig, breaks.risktable.less_than)
+  return(f)
+}
+
+for(window.name in names(survival.fits)) {
+  print(window.name)
+  strat.var <- 'fit.funding'
+  fig <- (
+          plot_survifit_wrap(
+           agg.window.compare.rule_effective[[window.name]],
+           survival.fits[[window.name]][[strat.var]]
+          )
+          + ggtitle(glue(
+              "Trials Reporting Results versus Months from Primary Completion Date",
+              " {window.titles[[window.name]]}",
+              " Stratified by {strat.var.labels[[strat.var]]}",
+            ))
+          +
+          # Position the legend inside the plot
+          theme(
+            legend.position = c(0.20, 0.95),  # Adjust these values as needed
+            legend.justification = c("right", "top"),  # This aligns the legend box's corner to the position
+            legend.background = element_rect(fill = "white", color = "NA", size = 0.5),  # Optional: make background semi-transparent or solid
+            legend.key = element_rect(fill = "white", colour = "white")  # Adjust key background
+          )
+          #+ theme(
+          #  legend.position = 'right',
+          #  legend.direction = 'vertical'
+          #)
+  )
+  show(fig)
+  plot.output.path <- fs::path(glue(
+      "figtab/{agg.window.compare.rule_effective[[1]]$window$prefix}/fig.window-{window.name}.surv.strat-{strat.var}.png"))
+  fs::dir_create(path_dir(plot.output.path))
+  ggsave(plot.output.path, width = 12, height = 8)
+}
