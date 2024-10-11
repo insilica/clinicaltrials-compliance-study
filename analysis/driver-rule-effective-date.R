@@ -51,11 +51,11 @@ for(window.name in names(survival.fits)) {
            agg.window.compare.rule_effective[[window.name]],
            survival.fits[[window.name]][[strat.var]]
           )
-          + ggtitle(glue(
+          + ggtitle(str_wrap(glue(
               "Trials Reporting Results versus Months from Primary Completion Date",
               " {window.titles[[window.name]]}",
               " Stratified by {strat.var.labels[[strat.var]]}",
-            ))
+            ),72))
           +
           # Position the legend inside the plot
           theme(
@@ -73,5 +73,5 @@ for(window.name in names(survival.fits)) {
   plot.output.path <- fs::path(glue(
       "figtab/{agg.window.compare.rule_effective[[1]]$window$prefix}/fig.window-{window.name}.surv.strat-{strat.var}.png"))
   fs::dir_create(path_dir(plot.output.path))
-  ggsave(plot.output.path, width = 12, height = 8)
+  ggsave(plot.output.path, width = 8, height = 8)
 }

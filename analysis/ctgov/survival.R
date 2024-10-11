@@ -34,7 +34,9 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
     ggsurvfit(type = 'risk') +
     add_risktable(times = breaks.risktable.less_than,
                   risktable_stats = c("n.risk"),
-                  theme = theme_risktable_boxed()) +
+                  #theme = theme_risktable_boxed(),
+                  risktable_height = 0.20,
+                  size = 3) +
     scale_ggsurvfit(x_scales = list(breaks = breaks.fig),
                     y_scales = list(limits = c(0, 1))) +
     xlab("Months after primary completion date")
