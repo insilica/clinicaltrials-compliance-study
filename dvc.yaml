@@ -82,14 +82,17 @@ stages:
     do:
       cmd:
         - make docker-compose-up
-        - mkdir -p $(dirname ${item.output.hlact-filtered})
+        - mkdir -p $(dirname ${item.output.hlact-filtered}) brick/flowchart-counts
         - . .env; script/tt-render-by-param ${key} sql/create_cthist_hlact.sql | duckdb
+        - . .env; script/cthist_hlact_flowchart_partial_sql.sh ${key} > brick/flowchart-counts/${key}.csv
       deps:
         - sql/create_cthist_hlact.sql
         - ${item.output.all}
         - download/aact/db-dump/20240430_clinical_trials.zip
+        - sql/params/hlact-filter
       outs:
         - ${item.output.hlact-filtered}
+        - brick/flowchart-counts/${key}.csv
   #analysis-driver-sliding_sliding-window:
   #  cmd: |
   #    Rscript analysis/driver-sliding.R params.yaml sliding-window

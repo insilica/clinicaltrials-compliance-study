@@ -1,0 +1,11 @@
+query:
+  do_select_count: true
+  count_key_name: 'N4'
+  disable_filter_first_recruitment_status:  false
+  disable_filter_start_date:                false
+  disable_filter_study_design:              false
+  disable_filter_phase:                     false
+  disable_filter_oversight:                 true
+  disable_filter_second_recruitment_status: true
+  disable_filter_end_date:                  true
+  disable_filter_verification_date:         true
