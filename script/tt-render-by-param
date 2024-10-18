@@ -2,14 +2,14 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -lt 2 ]; then
 	echo "Usage: $0 parameter_key template_file" >&2
 	exit 1
 fi
 
 export BIN_NAME="$0"
-export PARAM_KEY="$1"
-export TEMPLATE_FILE="$2"
+export PARAM_KEY="$1"; shift
+export TEMPLATE_FILE="$1"; shift
 
 export PARAMS_FILE="params.yaml"
 
@@ -33,7 +33,8 @@ cpanel_json_xs -f yaml-xs -t yaml-xs \
 			Existing parameter keys are: @params
 			EOF
 	' \
-	< $PARAMS_FILE > $MYTEMPDATA
+	< $PARAMS_FILE \
+	| cat - "$@" > $MYTEMPDATA
 
 tt-render --data=$MYTEMPDATA $TEMPLATE_FILE
 
