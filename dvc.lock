@@ -107,8 +107,8 @@ stages:
     outs:
     - path: brick/analysis-20130927/ctgov-studies-all.parquet
       hash: md5
-      md5: 4d8751433f388b842a9fddd7d1c67f7b
-      size: 7115856
+      md5: 1418fd2196904c98f16c60e21c19ed45
+      size: 7114875
   build-ctgov-studies-all@stanford_2019-2023:
     cmd:
     - mkdir -p $(dirname brick/analysis-20240430/ctgov-studies-all.parquet)
@@ -131,14 +131,16 @@ stages:
     outs:
     - path: brick/analysis-20240430/ctgov-studies-all.parquet
       hash: md5
-      md5: 9883e739e8dd663cd45746248ab63cb8
-      size: 25875248
+      md5: 678281a09f20359c499e95eedcfe2e3c
+      size: 25879514
   build-ctgov-studies-hlact-filtered@anderson2015_2008-2012:
     cmd:
     - make docker-compose-up
-    - mkdir -p $(dirname brick/analysis-20130927/ctgov-studies-hlact.parquet)
+    - mkdir -p $(dirname brick/analysis-20130927/ctgov-studies-hlact.parquet) brick/flowchart-counts
     - . .env; script/tt-render-by-param anderson2015_2008-2012 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh anderson2015_2008-2012
+      > brick/flowchart-counts/anderson2015_2008-2012.csv
     deps:
     - path: brick/analysis-20130927/ctgov-studies-all.parquet
       hash: md5
@@ -150,19 +152,29 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
     - path: brick/analysis-20130927/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 60f98cca3943e0435f1a37a2f3571666
-      size: 985637
+      md5: f03ea748ed94e9bb0e60f6128c0f8496
+      size: 962739
+    - path: brick/flowchart-counts/anderson2015_2008-2012.csv
+      hash: md5
+      md5: 749972ec34d4b8b14090fd1b3673cb13
+      size: 94
   build-ctgov-studies-hlact-filtered@stanford_2019-2023:
     cmd:
     - make docker-compose-up
-    - mkdir -p $(dirname brick/analysis-20240430/ctgov-studies-hlact.parquet)
+    - mkdir -p $(dirname brick/analysis-20240430/ctgov-studies-hlact.parquet) brick/flowchart-counts
     - . .env; script/tt-render-by-param stanford_2019-2023 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh stanford_2019-2023 > brick/flowchart-counts/stanford_2019-2023.csv
     deps:
     - path: brick/analysis-20240430/ctgov-studies-all.parquet
       hash: md5
@@ -174,13 +186,22 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
     - path: brick/analysis-20240430/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 990313f3db0519b8c7d805edf348498e
-      size: 1690204
+      md5: 0e9c6114cb06e30ff9acb56cde1075fe
+      size: 1657070
+    - path: brick/flowchart-counts/stanford_2019-2023.csv
+      hash: md5
+      md5: 3e09ec704dcc9f8a38780236ce04d45a
+      size: 96
   build-ctgov-studies-all@sliding-window_n-1_20130901:
     cmd:
     - mkdir -p $(dirname brick/sliding-window/n-1_20130901/ctgov-studies-all.parquet)
@@ -453,8 +474,8 @@ stages:
     outs:
     - path: brick/long-observe/n-1_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: aa612fc797af37e45831aea4e69196ba
-      size: 11202786
+      md5: 1e9f5c2484dca5a4c7e117784b42305d
+      size: 11202775
   build-ctgov-studies-all@long-observe_n-2_20190101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-2_20190101/ctgov-studies-all.parquet)
@@ -477,8 +498,8 @@ stages:
     outs:
     - path: brick/long-observe/n-2_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: fb455e078f59f06728b5a20f442ebad1
-      size: 14976394
+      md5: 01c8260d62857c9032d89f194842781f
+      size: 14978040
   build-ctgov-studies-all@long-observe_n-3_20210101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-3_20210101/ctgov-studies-all.parquet)
@@ -501,8 +522,8 @@ stages:
     outs:
     - path: brick/long-observe/n-3_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: cc476cc295d9879e4cf7feadd11e3121
-      size: 18939509
+      md5: d05c5321eb8a4b39e7ee58e4f458dbc4
+      size: 18937864
   build-ctgov-studies-all@long-observe_n-4_20230101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-4_20230101/ctgov-studies-all.parquet)
@@ -525,14 +546,17 @@ stages:
     outs:
     - path: brick/long-observe/n-4_20230101/ctgov-studies-all.parquet
       hash: md5
-      md5: a5d714761ef392b4699be03347ee1e29
-      size: 23045888
+      md5: 227ef5497efef2e9f08b00a946fe9ca5
+      size: 23033933
   build-ctgov-studies-hlact-filtered@long-observe_n-1_20170101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/long-observe/n-1_20170101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param long-observe_n-1_20170101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh long-observe_n-1_20170101
+      > brick/flowchart-counts/long-observe_n-1_20170101.csv
     deps:
     - path: brick/long-observe/n-1_20170101/ctgov-studies-all.parquet
       hash: md5
@@ -544,19 +568,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/long-observe_n-1_20170101.csv
+      hash: md5
+      md5: c3a4e9cf109c318dee22c63310d41128
+      size: 96
     - path: brick/long-observe/n-1_20170101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: cb81ef265810cca9b70eb2446ae31554
-      size: 966760
+      md5: 9bff78cbe5fa2ea6e97e405b66919aff
+      size: 945393
   build-ctgov-studies-hlact-filtered@long-observe_n-2_20190101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/long-observe/n-2_20190101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param long-observe_n-2_20190101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh long-observe_n-2_20190101
+      > brick/flowchart-counts/long-observe_n-2_20190101.csv
     deps:
     - path: brick/long-observe/n-2_20190101/ctgov-studies-all.parquet
       hash: md5
@@ -568,19 +604,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/long-observe_n-2_20190101.csv
+      hash: md5
+      md5: 9f97fe4e826500b3e853a9a595818f34
+      size: 96
     - path: brick/long-observe/n-2_20190101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 5048e133c168a2ce0ea20e499b90eae9
-      size: 1084797
+      md5: fe45d60e9b1e89fbb5b631d5dca88988
+      size: 1058071
   build-ctgov-studies-hlact-filtered@long-observe_n-3_20210101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/long-observe/n-3_20210101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param long-observe_n-3_20210101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh long-observe_n-3_20210101
+      > brick/flowchart-counts/long-observe_n-3_20210101.csv
     deps:
     - path: brick/long-observe/n-3_20210101/ctgov-studies-all.parquet
       hash: md5
@@ -592,19 +640,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/long-observe_n-3_20210101.csv
+      hash: md5
+      md5: ecacbb0f89ac44fe56de693f6d7310c1
+      size: 96
     - path: brick/long-observe/n-3_20210101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: cf5add8778c8d44d23641ed6d99f12df
-      size: 1192253
+      md5: bab896b2df887918c44696b9117ff74d
+      size: 1164332
   build-ctgov-studies-hlact-filtered@long-observe_n-4_20230101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/long-observe/n-4_20230101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param long-observe_n-4_20230101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh long-observe_n-4_20230101
+      > brick/flowchart-counts/long-observe_n-4_20230101.csv
     deps:
     - path: brick/long-observe/n-4_20230101/ctgov-studies-all.parquet
       hash: md5
@@ -616,34 +676,43 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/long-observe_n-4_20230101.csv
+      hash: md5
+      md5: c9c67a4ad7943620b6bb951980b669da
+      size: 96
     - path: brick/long-observe/n-4_20230101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 5bc1919943fb457bcc46f43fc98afcd3
-      size: 1376237
+      md5: 4e1c990f1ef6b169299895fea9fc1a3a
+      size: 1346507
   analysis-driver-sliding_long-observe:
     cmd: "Rscript analysis/driver-sliding.R params.yaml long-observe\n"
     deps:
     - path: analysis/driver-sliding.R
       hash: md5
-      md5: 7de93bd9e23e3a25ff8413b03b586687
-      size: 1170
+      md5: f09469d9cd2ad4a87e07a02842aa4cee
+      size: 1110
     - path: brick/long-observe
       hash: md5
-      md5: a002f275ccf332d6f92fc7aedf27b605.dir
-      size: 72784624
+      md5: 5fb5d2ab95720e514b01ab780f90b543.dir
+      size: 72678880
       nfiles: 8
     - path: params.yaml
       hash: md5
-      md5: 88f5e03c3dd2f7f6aeccf41c3d81bd43
-      size: 9736
+      md5: 05ca6fe65e172e64f4ecb68c16012716
+      size: 10452
     outs:
     - path: figtab/long-observe
       hash: md5
-      md5: e3e9ce53e29d068b497c4ede36f85ecd.dir
-      size: 618295
+      md5: ef6ebb204049b0cd5e7d024cdd14d9fa.dir
+      size: 687048
       nfiles: 3
   build-ctgov-studies-all@rule-effective-date-before:
     cmd:
@@ -667,8 +736,8 @@ stages:
     outs:
     - path: brick/rule-effective-date-before/ctgov-studies-all.parquet
       hash: md5
-      md5: cdfcf502b2c71cc082f0152042ae69ff
-      size: 11910165
+      md5: d0a055cc638658607a31b26635d7c043
+      size: 11918635
   build-ctgov-studies-all@rule-effective-date-after:
     cmd:
     - mkdir -p $(dirname brick/rule-effective-date-after/ctgov-studies-all.parquet)
@@ -691,14 +760,17 @@ stages:
     outs:
     - path: brick/rule-effective-date-after/ctgov-studies-all.parquet
       hash: md5
-      md5: 3d838aa27a868b6b63cef4f7257bbdae
-      size: 25865581
+      md5: 6ff91f39028e37c19ec2cea907c94fe9
+      size: 25877152
   build-ctgov-studies-hlact-filtered@rule-effective-date-before:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/rule-effective-date-before/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param rule-effective-date-before sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh rule-effective-date-before
+      > brick/flowchart-counts/rule-effective-date-before.csv
     deps:
     - path: brick/rule-effective-date-before/ctgov-studies-all.parquet
       hash: md5
@@ -710,19 +782,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/rule-effective-date-before.csv
+      hash: md5
+      md5: ee71b9720f584eacdfcd1d322376744a
+      size: 96
     - path: brick/rule-effective-date-before/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 726a1d7b678f238f336783d20490fed4
-      size: 1022551
+      md5: ac52c0fd9b5c5e97025f93290bc78c09
+      size: 997562
   build-ctgov-studies-hlact-filtered@rule-effective-date-after:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/rule-effective-date-after/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param rule-effective-date-after sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh rule-effective-date-after
+      > brick/flowchart-counts/rule-effective-date-after.csv
     deps:
     - path: brick/rule-effective-date-after/ctgov-studies-all.parquet
       hash: md5
@@ -734,13 +818,22 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/rule-effective-date-after.csv
+      hash: md5
+      md5: 7d625355f2563ecda4de53962cfe4a6e
+      size: 96
     - path: brick/rule-effective-date-after/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 739f2250a2a031f3fed8197f6fd33f0b
-      size: 1632556
+      md5: 754c265cabe33c7465fd0561a8211514
+      size: 1602525
   build-ctgov-historical-records:
     cmd:
     - mkdir -p brick/ctgov/historical
@@ -765,12 +858,12 @@ stages:
     deps:
     - path: analysis/driver-anderson2015-compare-stacked.R
       hash: md5
-      md5: 71ad3bb0abbd3b3b998a8b1fdad1059a
-      size: 1184
+      md5: 1437c99e5ac8f5589c63f5adc874ad92
+      size: 968
     - path: brick/analysis-20130927
       hash: md5
-      md5: f01a37e2d5827830d4b644e7475b7737.dir
-      size: 8101493
+      md5: 362de20bf125b2ac681d032e138fe507.dir
+      size: 8078595
       nfiles: 2
     - path: brick/anderson2015
       hash: md5
@@ -779,46 +872,46 @@ stages:
       nfiles: 4
     - path: params.yaml
       hash: md5
-      md5: 88f5e03c3dd2f7f6aeccf41c3d81bd43
-      size: 9736
+      md5: 05ca6fe65e172e64f4ecb68c16012716
+      size: 10452
     outs:
     - path: figtab/anderson2015.new
       hash: md5
-      md5: 51b2a67f0271f2bcb50bd1cfb01154f6.dir
-      size: 162765
+      md5: 5b5ebfa58ab3bffe6b6a5a5c4f3f0333.dir
+      size: 179672
       nfiles: 1
     - path: figtab/anderson2015.original
       hash: md5
-      md5: 209334ac2e75583ffe2cd910e013b066.dir
-      size: 166244
+      md5: 499dadb4e81539542cef5d9c0c0b10b5.dir
+      size: 183379
       nfiles: 1
   analysis-driver-rule-effective-date:
     cmd: "Rscript analysis/driver-rule-effective-date.R\n"
     deps:
     - path: analysis/driver-rule-effective-date.R
       hash: md5
-      md5: 7b3229f08e7a60095207c379217821cf
-      size: 993
+      md5: 779af7ddd2e57d2dd29e205d8334c1fb
+      size: 3130
     - path: brick/rule-effective-date-after
       hash: md5
-      md5: 4d1dc6a90f6d2ceeabfac30dd11c87c4.dir
-      size: 27498137
+      md5: 2ae447a803f5d4e8e97e906f01d0d41e.dir
+      size: 27468106
       nfiles: 2
     - path: brick/rule-effective-date-before
       hash: md5
-      md5: 6befccdc0c2a7039d951d0a66b58d3b2.dir
-      size: 12932716
+      md5: 6b5de60dae129cf8caa29d8505bd7e93.dir
+      size: 12907727
       nfiles: 2
     - path: params.yaml
       hash: md5
-      md5: 88f5e03c3dd2f7f6aeccf41c3d81bd43
-      size: 9736
+      md5: 05ca6fe65e172e64f4ecb68c16012716
+      size: 10452
     outs:
     - path: figtab/rule-effective
       hash: md5
-      md5: 91cefa49b7444117fbfd8d1b4dfa36c4.dir
-      size: 364724
-      nfiles: 2
+      md5: 6ae6752ceb15213d4c46913cdd5daaef.dir
+      size: 2086917
+      nfiles: 10
   build-ctgov-studies-all@yearly_obs36_n-1_20120101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-1_20120101/ctgov-studies-all.parquet)
@@ -841,8 +934,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-1_20120101/ctgov-studies-all.parquet
       hash: md5
-      md5: c563e01c1b5d649815e1d04d088cd404
-      size: 5337475
+      md5: 70b539164fb8a6cd0994b0893149ee27
+      size: 5336619
   build-ctgov-studies-all@yearly_obs36_n-2_20130101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-2_20130101/ctgov-studies-all.parquet)
@@ -865,8 +958,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-2_20130101/ctgov-studies-all.parquet
       hash: md5
-      md5: 66f733e95d110e1b1fa90b5b8ae3ffc2
-      size: 6335644
+      md5: b970888db5ed2b241608e0369381a8e2
+      size: 6338124
   build-ctgov-studies-all@yearly_obs36_n-3_20140101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-3_20140101/ctgov-studies-all.parquet)
@@ -889,8 +982,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-3_20140101/ctgov-studies-all.parquet
       hash: md5
-      md5: 6d3db90b56a94b64c409981a03b87d6a
-      size: 7387624
+      md5: 0e23ace98220d081decb5ae09216e2ec
+      size: 7388351
   build-ctgov-studies-all@yearly_obs36_n-4_20150101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-4_20150101/ctgov-studies-all.parquet)
@@ -913,8 +1006,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-4_20150101/ctgov-studies-all.parquet
       hash: md5
-      md5: 4d6e035635e18a763ed99daeaba375c1
-      size: 8574614
+      md5: 37eee366ab4d9d6b6d270af50601e2a1
+      size: 8579224
   build-ctgov-studies-all@yearly_obs36_n-5_20160101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-5_20160101/ctgov-studies-all.parquet)
@@ -937,8 +1030,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-5_20160101/ctgov-studies-all.parquet
       hash: md5
-      md5: b09e5f60aa895a03cbdec9f7f8df3bbb
-      size: 9805494
+      md5: ad58dd633c78062527563bc3b8234ba1
+      size: 9811852
   build-ctgov-studies-all@yearly_obs36_n-6_20170101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-6_20170101/ctgov-studies-all.parquet)
@@ -961,8 +1054,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-6_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: 3928ca14448e5abaa767c2c4aec77c29
-      size: 11205072
+      md5: 381073e3b246b54b7d5440da8d2d54bf
+      size: 11208014
   build-ctgov-studies-all@yearly_obs36_n-7_20180101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-7_20180101/ctgov-studies-all.parquet)
@@ -985,8 +1078,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-7_20180101/ctgov-studies-all.parquet
       hash: md5
-      md5: f26b3129637f769c5cb34a1b07cdfd55
-      size: 13161654
+      md5: f261eb5e9075331b50568c7fb3f14f32
+      size: 13163713
   build-ctgov-studies-all@yearly_obs36_n-8_20190101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-8_20190101/ctgov-studies-all.parquet)
@@ -1009,8 +1102,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-8_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: 587391ea2e87b82332d72a1dcaa8d192
-      size: 14980950
+      md5: f590c0c809d1ba6ec55cdc473e43eba4
+      size: 14981967
   build-ctgov-studies-all@yearly_obs36_n-9_20200101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-9_20200101/ctgov-studies-all.parquet)
@@ -1033,8 +1126,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-9_20200101/ctgov-studies-all.parquet
       hash: md5
-      md5: 63248c310ef4cfce4886ea1a5427e9c1
-      size: 16884908
+      md5: e5d196d73c53c33c3b8fd459f98e1c92
+      size: 16876737
   build-ctgov-studies-all@yearly_obs36_n-10_20210101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-10_20210101/ctgov-studies-all.parquet)
@@ -1057,8 +1150,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-10_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: 4a1420596f0f7b79b1fe57b01f6ca914
-      size: 18942833
+      md5: 071eb552419f619fc991384ccb9a0d32
+      size: 18938070
   build-ctgov-studies-all@yearly_obs36_n-11_20220101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-11_20220101/ctgov-studies-all.parquet)
@@ -1081,8 +1174,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-11_20220101/ctgov-studies-all.parquet
       hash: md5
-      md5: 646a999176eb7fa2ffb9d3ddfcb9abc5
-      size: 21023179
+      md5: 2d4210728c3d7a3436ad4806780a6cef
+      size: 21013777
   build-ctgov-studies-all@yearly_obs36_n-12_20230101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-12_20230101/ctgov-studies-all.parquet)
@@ -1105,8 +1198,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-12_20230101/ctgov-studies-all.parquet
       hash: md5
-      md5: bb255514db329d990b730caf970f2de1
-      size: 23047533
+      md5: 66e4b9e87c206dd9db73e11f586e6334
+      size: 23035506
   build-ctgov-studies-all@yearly_obs36_n-13_20240101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-13_20240101/ctgov-studies-all.parquet)
@@ -1129,14 +1222,17 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-13_20240101/ctgov-studies-all.parquet
       hash: md5
-      md5: 5bcf6e5502580d336ea786bad1388e0f
-      size: 25147742
+      md5: b54db3e8d1166f2f9157fd936bc9cacd
+      size: 25131395
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-1_20120101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-1_20120101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-1_20120101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-1_20120101
+      > brick/flowchart-counts/yearly_obs36_n-1_20120101.csv
     deps:
     - path: brick/yearly_obs36/n-1_20120101/ctgov-studies-all.parquet
       hash: md5
@@ -1148,19 +1244,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-1_20120101.csv
+      hash: md5
+      md5: 59fcd746c5de6a69e0cbf29ebaf15ab5
+      size: 91
     - path: brick/yearly_obs36/n-1_20120101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 396f55307ab0795563de6c90eb2978fd
-      size: 265242
+      md5: 2c1bc934407eaeaa4103afa28f907971
+      size: 258350
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-2_20130101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-2_20130101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-2_20130101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-2_20130101
+      > brick/flowchart-counts/yearly_obs36_n-2_20130101.csv
     deps:
     - path: brick/yearly_obs36/n-2_20130101/ctgov-studies-all.parquet
       hash: md5
@@ -1172,19 +1280,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-2_20130101.csv
+      hash: md5
+      md5: e9808aaef456d453caa30c34b6addebd
+      size: 91
     - path: brick/yearly_obs36/n-2_20130101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 08e0f873804a5a302777202a05e9ba47
-      size: 281893
+      md5: 346efecebfea4e6a9d996f7eddc0f1d0
+      size: 274457
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-3_20140101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-3_20140101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-3_20140101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-3_20140101
+      > brick/flowchart-counts/yearly_obs36_n-3_20140101.csv
     deps:
     - path: brick/yearly_obs36/n-3_20140101/ctgov-studies-all.parquet
       hash: md5
@@ -1196,19 +1316,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-3_20140101.csv
+      hash: md5
+      md5: f057adac0e50438e5c4c4436ffe41a2e
+      size: 92
     - path: brick/yearly_obs36/n-3_20140101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 6b4f9fea107d08197379cbcf30fdbea8
-      size: 290385
+      md5: b722f055182c005e40dc18cdb4d1d838
+      size: 282663
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-4_20150101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-4_20150101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-4_20150101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-4_20150101
+      > brick/flowchart-counts/yearly_obs36_n-4_20150101.csv
     deps:
     - path: brick/yearly_obs36/n-4_20150101/ctgov-studies-all.parquet
       hash: md5
@@ -1220,19 +1352,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-4_20150101.csv
+      hash: md5
+      md5: c44ee2bf66d5b05235571a26595833ec
+      size: 92
     - path: brick/yearly_obs36/n-4_20150101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 23f75533e17a971f904684703665c3ac
-      size: 305849
+      md5: 501fa08882b37682ba094eb4f333edc3
+      size: 298706
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-5_20160101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-5_20160101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-5_20160101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-5_20160101
+      > brick/flowchart-counts/yearly_obs36_n-5_20160101.csv
     deps:
     - path: brick/yearly_obs36/n-5_20160101/ctgov-studies-all.parquet
       hash: md5
@@ -1244,19 +1388,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-5_20160101.csv
+      hash: md5
+      md5: fcb34163ffd88ad458bb999f9256a2b2
+      size: 92
     - path: brick/yearly_obs36/n-5_20160101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 632cdd8b191c80ec22b4f891daded956
-      size: 308676
+      md5: 891dfc6ad3f7643c6f47bc12b33def25
+      size: 301566
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-6_20170101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-6_20170101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-6_20170101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-6_20170101
+      > brick/flowchart-counts/yearly_obs36_n-6_20170101.csv
     deps:
     - path: brick/yearly_obs36/n-6_20170101/ctgov-studies-all.parquet
       hash: md5
@@ -1268,19 +1424,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-6_20170101.csv
+      hash: md5
+      md5: 9c34865339d7ff112f4ea09639c41b47
+      size: 93
     - path: brick/yearly_obs36/n-6_20170101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: cb0dd4028f55d63022744902cc7c5001
-      size: 315832
+      md5: 7f9d0b579f9313d852886e3d63c30d0c
+      size: 308305
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-7_20180101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-7_20180101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-7_20180101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-7_20180101
+      > brick/flowchart-counts/yearly_obs36_n-7_20180101.csv
     deps:
     - path: brick/yearly_obs36/n-7_20180101/ctgov-studies-all.parquet
       hash: md5
@@ -1292,19 +1460,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-7_20180101.csv
+      hash: md5
+      md5: 3c2cd68c61d5b2d6f4f18324c4bc94f9
+      size: 93
     - path: brick/yearly_obs36/n-7_20180101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 638fb012335a310951622270e0d529c0
-      size: 338691
+      md5: b4fc866b7942498f587c705d1a9539c4
+      size: 330995
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-8_20190101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-8_20190101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-8_20190101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-8_20190101
+      > brick/flowchart-counts/yearly_obs36_n-8_20190101.csv
     deps:
     - path: brick/yearly_obs36/n-8_20190101/ctgov-studies-all.parquet
       hash: md5
@@ -1316,19 +1496,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-8_20190101.csv
+      hash: md5
+      md5: 556885e69e259a606c1c38f73ca1a7e7
+      size: 94
     - path: brick/yearly_obs36/n-8_20190101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: e2c8484079290e5fc9d6cb7dee553c37
-      size: 358184
+      md5: cc2af6f7b23064a0d2175d6986d9b6e8
+      size: 349765
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-9_20200101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-9_20200101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-9_20200101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-9_20200101
+      > brick/flowchart-counts/yearly_obs36_n-9_20200101.csv
     deps:
     - path: brick/yearly_obs36/n-9_20200101/ctgov-studies-all.parquet
       hash: md5
@@ -1340,19 +1532,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-9_20200101.csv
+      hash: md5
+      md5: 263d0120459049d230c4e8c29f18fdd9
+      size: 94
     - path: brick/yearly_obs36/n-9_20200101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: ac28c3caa9158a53b0166e7ad4e30766
-      size: 401985
+      md5: 7ba20614165a1ec4bbe2ca30e63a17bc
+      size: 393791
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-10_20210101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-10_20210101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-10_20210101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-10_20210101
+      > brick/flowchart-counts/yearly_obs36_n-10_20210101.csv
     deps:
     - path: brick/yearly_obs36/n-10_20210101/ctgov-studies-all.parquet
       hash: md5
@@ -1364,19 +1568,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-10_20210101.csv
+      hash: md5
+      md5: b3eff135c077fa6098951d48e1a718ba
+      size: 94
     - path: brick/yearly_obs36/n-10_20210101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: f0f315c90718c375106d1f0ffdf4382d
-      size: 415146
+      md5: 516623903448eb758b8ddf2c7d0691e3
+      size: 405321
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-11_20220101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-11_20220101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-11_20220101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-11_20220101
+      > brick/flowchart-counts/yearly_obs36_n-11_20220101.csv
     deps:
     - path: brick/yearly_obs36/n-11_20220101/ctgov-studies-all.parquet
       hash: md5
@@ -1388,19 +1604,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-11_20220101.csv
+      hash: md5
+      md5: dc73194447350850357e2eb2e341dafd
+      size: 94
     - path: brick/yearly_obs36/n-11_20220101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: d82cb20d8dcd8b975c12ba2470253ce9
-      size: 450109
+      md5: 66fb4ffce98f1feee149c8e07bd076e4
+      size: 441166
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-12_20230101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-12_20230101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-12_20230101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-12_20230101
+      > brick/flowchart-counts/yearly_obs36_n-12_20230101.csv
     deps:
     - path: brick/yearly_obs36/n-12_20230101/ctgov-studies-all.parquet
       hash: md5
@@ -1412,19 +1640,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-12_20230101.csv
+      hash: md5
+      md5: f736079e90b19e5a14ead7fd637ffdce
+      size: 94
     - path: brick/yearly_obs36/n-12_20230101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: a7cf3d2a2c4150fec2c366fd9650c6c0
-      size: 475868
+      md5: 35b5c1ec2db080b579fa7a9105642080
+      size: 466439
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-13_20240101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/yearly_obs36/n-13_20240101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param yearly_obs36_n-13_20240101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh yearly_obs36_n-13_20240101
+      > brick/flowchart-counts/yearly_obs36_n-13_20240101.csv
     deps:
     - path: brick/yearly_obs36/n-13_20240101/ctgov-studies-all.parquet
       hash: md5
@@ -1436,34 +1676,43 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/yearly_obs36_n-13_20240101.csv
+      hash: md5
+      md5: c86b33d305aeeecdabd8b001a7c6ba29
+      size: 94
     - path: brick/yearly_obs36/n-13_20240101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: f176f273ed74d69ece2fdf41739971f7
-      size: 462501
+      md5: ed00b577651ba943fb0a31087da24469
+      size: 454350
   analysis-driver-sliding_yearly_obs36:
     cmd: "Rscript analysis/driver-sliding.R params.yaml yearly_obs36\n"
     deps:
     - path: analysis/driver-sliding.R
       hash: md5
-      md5: 7de93bd9e23e3a25ff8413b03b586687
-      size: 1170
+      md5: f09469d9cd2ad4a87e07a02842aa4cee
+      size: 1110
     - path: brick/yearly_obs36
       hash: md5
-      md5: e291494f3826f6bd2c607ce0566c2e55.dir
-      size: 186505083
+      md5: e558b154ce28161fc9f6bae8c8b58190.dir
+      size: 186400596
       nfiles: 26
     - path: params.yaml
       hash: md5
-      md5: 88f5e03c3dd2f7f6aeccf41c3d81bd43
-      size: 9736
+      md5: 05ca6fe65e172e64f4ecb68c16012716
+      size: 10452
     outs:
     - path: figtab/yearly_obs36
       hash: md5
-      md5: 5e8be4523900a4d02b70853726e6d2d8.dir
-      size: 1141644
+      md5: ec2c46b8137f1884f1bffc649893726f.dir
+      size: 1341718
       nfiles: 3
   build-ctgov-studies-all@pre-post-2017_n-1_20200101:
     cmd:
@@ -1487,8 +1736,8 @@ stages:
     outs:
     - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet
       hash: md5
-      md5: 53f6d36ad394ea0168b40bfc8e287804
-      size: 16877581
+      md5: 2a8621c0fe95f33f7bf4ff2cd3496061
+      size: 16880638
   build-ctgov-studies-all@pre-post-2017_n-2_20240101:
     cmd:
     - mkdir -p $(dirname brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet)
@@ -1511,14 +1760,17 @@ stages:
     outs:
     - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet
       hash: md5
-      md5: 68a013b46f96bbc3f38a336787c07fe3
-      size: 25130758
+      md5: bcf01edc1cfd5b1609347a3180afdeb7
+      size: 25146072
   build-ctgov-studies-hlact-filtered@pre-post-2017_n-1_20200101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/pre-post-2017/n-1_20200101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param pre-post-2017_n-1_20200101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh pre-post-2017_n-1_20200101
+      > brick/flowchart-counts/pre-post-2017_n-1_20200101.csv
     deps:
     - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet
       hash: md5
@@ -1530,19 +1782,31 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/pre-post-2017_n-1_20200101.csv
+      hash: md5
+      md5: 33b9dae90295b700d32658f994ea0398
+      size: 96
     - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 986ec25381b5c5a21ffc4746034add18
-      size: 1224846
+      md5: 681e8f579f509b7a91ea95c2bd03ee57
+      size: 1198260
   build-ctgov-studies-hlact-filtered@pre-post-2017_n-2_20240101:
     cmd:
     - make docker-compose-up
     - mkdir -p $(dirname brick/pre-post-2017/n-2_20240101/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
     - . .env; script/tt-render-by-param pre-post-2017_n-2_20240101 sql/create_cthist_hlact.sql
       | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh pre-post-2017_n-2_20240101
+      > brick/flowchart-counts/pre-post-2017_n-2_20240101.csv
     deps:
     - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet
       hash: md5
@@ -1554,10 +1818,19 @@ stages:
       size: 1831128430
     - path: sql/create_cthist_hlact.sql
       hash: md5
-      md5: 120c21cda19be08ad3cc7f65ee1cb111
-      size: 4299
+      md5: 6bb4be848179ed2fe4c031f82ce3f512
+      size: 5824
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
     outs:
+    - path: brick/flowchart-counts/pre-post-2017_n-2_20240101.csv
+      hash: md5
+      md5: 8d73049000888cf66cf00f9422a8c72f
+      size: 96
     - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 7ad06feeac7e10ff0361c95edc2e01d0
-      size: 1617149
+      md5: 594910db6be20145ceba95384f530d6b
+      size: 1585390
