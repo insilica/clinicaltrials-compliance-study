@@ -107,8 +107,8 @@ stages:
     outs:
     - path: brick/analysis-20130927/ctgov-studies-all.parquet
       hash: md5
-      md5: 1418fd2196904c98f16c60e21c19ed45
-      size: 7114875
+      md5: 8565a8102ab81d1260ab4e0ef003f3b7
+      size: 7114321
   build-ctgov-studies-all@stanford_2019-2023:
     cmd:
     - mkdir -p $(dirname brick/analysis-20240430/ctgov-studies-all.parquet)
@@ -131,8 +131,8 @@ stages:
     outs:
     - path: brick/analysis-20240430/ctgov-studies-all.parquet
       hash: md5
-      md5: 678281a09f20359c499e95eedcfe2e3c
-      size: 25879514
+      md5: 23ccbd711a4d5302928a6175c41afb37
+      size: 25890442
   build-ctgov-studies-hlact-filtered@anderson2015_2008-2012:
     cmd:
     - make docker-compose-up
@@ -144,8 +144,8 @@ stages:
     deps:
     - path: brick/analysis-20130927/ctgov-studies-all.parquet
       hash: md5
-      md5: 4d8751433f388b842a9fddd7d1c67f7b
-      size: 7115856
+      md5: 1418fd2196904c98f16c60e21c19ed45
+      size: 7114875
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -162,8 +162,8 @@ stages:
     outs:
     - path: brick/analysis-20130927/ctgov-studies-hlact.parquet
       hash: md5
-      md5: f03ea748ed94e9bb0e60f6128c0f8496
-      size: 962739
+      md5: e2a3b5e5ee6486e889696419ef0febeb
+      size: 962399
     - path: brick/flowchart-counts/anderson2015_2008-2012.csv
       hash: md5
       md5: 749972ec34d4b8b14090fd1b3673cb13
@@ -178,8 +178,8 @@ stages:
     deps:
     - path: brick/analysis-20240430/ctgov-studies-all.parquet
       hash: md5
-      md5: 9883e739e8dd663cd45746248ab63cb8
-      size: 25875248
+      md5: 678281a09f20359c499e95eedcfe2e3c
+      size: 25879514
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -196,8 +196,8 @@ stages:
     outs:
     - path: brick/analysis-20240430/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 0e9c6114cb06e30ff9acb56cde1075fe
-      size: 1657070
+      md5: 81f4bfd5706044e113f13242f6ded00d
+      size: 1658547
     - path: brick/flowchart-counts/stanford_2019-2023.csv
       hash: md5
       md5: 3e09ec704dcc9f8a38780236ce04d45a
@@ -474,8 +474,8 @@ stages:
     outs:
     - path: brick/long-observe/n-1_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: 1e9f5c2484dca5a4c7e117784b42305d
-      size: 11202775
+      md5: 36feea876de06af95ed80dce3b9d7236
+      size: 11209053
   build-ctgov-studies-all@long-observe_n-2_20190101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-2_20190101/ctgov-studies-all.parquet)
@@ -498,8 +498,8 @@ stages:
     outs:
     - path: brick/long-observe/n-2_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: 01c8260d62857c9032d89f194842781f
-      size: 14978040
+      md5: 2298c87e4dc3d4ee7ae2bb52c814b6b2
+      size: 14978362
   build-ctgov-studies-all@long-observe_n-3_20210101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-3_20210101/ctgov-studies-all.parquet)
@@ -522,8 +522,8 @@ stages:
     outs:
     - path: brick/long-observe/n-3_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: d05c5321eb8a4b39e7ee58e4f458dbc4
-      size: 18937864
+      md5: ffc8bbb09e26f9f970ccd42db8a2b900
+      size: 18931805
   build-ctgov-studies-all@long-observe_n-4_20230101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-4_20230101/ctgov-studies-all.parquet)
@@ -546,8 +546,8 @@ stages:
     outs:
     - path: brick/long-observe/n-4_20230101/ctgov-studies-all.parquet
       hash: md5
-      md5: 227ef5497efef2e9f08b00a946fe9ca5
-      size: 23033933
+      md5: a1e8a8cae83dea3976d42a8d090fb54e
+      size: 23023910
   build-ctgov-studies-hlact-filtered@long-observe_n-1_20170101:
     cmd:
     - make docker-compose-up
@@ -560,8 +560,8 @@ stages:
     deps:
     - path: brick/long-observe/n-1_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: aa612fc797af37e45831aea4e69196ba
-      size: 11202786
+      md5: 1e9f5c2484dca5a4c7e117784b42305d
+      size: 11202775
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -582,8 +582,8 @@ stages:
       size: 96
     - path: brick/long-observe/n-1_20170101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 9bff78cbe5fa2ea6e97e405b66919aff
-      size: 945393
+      md5: 4a117b6c5be5fab0016a94a30cdfe245
+      size: 944722
   build-ctgov-studies-hlact-filtered@long-observe_n-2_20190101:
     cmd:
     - make docker-compose-up
@@ -596,8 +596,8 @@ stages:
     deps:
     - path: brick/long-observe/n-2_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: fb455e078f59f06728b5a20f442ebad1
-      size: 14976394
+      md5: 01c8260d62857c9032d89f194842781f
+      size: 14978040
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -618,8 +618,8 @@ stages:
       size: 96
     - path: brick/long-observe/n-2_20190101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: fe45d60e9b1e89fbb5b631d5dca88988
-      size: 1058071
+      md5: 06de559586eb68c4a86f363fa6f9036d
+      size: 1057369
   build-ctgov-studies-hlact-filtered@long-observe_n-3_20210101:
     cmd:
     - make docker-compose-up
@@ -632,8 +632,8 @@ stages:
     deps:
     - path: brick/long-observe/n-3_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: cc476cc295d9879e4cf7feadd11e3121
-      size: 18939509
+      md5: d05c5321eb8a4b39e7ee58e4f458dbc4
+      size: 18937864
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -654,8 +654,8 @@ stages:
       size: 96
     - path: brick/long-observe/n-3_20210101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: bab896b2df887918c44696b9117ff74d
-      size: 1164332
+      md5: 87a117f06eff99474bca771a63db6eaf
+      size: 1162488
   build-ctgov-studies-hlact-filtered@long-observe_n-4_20230101:
     cmd:
     - make docker-compose-up
@@ -668,8 +668,8 @@ stages:
     deps:
     - path: brick/long-observe/n-4_20230101/ctgov-studies-all.parquet
       hash: md5
-      md5: a5d714761ef392b4699be03347ee1e29
-      size: 23045888
+      md5: 227ef5497efef2e9f08b00a946fe9ca5
+      size: 23033933
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -690,8 +690,8 @@ stages:
       size: 96
     - path: brick/long-observe/n-4_20230101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 4e1c990f1ef6b169299895fea9fc1a3a
-      size: 1346507
+      md5: dc61b3afcaa7a63831f651ed6c29aa38
+      size: 1342745
   analysis-driver-sliding_long-observe:
     cmd: "Rscript analysis/driver-sliding.R params.yaml long-observe\n"
     deps:
@@ -701,12 +701,12 @@ stages:
       size: 1110
     - path: brick/long-observe
       hash: md5
-      md5: 5fb5d2ab95720e514b01ab780f90b543.dir
-      size: 72678880
+      md5: dada843b0d6211077ccd1ab00e4d29a0.dir
+      size: 72659936
       nfiles: 8
     - path: params.yaml
       hash: md5
-      md5: 05ca6fe65e172e64f4ecb68c16012716
+      md5: 219462831baf96ee95520b3d08ad6b87
       size: 10452
     outs:
     - path: figtab/long-observe
@@ -736,8 +736,8 @@ stages:
     outs:
     - path: brick/rule-effective-date-before/ctgov-studies-all.parquet
       hash: md5
-      md5: d0a055cc638658607a31b26635d7c043
-      size: 11918635
+      md5: f0cb3f3ab7571d54d49e0c8a36aae6d0
+      size: 11274859
   build-ctgov-studies-all@rule-effective-date-after:
     cmd:
     - mkdir -p $(dirname brick/rule-effective-date-after/ctgov-studies-all.parquet)
@@ -760,8 +760,8 @@ stages:
     outs:
     - path: brick/rule-effective-date-after/ctgov-studies-all.parquet
       hash: md5
-      md5: 6ff91f39028e37c19ec2cea907c94fe9
-      size: 25877152
+      md5: 50534a47d1a7b9b1cdb44a9aaef81b6d
+      size: 25223746
   build-ctgov-studies-hlact-filtered@rule-effective-date-before:
     cmd:
     - make docker-compose-up
@@ -774,8 +774,8 @@ stages:
     deps:
     - path: brick/rule-effective-date-before/ctgov-studies-all.parquet
       hash: md5
-      md5: cdfcf502b2c71cc082f0152042ae69ff
-      size: 11910165
+      md5: d0a055cc638658607a31b26635d7c043
+      size: 11918635
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -792,12 +792,12 @@ stages:
     outs:
     - path: brick/flowchart-counts/rule-effective-date-before.csv
       hash: md5
-      md5: ee71b9720f584eacdfcd1d322376744a
+      md5: 086cf76ea76a066ffa198f3c27c46801
       size: 96
     - path: brick/rule-effective-date-before/ctgov-studies-hlact.parquet
       hash: md5
-      md5: ac52c0fd9b5c5e97025f93290bc78c09
-      size: 997562
+      md5: 27971d46e5292e1044ad68686bb8d423
+      size: 996588
   build-ctgov-studies-hlact-filtered@rule-effective-date-after:
     cmd:
     - make docker-compose-up
@@ -810,8 +810,8 @@ stages:
     deps:
     - path: brick/rule-effective-date-after/ctgov-studies-all.parquet
       hash: md5
-      md5: 3d838aa27a868b6b63cef4f7257bbdae
-      size: 25865581
+      md5: 6ff91f39028e37c19ec2cea907c94fe9
+      size: 25877152
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -828,12 +828,12 @@ stages:
     outs:
     - path: brick/flowchart-counts/rule-effective-date-after.csv
       hash: md5
-      md5: 7d625355f2563ecda4de53962cfe4a6e
+      md5: 37004f2c4e85309ab63d1b60e1e4eeb8
       size: 96
     - path: brick/rule-effective-date-after/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 754c265cabe33c7465fd0561a8211514
-      size: 1602525
+      md5: d1291f69c689248d3a075e9702c51d41
+      size: 1592435
   build-ctgov-historical-records:
     cmd:
     - mkdir -p brick/ctgov/historical
@@ -862,8 +862,8 @@ stages:
       size: 968
     - path: brick/analysis-20130927
       hash: md5
-      md5: 362de20bf125b2ac681d032e138fe507.dir
-      size: 8078595
+      md5: f0f59f8be69bfed33e2d57290b71e650.dir
+      size: 8077274
       nfiles: 2
     - path: brick/anderson2015
       hash: md5
@@ -872,7 +872,7 @@ stages:
       nfiles: 4
     - path: params.yaml
       hash: md5
-      md5: 05ca6fe65e172e64f4ecb68c16012716
+      md5: 219462831baf96ee95520b3d08ad6b87
       size: 10452
     outs:
     - path: figtab/anderson2015.new
@@ -894,23 +894,23 @@ stages:
       size: 3130
     - path: brick/rule-effective-date-after
       hash: md5
-      md5: 2ae447a803f5d4e8e97e906f01d0d41e.dir
-      size: 27468106
+      md5: 1687e989720cb1edf325492fb878accb.dir
+      size: 27469587
       nfiles: 2
     - path: brick/rule-effective-date-before
       hash: md5
-      md5: 6b5de60dae129cf8caa29d8505bd7e93.dir
-      size: 12907727
+      md5: 531d0a8117c1c2c6b42e2103445e7e0f.dir
+      size: 12915223
       nfiles: 2
     - path: params.yaml
       hash: md5
-      md5: 05ca6fe65e172e64f4ecb68c16012716
+      md5: 219462831baf96ee95520b3d08ad6b87
       size: 10452
     outs:
     - path: figtab/rule-effective
       hash: md5
-      md5: 6ae6752ceb15213d4c46913cdd5daaef.dir
-      size: 2086917
+      md5: 233ad1911bacdfd4b89c82a46dd6a437.dir
+      size: 2090211
       nfiles: 10
   build-ctgov-studies-all@yearly_obs36_n-1_20120101:
     cmd:
@@ -934,8 +934,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-1_20120101/ctgov-studies-all.parquet
       hash: md5
-      md5: 70b539164fb8a6cd0994b0893149ee27
-      size: 5336619
+      md5: fd802fa5fd0fa0a474d2c0faafe77779
+      size: 5336189
   build-ctgov-studies-all@yearly_obs36_n-2_20130101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-2_20130101/ctgov-studies-all.parquet)
@@ -958,8 +958,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-2_20130101/ctgov-studies-all.parquet
       hash: md5
-      md5: b970888db5ed2b241608e0369381a8e2
-      size: 6338124
+      md5: d11f009a8560d3082d9b03f5e3bdb2bb
+      size: 6341124
   build-ctgov-studies-all@yearly_obs36_n-3_20140101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-3_20140101/ctgov-studies-all.parquet)
@@ -982,8 +982,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-3_20140101/ctgov-studies-all.parquet
       hash: md5
-      md5: 0e23ace98220d081decb5ae09216e2ec
-      size: 7388351
+      md5: d0e8155fffceb2037c3ace9a6d4b4667
+      size: 7392017
   build-ctgov-studies-all@yearly_obs36_n-4_20150101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-4_20150101/ctgov-studies-all.parquet)
@@ -1006,8 +1006,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-4_20150101/ctgov-studies-all.parquet
       hash: md5
-      md5: 37eee366ab4d9d6b6d270af50601e2a1
-      size: 8579224
+      md5: 54ecc37482351df2fff122999db37041
+      size: 8578141
   build-ctgov-studies-all@yearly_obs36_n-5_20160101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-5_20160101/ctgov-studies-all.parquet)
@@ -1030,8 +1030,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-5_20160101/ctgov-studies-all.parquet
       hash: md5
-      md5: ad58dd633c78062527563bc3b8234ba1
-      size: 9811852
+      md5: c2a8f40feadf5f73a5674bb2059e612d
+      size: 9810744
   build-ctgov-studies-all@yearly_obs36_n-6_20170101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-6_20170101/ctgov-studies-all.parquet)
@@ -1054,8 +1054,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-6_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: 381073e3b246b54b7d5440da8d2d54bf
-      size: 11208014
+      md5: ea5529a76d34f0efcb3f6b5dd871628c
+      size: 11206946
   build-ctgov-studies-all@yearly_obs36_n-7_20180101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-7_20180101/ctgov-studies-all.parquet)
@@ -1078,8 +1078,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-7_20180101/ctgov-studies-all.parquet
       hash: md5
-      md5: f261eb5e9075331b50568c7fb3f14f32
-      size: 13163713
+      md5: d77795b0b065a8c99000a7fa06d80782
+      size: 13155025
   build-ctgov-studies-all@yearly_obs36_n-8_20190101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-8_20190101/ctgov-studies-all.parquet)
@@ -1102,8 +1102,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-8_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: f590c0c809d1ba6ec55cdc473e43eba4
-      size: 14981967
+      md5: 655bbad60c0d95f13a18a00c96513f42
+      size: 14981748
   build-ctgov-studies-all@yearly_obs36_n-9_20200101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-9_20200101/ctgov-studies-all.parquet)
@@ -1126,8 +1126,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-9_20200101/ctgov-studies-all.parquet
       hash: md5
-      md5: e5d196d73c53c33c3b8fd459f98e1c92
-      size: 16876737
+      md5: d03bf75258c948830e7421235776cb57
+      size: 16882467
   build-ctgov-studies-all@yearly_obs36_n-10_20210101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-10_20210101/ctgov-studies-all.parquet)
@@ -1150,8 +1150,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-10_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: 071eb552419f619fc991384ccb9a0d32
-      size: 18938070
+      md5: d44c13ec0db855c1fc776ea522242248
+      size: 18945847
   build-ctgov-studies-all@yearly_obs36_n-11_20220101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-11_20220101/ctgov-studies-all.parquet)
@@ -1174,8 +1174,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-11_20220101/ctgov-studies-all.parquet
       hash: md5
-      md5: 2d4210728c3d7a3436ad4806780a6cef
-      size: 21013777
+      md5: 058190e3416b906215d7c88be3f7b024
+      size: 21018305
   build-ctgov-studies-all@yearly_obs36_n-12_20230101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-12_20230101/ctgov-studies-all.parquet)
@@ -1198,8 +1198,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-12_20230101/ctgov-studies-all.parquet
       hash: md5
-      md5: 66e4b9e87c206dd9db73e11f586e6334
-      size: 23035506
+      md5: a8f011c6f183074ae64e183d218cec9a
+      size: 23036471
   build-ctgov-studies-all@yearly_obs36_n-13_20240101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-13_20240101/ctgov-studies-all.parquet)
@@ -1222,8 +1222,8 @@ stages:
     outs:
     - path: brick/yearly_obs36/n-13_20240101/ctgov-studies-all.parquet
       hash: md5
-      md5: b54db3e8d1166f2f9157fd936bc9cacd
-      size: 25131395
+      md5: 6008bd437e2eb1960945555b80b2bf46
+      size: 25135304
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-1_20120101:
     cmd:
     - make docker-compose-up
@@ -1236,8 +1236,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-1_20120101/ctgov-studies-all.parquet
       hash: md5
-      md5: c563e01c1b5d649815e1d04d088cd404
-      size: 5337475
+      md5: 70b539164fb8a6cd0994b0893149ee27
+      size: 5336619
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1258,8 +1258,8 @@ stages:
       size: 91
     - path: brick/yearly_obs36/n-1_20120101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 2c1bc934407eaeaa4103afa28f907971
-      size: 258350
+      md5: 52e7a47536530e39f0bfe64a9ce8ed6e
+      size: 257951
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-2_20130101:
     cmd:
     - make docker-compose-up
@@ -1272,8 +1272,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-2_20130101/ctgov-studies-all.parquet
       hash: md5
-      md5: 66f733e95d110e1b1fa90b5b8ae3ffc2
-      size: 6335644
+      md5: b970888db5ed2b241608e0369381a8e2
+      size: 6338124
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1294,8 +1294,8 @@ stages:
       size: 91
     - path: brick/yearly_obs36/n-2_20130101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 346efecebfea4e6a9d996f7eddc0f1d0
-      size: 274457
+      md5: ffe5d393cc8221539cad11cba749a061
+      size: 274516
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-3_20140101:
     cmd:
     - make docker-compose-up
@@ -1308,8 +1308,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-3_20140101/ctgov-studies-all.parquet
       hash: md5
-      md5: 6d3db90b56a94b64c409981a03b87d6a
-      size: 7387624
+      md5: 0e23ace98220d081decb5ae09216e2ec
+      size: 7388351
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1330,8 +1330,8 @@ stages:
       size: 92
     - path: brick/yearly_obs36/n-3_20140101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: b722f055182c005e40dc18cdb4d1d838
-      size: 282663
+      md5: 5dd6aa9a4d95b115462d0ab74d46729f
+      size: 282176
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-4_20150101:
     cmd:
     - make docker-compose-up
@@ -1344,8 +1344,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-4_20150101/ctgov-studies-all.parquet
       hash: md5
-      md5: 4d6e035635e18a763ed99daeaba375c1
-      size: 8574614
+      md5: 37eee366ab4d9d6b6d270af50601e2a1
+      size: 8579224
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1366,8 +1366,8 @@ stages:
       size: 92
     - path: brick/yearly_obs36/n-4_20150101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 501fa08882b37682ba094eb4f333edc3
-      size: 298706
+      md5: 26233530900a15c0c3ae9350281829c9
+      size: 298188
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-5_20160101:
     cmd:
     - make docker-compose-up
@@ -1380,8 +1380,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-5_20160101/ctgov-studies-all.parquet
       hash: md5
-      md5: b09e5f60aa895a03cbdec9f7f8df3bbb
-      size: 9805494
+      md5: ad58dd633c78062527563bc3b8234ba1
+      size: 9811852
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1402,8 +1402,8 @@ stages:
       size: 92
     - path: brick/yearly_obs36/n-5_20160101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 891dfc6ad3f7643c6f47bc12b33def25
-      size: 301566
+      md5: bb67d608b1e951292a1a36f6a111c9ae
+      size: 301758
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-6_20170101:
     cmd:
     - make docker-compose-up
@@ -1416,8 +1416,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-6_20170101/ctgov-studies-all.parquet
       hash: md5
-      md5: 3928ca14448e5abaa767c2c4aec77c29
-      size: 11205072
+      md5: 381073e3b246b54b7d5440da8d2d54bf
+      size: 11208014
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1438,8 +1438,8 @@ stages:
       size: 93
     - path: brick/yearly_obs36/n-6_20170101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 7f9d0b579f9313d852886e3d63c30d0c
-      size: 308305
+      md5: ae6b0a23eccf343b507b8216ca86b9e0
+      size: 308070
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-7_20180101:
     cmd:
     - make docker-compose-up
@@ -1452,8 +1452,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-7_20180101/ctgov-studies-all.parquet
       hash: md5
-      md5: f26b3129637f769c5cb34a1b07cdfd55
-      size: 13161654
+      md5: f261eb5e9075331b50568c7fb3f14f32
+      size: 13163713
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1474,8 +1474,8 @@ stages:
       size: 93
     - path: brick/yearly_obs36/n-7_20180101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: b4fc866b7942498f587c705d1a9539c4
-      size: 330995
+      md5: 6ba55eb49e867fa1b5f7786c76980dd4
+      size: 331085
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-8_20190101:
     cmd:
     - make docker-compose-up
@@ -1488,8 +1488,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-8_20190101/ctgov-studies-all.parquet
       hash: md5
-      md5: 587391ea2e87b82332d72a1dcaa8d192
-      size: 14980950
+      md5: f590c0c809d1ba6ec55cdc473e43eba4
+      size: 14981967
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1510,8 +1510,8 @@ stages:
       size: 94
     - path: brick/yearly_obs36/n-8_20190101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: cc2af6f7b23064a0d2175d6986d9b6e8
-      size: 349765
+      md5: d92b2698a9275599bca11f5656e10e62
+      size: 349951
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-9_20200101:
     cmd:
     - make docker-compose-up
@@ -1524,8 +1524,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-9_20200101/ctgov-studies-all.parquet
       hash: md5
-      md5: 63248c310ef4cfce4886ea1a5427e9c1
-      size: 16884908
+      md5: e5d196d73c53c33c3b8fd459f98e1c92
+      size: 16876737
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1546,8 +1546,8 @@ stages:
       size: 94
     - path: brick/yearly_obs36/n-9_20200101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 7ba20614165a1ec4bbe2ca30e63a17bc
-      size: 393791
+      md5: 7688514376ab6740a4cff68adf6a89b8
+      size: 393472
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-10_20210101:
     cmd:
     - make docker-compose-up
@@ -1560,8 +1560,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-10_20210101/ctgov-studies-all.parquet
       hash: md5
-      md5: 4a1420596f0f7b79b1fe57b01f6ca914
-      size: 18942833
+      md5: 071eb552419f619fc991384ccb9a0d32
+      size: 18938070
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1582,8 +1582,8 @@ stages:
       size: 94
     - path: brick/yearly_obs36/n-10_20210101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 516623903448eb758b8ddf2c7d0691e3
-      size: 405321
+      md5: 22f1de438971f4c0a5ed24a0fa32cd14
+      size: 405843
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-11_20220101:
     cmd:
     - make docker-compose-up
@@ -1596,8 +1596,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-11_20220101/ctgov-studies-all.parquet
       hash: md5
-      md5: 646a999176eb7fa2ffb9d3ddfcb9abc5
-      size: 21023179
+      md5: 2d4210728c3d7a3436ad4806780a6cef
+      size: 21013777
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1618,8 +1618,8 @@ stages:
       size: 94
     - path: brick/yearly_obs36/n-11_20220101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 66fb4ffce98f1feee149c8e07bd076e4
-      size: 441166
+      md5: ba91707e0b93836488f09b0ff0ff32c0
+      size: 439970
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-12_20230101:
     cmd:
     - make docker-compose-up
@@ -1632,8 +1632,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-12_20230101/ctgov-studies-all.parquet
       hash: md5
-      md5: bb255514db329d990b730caf970f2de1
-      size: 23047533
+      md5: 66e4b9e87c206dd9db73e11f586e6334
+      size: 23035506
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1654,8 +1654,8 @@ stages:
       size: 94
     - path: brick/yearly_obs36/n-12_20230101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 35b5c1ec2db080b579fa7a9105642080
-      size: 466439
+      md5: 4a47824fc52290aede5196ef7463f61d
+      size: 465635
   build-ctgov-studies-hlact-filtered@yearly_obs36_n-13_20240101:
     cmd:
     - make docker-compose-up
@@ -1668,8 +1668,8 @@ stages:
     deps:
     - path: brick/yearly_obs36/n-13_20240101/ctgov-studies-all.parquet
       hash: md5
-      md5: 5bcf6e5502580d336ea786bad1388e0f
-      size: 25147742
+      md5: b54db3e8d1166f2f9157fd936bc9cacd
+      size: 25131395
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1690,8 +1690,8 @@ stages:
       size: 94
     - path: brick/yearly_obs36/n-13_20240101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: ed00b577651ba943fb0a31087da24469
-      size: 454350
+      md5: 2bbbd6b177dd80b064b7a8eb7b686c4e
+      size: 453676
   analysis-driver-sliding_yearly_obs36:
     cmd: "Rscript analysis/driver-sliding.R params.yaml yearly_obs36\n"
     deps:
@@ -1701,12 +1701,12 @@ stages:
       size: 1110
     - path: brick/yearly_obs36
       hash: md5
-      md5: e558b154ce28161fc9f6bae8c8b58190.dir
-      size: 186400596
+      md5: a118f886e0b786a1d9819f974699fe66.dir
+      size: 186365640
       nfiles: 26
     - path: params.yaml
       hash: md5
-      md5: 05ca6fe65e172e64f4ecb68c16012716
+      md5: 219462831baf96ee95520b3d08ad6b87
       size: 10452
     outs:
     - path: figtab/yearly_obs36
@@ -1736,8 +1736,8 @@ stages:
     outs:
     - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet
       hash: md5
-      md5: 2a8621c0fe95f33f7bf4ff2cd3496061
-      size: 16880638
+      md5: 3b700f7bf698501fc8510e4efe89d74f
+      size: 16873094
   build-ctgov-studies-all@pre-post-2017_n-2_20240101:
     cmd:
     - mkdir -p $(dirname brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet)
@@ -1760,8 +1760,8 @@ stages:
     outs:
     - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet
       hash: md5
-      md5: bcf01edc1cfd5b1609347a3180afdeb7
-      size: 25146072
+      md5: 8c79856671c55e267e8e87f7ef439f5f
+      size: 25127189
   build-ctgov-studies-hlact-filtered@pre-post-2017_n-1_20200101:
     cmd:
     - make docker-compose-up
@@ -1774,8 +1774,8 @@ stages:
     deps:
     - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet
       hash: md5
-      md5: 53f6d36ad394ea0168b40bfc8e287804
-      size: 16877581
+      md5: 2a8621c0fe95f33f7bf4ff2cd3496061
+      size: 16880638
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1796,8 +1796,8 @@ stages:
       size: 96
     - path: brick/pre-post-2017/n-1_20200101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 681e8f579f509b7a91ea95c2bd03ee57
-      size: 1198260
+      md5: 8a8356ea2a5dbd956775abf34201c19a
+      size: 1197583
   build-ctgov-studies-hlact-filtered@pre-post-2017_n-2_20240101:
     cmd:
     - make docker-compose-up
@@ -1810,8 +1810,8 @@ stages:
     deps:
     - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-all.parquet
       hash: md5
-      md5: 68a013b46f96bbc3f38a336787c07fe3
-      size: 25130758
+      md5: bcf01edc1cfd5b1609347a3180afdeb7
+      size: 25146072
     - path: download/aact/db-dump/20240430_clinical_trials.zip
       hash: md5
       md5: dd7dd067786f58bbd6cd43758fc1a3da
@@ -1832,5 +1832,5 @@ stages:
       size: 96
     - path: brick/pre-post-2017/n-2_20240101/ctgov-studies-hlact.parquet
       hash: md5
-      md5: 594910db6be20145ceba95384f530d6b
-      size: 1585390
+      md5: ac3f96b8630aa4b7079acd8c5ac6e755
+      size: 1588048
