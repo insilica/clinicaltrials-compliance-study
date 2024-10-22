@@ -67,6 +67,15 @@ COPY (
                             OR completion_date IS NULL
                         )
                     )
+--%%                IF date.exists('initiated') # {{{
+                    AND (
+                        -- This is to accurately model the regulation which
+                        -- only comes into effect for trials on or after a
+                        -- certain start date.
+                        try_parse_date(start_date) :: DATE >= '\[\% date.initiated \%\]'
+                        OR start_date IS NULL
+                    )
+--%%                END ## date.exists('initiated') }}}
 --%%            END ## query.disable_filter_start_date }}}
 --%%            UNLESS query.disable_filter_study_design # {{{
                     AND study_type = 'INTERVENTIONAL'
