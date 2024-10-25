@@ -15,11 +15,18 @@ print(names(params.filtered))
 agg.windows <- process.windows.init(params.filtered) |>
   process.windows.amend.results_reported()
 
+( agg.windows <-
+    agg.windows
+    |> list_rename(
+                   Before = 'rule-effective-date-before',
+                   After  = 'rule-effective-date-after',
+    )
+)
+
 table.count <- matrix(
             nrow = 2,
-            data = c(table( ! agg.windows[['rule-effective-date-before']]$hlact.studies$rr.results_reported_12mo ),
-                     table( ! agg.windows[['rule-effective-date-after']]$hlact.studies$rr.results_reported_12mo ) ),
-            dimnames = list( c("Yes", "No"), c("Before", "After"))
+            data = unlist(agg.windows |> map( ~ table( ! .x$hlact.studies$rr.results_reported_12mo ) )),
+            dimnames = list( c("Yes", "No"), names(agg.windows) )
 ) |> t()
 
 table.count
@@ -86,19 +93,19 @@ prop.test( table.count, alternative = 'less'  )
 
 ### Run prop.test() by funding source
 table.count.funding <- {
-  funding.levels <- agg.windows[['rule-effective-date-before']]$hlact.studies$common.funding |> levels()
+  funding.levels <- agg.windows[['Before']]$hlact.studies$common.funding |> levels()
   result <- funding.levels |>
     map( \(level) {
       matrix(
                   nrow = 2,
-                  byrow = FALSE,
-                  data = c(table( ! agg.windows[['rule-effective-date-before']]$hlact.studies
-                                 |> filter( common.funding == level)
-                                 |> pull(rr.results_reported_12mo) ),
-                           table( ! agg.windows[['rule-effective-date-after']]$hlact.studies
-                                 |> filter( common.funding == level)
-                                 |> pull(rr.results_reported_12mo) ) ),
-                  dimnames = list( c("Yes", "No"), c("Before", "After"))
+                  data = unlist(
+                                agg.windows |> map( \(window) {
+                                  table( ! window$hlact.studies
+                                        |> filter( common.funding == level)
+                                        |> pull(rr.results_reported_12mo) )
+                                })
+                  ),
+                  dimnames = list( c("Yes", "No"), names(agg.windows) )
       ) |> t()
     })
   names(result) <- funding.levels
