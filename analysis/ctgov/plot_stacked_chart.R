@@ -44,6 +44,19 @@ process.single.agg.window.amend.agg.interval.groups <-
   return(agg.window.single)
 }
 
+process.all.agg.window.amend.agg.interval.groups <-
+  function(agg.windows, with_facet = NULL ) {
+  for(w_name in names(agg.windows)) {
+    agg.windows[[w_name]] <- agg.windows[[w_name]] |>
+      process.single.agg.window.amend.agg.interval.groups(
+        with_facet = with_facet
+      )
+  }
+  agg.windows[[1]]$agg.interval.groups |> names()
+
+  return(agg.windows)
+}
+
 # plot.windows.stacked.chart(agg.windows)
 plot.windows.stacked.chart <-
     function(agg.windows,
@@ -56,13 +69,8 @@ plot.windows.stacked.chart <-
   }
   faceted_by.label <- gsub("^common\\.", "", faceted_by.label)
 
-  for(w_name in names(agg.windows)) {
-    agg.windows[[w_name]] <- agg.windows[[w_name]] |>
-      process.single.agg.window.amend.agg.interval.groups(
-        with_facet = with_facet
-      )
-  }
-  agg.windows[[1]]$agg.interval.groups |> names()
+  agg.windows <- agg.windows |>
+    process.all.agg.window.amend.agg.interval.groups(with_facet = with_facet)
 
   #agg.windows |>
   #  map( ~ .x$agg.interval.groups |> print() )
