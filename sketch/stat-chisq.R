@@ -25,6 +25,13 @@ table.count <- matrix(
 table.count
 
 table.count |> addmargins()
+#################################
+# > table.count |> addmargins() #
+#         Yes    No   Sum       #
+# Before 1170 13004 14174       #
+# After  2292  7588  9880       #
+# Sum    3462 20592 24054       #
+#################################
 
 # Compare??
 #        Yes
@@ -33,9 +40,39 @@ table.count |> addmargins()
 
 # is prop1 ≠ prop2?
 prop.test( table.count, alternative = 'two.sided'  )
+################################################################################
+# > # is prop1 ≠ prop2?                                                        #
+# > prop.test( table.count, alternative = 'two.sided'  )                       #
+#                                                                              #
+#         2-sample test for equality of proportions with continuity correction #
+#                                                                              #
+# data:  table.count                                                           #
+# X-squared = 1054, df = 1, p-value < 2.2e-16                                  #
+# alternative hypothesis: two.sided                                            #
+# 95 percent confidence interval:                                              #
+#  -0.1590004 -0.1398762                                                       #
+# sample estimates:                                                            #
+#     prop 1     prop 2                                                        #
+# 0.08254551 0.23198381                                                        #
+################################################################################
 
 # is prop1 (before) < prop2 (after)?
 prop.test( table.count, alternative = 'less'  )
+################################################################################
+# > # is prop1 (before) < prop2 (after)?                                       #
+# > prop.test( table.count, alternative = 'less'  )                            #
+#                                                                              #
+#         2-sample test for equality of proportions with continuity correction #
+#                                                                              #
+# data:  table.count                                                           #
+# X-squared = 1054, df = 1, p-value < 2.2e-16                                  #
+# alternative hypothesis: less                                                 #
+# 95 percent confidence interval:                                              #
+#  -1.0000000 -0.1413997                                                       #
+# sample estimates:                                                            #
+#     prop 1     prop 2                                                        #
+# 0.08254551 0.23198381                                                        #
+################################################################################
 
 #(
 #agg.windows[['rule-effective-date-before']]$hlact.studies
@@ -69,10 +106,70 @@ table.count.funding <- {
 }
 
 table.count.funding
+#########################
+# > table.count.funding #
+# $Industry             #
+#         Yes   No      #
+# Before  687 6027      #
+# After  1198 2606      #
+#                       #
+# $NIH                  #
+#        Yes   No       #
+# Before 205 2429       #
+# After  292  615       #
+#                       #
+# $Other                #
+#        Yes   No       #
+# Before 278 4548       #
+# After  802 4367       #
+#########################
 
 result.prop.test.funding <- table.count.funding |> map( ~ prop.test( .x , alternative = 'less'  ) )
 
 result.prop.test.funding
+################################################################################
+# > result.prop.test.funding                                                   #
+# $Industry                                                                    #
+#                                                                              #
+#         2-sample test for equality of proportions with continuity correction #
+#                                                                              #
+# data:  .x                                                                    #
+# X-squared = 744.73, df = 1, p-value < 2.2e-16                                #
+# alternative hypothesis: less                                                 #
+# 95 percent confidence interval:                                              #
+#  -1.0000000 -0.1986014                                                       #
+# sample estimates:                                                            #
+#    prop 1    prop 2                                                          #
+# 0.1023235 0.3149317                                                          #
+#                                                                              #
+#                                                                              #
+# $NIH                                                                         #
+#                                                                              #
+#         2-sample test for equality of proportions with continuity correction #
+#                                                                              #
+# data:  .x                                                                    #
+# X-squared = 331.2, df = 1, p-value < 2.2e-16                                 #
+# alternative hypothesis: less                                                 #
+# 95 percent confidence interval:                                              #
+#  -1.0000000 -0.2164473                                                       #
+# sample estimates:                                                            #
+#    prop 1    prop 2                                                          #
+# 0.0778284 0.3219405                                                          #
+#                                                                              #
+#                                                                              #
+# $Other                                                                       #
+#                                                                              #
+#         2-sample test for equality of proportions with continuity correction #
+#                                                                              #
+# data:  .x                                                                    #
+# X-squared = 245.42, df = 1, p-value < 2.2e-16                                #
+# alternative hypothesis: less                                                 #
+# 95 percent confidence interval:                                              #
+#  -1.00000000 -0.08739864                                                     #
+# sample estimates:                                                            #
+#     prop 1     prop 2                                                        #
+# 0.05760464 0.15515574                                                        #
+################################################################################
 
 
 (
