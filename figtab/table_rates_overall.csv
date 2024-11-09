@@ -1,0 +1,16 @@
+name,value
+N_trials_overall,24054.0
+n_within_12_overall,3462.0
+n_within_36_overall,10647.0
+p_within_12_overall,14.4
+p_within_36_overall,44.3
+N_trials_pre,14174.0
+n_within_12_pre,1170.0
+n_within_36_pre,5782.0
+p_within_12_pre,8.3
+p_within_36_pre,40.8
+N_trials_post,9880.0
+n_within_12_post,2292.0
+n_within_36_post,4865.0
+p_within_12_post,23.2
+p_within_36_post,49.2
