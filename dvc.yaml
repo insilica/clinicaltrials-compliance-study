@@ -144,3 +144,13 @@ stages:
     outs:
       - figtab/rule-effective
       - brick/rule-effective-date_processed
+  plotter_py:
+    cmd: |
+      python3 analysis/plotter.py
+    deps:
+      - analysis/plotter.py
+      - analysis/utils.py
+      - brick/rule-effective-date_processed
+      - brick/yearly_obs36_processed
+    outs:
+      - figtab/plotter_py

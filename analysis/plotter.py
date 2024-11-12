@@ -9,7 +9,8 @@ warnings.filterwarnings('ignore')
 import utils
 from scipy.stats import permutation_test
 from tqdm import tqdm
-    
+from pathlib import Path
+
 # TABLES OF RATES OF REPORTING OVERALL, SUBGROUPS
 # TABLES OF COMPOSITION OF SUBGROUPS
 
@@ -140,19 +141,19 @@ def plot_lollipop(df_prepost_12, df_prepost_36):
 
 # BOX PLOTS BY YEAR
 def plot_boxplot_yearly():
-    df_12 = pd.read_parquet("../brick/yearly_obs36_processed/1_20120101_hlact_studies.parquet")
-    df_13 = pd.read_parquet("../brick/yearly_obs36_processed/2_20130101_hlact_studies.parquet")
-    df_14 = pd.read_parquet("../brick/yearly_obs36_processed/3_20140101_hlact_studies.parquet")
-    df_15 = pd.read_parquet("../brick/yearly_obs36_processed/4_20150101_hlact_studies.parquet")
-    df_16 = pd.read_parquet("../brick/yearly_obs36_processed/5_20160101_hlact_studies.parquet")
-    df_17 = pd.read_parquet("../brick/yearly_obs36_processed/6_20170101_hlact_studies.parquet")
-    df_18 = pd.read_parquet("../brick/yearly_obs36_processed/7_20180101_hlact_studies.parquet")
-    df_19 = pd.read_parquet("../brick/yearly_obs36_processed/8_20190101_hlact_studies.parquet")
-    df_20 = pd.read_parquet("../brick/yearly_obs36_processed/9_20200101_hlact_studies.parquet")
-    df_21 = pd.read_parquet("../brick/yearly_obs36_processed/10_20210101_hlact_studies.parquet")
-    df_22 = pd.read_parquet("../brick/yearly_obs36_processed/11_20220101_hlact_studies.parquet")
-    df_23 = pd.read_parquet("../brick/yearly_obs36_processed/12_20230101_hlact_studies.parquet")
-    df_24 = pd.read_parquet("../brick/yearly_obs36_processed/13_20240101_hlact_studies.parquet")
+    df_12 = pd.read_parquet("brick/yearly_obs36_processed/1_20120101_hlact_studies.parquet")
+    df_13 = pd.read_parquet("brick/yearly_obs36_processed/2_20130101_hlact_studies.parquet")
+    df_14 = pd.read_parquet("brick/yearly_obs36_processed/3_20140101_hlact_studies.parquet")
+    df_15 = pd.read_parquet("brick/yearly_obs36_processed/4_20150101_hlact_studies.parquet")
+    df_16 = pd.read_parquet("brick/yearly_obs36_processed/5_20160101_hlact_studies.parquet")
+    df_17 = pd.read_parquet("brick/yearly_obs36_processed/6_20170101_hlact_studies.parquet")
+    df_18 = pd.read_parquet("brick/yearly_obs36_processed/7_20180101_hlact_studies.parquet")
+    df_19 = pd.read_parquet("brick/yearly_obs36_processed/8_20190101_hlact_studies.parquet")
+    df_20 = pd.read_parquet("brick/yearly_obs36_processed/9_20200101_hlact_studies.parquet")
+    df_21 = pd.read_parquet("brick/yearly_obs36_processed/10_20210101_hlact_studies.parquet")
+    df_22 = pd.read_parquet("brick/yearly_obs36_processed/11_20220101_hlact_studies.parquet")
+    df_23 = pd.read_parquet("brick/yearly_obs36_processed/12_20230101_hlact_studies.parquet")
+    df_24 = pd.read_parquet("brick/yearly_obs36_processed/13_20240101_hlact_studies.parquet")
 
 
     all_dfs = [df_12, df_13, df_14, df_15, df_16, 
@@ -330,9 +331,11 @@ def permutation_test(df_pre, df_post):
 
 # RUN MAIN
 if __name__ == '__main__':
+    output_dir = Path('figtab/plotter_py')
+    output_dir.mkdir(parents=True, exist_ok=True)
     # Get dataframes
-    path_pre_processed = "../brick/rule-effective-date_processed/datebefore_hlact_studies.parquet"
-    path_post_processed = "../brick/rule-effective-date_processed/dateafter_hlact_studies.parquet"
+    path_pre_processed = "brick/rule-effective-date_processed/datebefore_hlact_studies.parquet"
+    path_post_processed = "brick/rule-effective-date_processed/dateafter_hlact_studies.parquet"
     df_pre, df_post, df_overall, df_prepost_12, df_prepost_36 = utils.get_dataframes(
         path_pre_processed, 
         path_post_processed
@@ -343,20 +346,20 @@ if __name__ == '__main__':
     # - table_rates_overall.csv,
     # - table_rates_subgroup.csv, 
     # - table_composition_subgroup.csv
-    print("\n Creating and saving in ../figtab/")
+    print(f"\n Creating and saving in {output_dir}")
     print("- table_rates_overall.csv")
     print("- table_rates_subgroup.csv")
     print("- table_composition_subgroup.csv \n")
     
     table_rates_overall_save = table_rates_overall(df_overall, df_pre, df_post)
-    table_rates_overall_save.to_csv("../figtab/table_rates_overall.csv", index=False)
+    table_rates_overall_save.to_csv(output_dir / "table_rates_overall.csv", index=False)
 
     table_rates_subgroup_save = table_rates_subgroup(df_prepost_12, df_prepost_36)
-    table_rates_subgroup_save.to_csv("../figtab/table_rates_subgroup.csv", index=False) 
+    table_rates_subgroup_save.to_csv(output_dir / "table_rates_subgroup.csv", index=False) 
 
     # only needs one of them df_prepost_12, redundant columns in both 12 and 36
     table_composition_subgroup_save = table_composition_subgroup(df_prepost_12) 
-    table_composition_subgroup_save.to_csv("../figtab/table_composition_subgroup.csv", index=False) 
+    table_composition_subgroup_save.to_csv(output_dir / "table_composition_subgroup.csv", index=False) 
 
 
     
@@ -365,28 +368,29 @@ if __name__ == '__main__':
     # - p_lollipop_36.png : shows subgroups pre/post rr36mo on lollipop chart
     # - p_boxplot_yearly.png  : shows boxplots of time to report of those who report within 36mo
     # - p_barchart_yearly.png : shows proportion of those who report within 36mo
-    print("\n Creating and saving in ../figtab/ ")
+    print(f"\n Creating and saving in {output_dir}")
     print("- p_lollipop_12.svg and _36.svg")
     print("- p_boxplot_yearly.svg and p_barchart_yearly.svg \n")
     
     p_lollipop_12, p_lollipop_36 = plot_lollipop(df_prepost_12, df_prepost_36)
     bokeh.io.show(bokeh.layouts.row(p_lollipop_12, p_lollipop_36))
-    bokeh.io.export_svg(p_lollipop_12, filename='p_lollipop_12.svg')
-    bokeh.io.export_svg(p_lollipop_36, filename='p_lollipop_36.svg')
+    bokeh.io.export_svg(p_lollipop_12, filename=output_dir / 'p_lollipop_12.svg')
+    bokeh.io.export_svg(p_lollipop_36, filename=output_dir / 'p_lollipop_36.svg')
 
     p_boxplot_yearly, p_barchart_yearly = plot_boxplot_yearly()
     bokeh.io.show(bokeh.layouts.column(p_boxplot_yearly, p_barchart_yearly))
-    bokeh.io.export_svg(p_boxplot_yearly, filename='p_boxplot_yearly.svg')
-    bokeh.io.export_svg(p_barchart_yearly, filename='p_barchart_yearly.svg')
+    bokeh.io.export_svg(p_boxplot_yearly, filename=output_dir / 'p_boxplot_yearly.svg')
+    bokeh.io.export_svg(p_barchart_yearly, filename=output_dir / 'p_barchart_yearly.svg')
 
 
     
     # Create and save 
     # - permutation_results.csv
-    print("\n Creating and saving ../figtab/permutation_results.csv...")
+    output_permutation_path = output_dir / "permutation_results.csv"
+    print(f"\n Creating and saving {output_permutation_path}...")
     
     permutation_results = permutation_test(df_pre, df_post)
-    permutation_results.to_csv("../figtab/permutation_results.csv", index=False) 
+    permutation_results.to_csv(output_permutation_path, index=False) 
 
     pass
 
