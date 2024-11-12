@@ -57,7 +57,7 @@
               parallelWithPerlEnv = pkgs.stdenv.mkDerivation {
                 name = "parallel-with-perl-env";
                 buildInputs = [ pkgs.parallel pkgs.makeWrapper ];
-                propagatedBuildInputs = [ extraPerlPackages ];
+                propagatedBuildInputs = extraPerlPackages;
                 unpackPhase = "true";
                 installPhase = ''
                   mkdir -p $out/bin
