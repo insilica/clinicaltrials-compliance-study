@@ -1909,3 +1909,30 @@ stages:
       hash: md5
       md5: 2d077c9ba40313578c19d1282734c7c0
       size: 1583593
+  plotter_py:
+    cmd: "python3 analysis/plotter.py\n"
+    deps:
+    - path: analysis/plotter.py
+      hash: md5
+      md5: aec5b3db0c9b2c9f88319fe5f1e6ca49
+      size: 15847
+    - path: analysis/utils.py
+      hash: md5
+      md5: eaac24364b7b89e4d11c23315a970909
+      size: 4888
+    - path: brick/rule-effective-date_processed
+      hash: md5
+      md5: a4330e3c2dc160c6b7b59a45215bf0c7.dir
+      size: 1692827
+      nfiles: 2
+    - path: brick/yearly_obs36_processed
+      hash: md5
+      md5: 103192c6b313182437881466c4b56f0a.dir
+      size: 4279189
+      nfiles: 13
+    outs:
+    - path: figtab/plotter_py
+      hash: md5
+      md5: 3f684049db09a84e24e9d5d3a06665b9.dir
+      size: 102888
+      nfiles: 8
