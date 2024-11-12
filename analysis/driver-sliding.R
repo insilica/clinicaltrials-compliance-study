@@ -28,6 +28,9 @@ windows <- window.params.filter.by.prefix(params, prefix)
 agg.windows <- process.windows.init(windows) |>
   process.windows.amend.results_reported()
 
+windows.hlact.write(glue('brick/{prefix}_processed'),
+                    agg.windows)
+
 plot.windows.pct.scatterline(agg.windows)
 
 if( FALSE ) {

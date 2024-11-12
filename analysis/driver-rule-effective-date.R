@@ -31,6 +31,9 @@ process.compare.rule_effective.agg.window <- function() {
 }
 
 agg.window.compare.rule_effective <- process.compare.rule_effective.agg.window()
+
+windows.hlact.write('brick/rule-effective-date_processed', agg.window.compare.rule_effective)
+
 plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE)
 plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE, with_facet = NULL)
 
