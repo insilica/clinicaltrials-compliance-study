@@ -22,6 +22,10 @@
 
           TemplateToolkitSimple    = final.callPackage ./maint/nixpkg/perl/template-toolkit-simple.nix {};
         };
+
+        rPackages = prev.rPackages // {
+          arrow = final.callPackage ./maint/nixpkg/r/arrow.nix {};
+        };
       };
     } //
     flake-utils.lib.eachDefaultSystem (system:
