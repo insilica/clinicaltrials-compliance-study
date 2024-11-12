@@ -61,27 +61,31 @@
                     --set PERL5LIB "${with pkgs.perlPackages; makeFullPerlPath (extraPerlPackages)}"
                 '';
               };
+              extraRPackages = with pkgs.rPackages; [
+                  arrow assertthat
+                  blandr broom
+                  ComplexUpset cthist
+                  DBI dotenv dplyr
+                  forcats fs
+                  ggplot2 ggsurvfit glue gtsummary
+                  here
+                  listr logger lubridate
+                  pacman parsedate patchwork purrr
+                  readr rlang RPostgres
+                  scales stringr survival survminer
+                  this_path tidyr tidyverse
+                  vroom
+                  yaml
+                ];
+              rEnv = pkgs.rWrapper.override {
+                packages = extraRPackages;
+              };
                 in {
             buildInputs =
-              [ parallelWithPerlEnv ]
+              [ parallelWithPerlEnv rEnv ]
               ++ oldAttrs.buildInputs
               ++ [ (pkgs.python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
-              ++ (with pkgs.rPackages; [
-                            arrow assertthat
-                            blandr broom
-                            ComplexUpset cthist
-                            DBI dotenv dplyr
-                            forcats fs
-                            ggplot2 ggsurvfit glue gtsummary
-                            here
-                            listr logger lubridate
-                            pacman parsedate patchwork purrr
-                            readr rlang RPostgres
-                            scales stringr survival survminer
-                            this_path tidyr tidyverse
-                            vroom
-                            yaml
-                    ]);
+              ;
             env = oldAttrs.env // {
               LC_ALL = "C";
             };
