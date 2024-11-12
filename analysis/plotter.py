@@ -110,6 +110,7 @@ def _lollipop_plotter(df_prepost, within=36):
     size_dot = 9
     height, width = 450, 500
     p = bokeh.plotting.figure(
+        output_backend='svg',
         y_range=bokeh.models.FactorRange(*tuples[::-1]), 
         height=height, width=width, title=f"Results reported within {within} months",
         x_axis_label=f'% reporting within {within} months', x_range=(0,1)
@@ -191,6 +192,7 @@ def plot_boxplot_yearly():
     
     
     p = bokeh.plotting.figure(
+        output_backend='svg',
         height=400, width=600, y_range=(0, 52),
         x_axis_label='Start year', y_axis_label='months to report',
         title='*Of those reported* within 36 months, quantiles of months to report',
@@ -242,6 +244,7 @@ def plot_boxplot_yearly():
     p_report = d_p_report.values()
     
     p = bokeh.plotting.figure(
+        output_backend='svg',
         height=300, width=500, y_range=(-0.05, 1),
         x_axis_label='Cutoff year', y_axis_label='months to report',
         title='% Reporting Results within 36 months',
