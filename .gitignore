@@ -6,3 +6,4 @@
 /_build
 
 Rplots.pdf
+__pycache__/

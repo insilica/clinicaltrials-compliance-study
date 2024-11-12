@@ -57,7 +57,7 @@
               parallelWithPerlEnv = pkgs.stdenv.mkDerivation {
                 name = "parallel-with-perl-env";
                 buildInputs = [ pkgs.parallel pkgs.makeWrapper ];
-                propagatedBuildInputs = [ extraPerlPackages ];
+                propagatedBuildInputs = extraPerlPackages;
                 unpackPhase = "true";
                 installPhase = ''
                   mkdir -p $out/bin
@@ -84,11 +84,32 @@
               rEnv = pkgs.rWrapper.override {
                 packages = extraRPackages;
               };
+
+              python3PackageOverrides = pkgs.callPackage ./maint/nixpkg/python3/packages.nix { };
+              python = pkgs.python3.override { packageOverrides = python3PackageOverrides; };
+              extraPython3Packages = ps: with ps; [
+                  numpy
+                  pandas
+                  scipy
+                  pyarrow
+                  fastparquet
+                  openpyxl
+                  bokeh
+                  tqdm
+                  iqplot
+                  ipython
+                  selenium
+                ];
+              python3Env = python.withPackages extraPython3Packages ;
                 in {
             buildInputs =
-              [ parallelWithPerlEnv rEnv ]
-              ++ oldAttrs.buildInputs
-              ++ [ (pkgs.python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
+              [
+                parallelWithPerlEnv
+                rEnv
+                python3Env
+                pkgs.chromium
+                pkgs.chromedriver
+              ] ++ oldAttrs.buildInputs
               ;
             env = oldAttrs.env // {
               LC_ALL = "C";

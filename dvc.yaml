@@ -111,6 +111,7 @@ stages:
       - analysis/driver-sliding.R
     outs:
       - figtab/long-observe
+      - brick/long-observe_processed
   analysis-driver-sliding_yearly_obs36:
     cmd: |
       Rscript analysis/driver-sliding.R params.yaml yearly_obs36
@@ -120,6 +121,7 @@ stages:
       - analysis/driver-sliding.R
     outs:
       - figtab/yearly_obs36
+      - brick/yearly_obs36_processed
   analysis-driver-anderson2015-compare-stacked:
     cmd: |
       Rscript analysis/driver-anderson2015-compare-stacked.R
@@ -141,3 +143,14 @@ stages:
       - analysis/driver-rule-effective-date.R
     outs:
       - figtab/rule-effective
+      - brick/rule-effective-date_processed
+  plotter_py:
+    cmd: |
+      python3 analysis/plotter.py
+    deps:
+      - analysis/plotter.py
+      - analysis/utils.py
+      - brick/rule-effective-date_processed
+      - brick/yearly_obs36_processed
+    outs:
+      - figtab/plotter_py

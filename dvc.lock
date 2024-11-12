@@ -697,8 +697,8 @@ stages:
     deps:
     - path: analysis/driver-sliding.R
       hash: md5
-      md5: f09469d9cd2ad4a87e07a02842aa4cee
-      size: 1110
+      md5: 8a565a69f139ecf2195eac78dfdb796f
+      size: 1198
     - path: brick/long-observe
       hash: md5
       md5: 6c67982e1e1b1ddadb623a5c22afc911.dir
@@ -709,10 +709,15 @@ stages:
       md5: 59a86acc308c6ac883bc751ebac18b44
       size: 10815
     outs:
+    - path: brick/long-observe_processed
+      hash: md5
+      md5: 7f114558dc386ab62373d7dec0ff773d.dir
+      size: 4431208
+      nfiles: 4
     - path: figtab/long-observe
       hash: md5
-      md5: ef6ebb204049b0cd5e7d024cdd14d9fa.dir
-      size: 687048
+      md5: 8e983307945ff0c828c2179f207266b6.dir
+      size: 895362
       nfiles: 3
   build-ctgov-studies-all@rule-effective-date-before:
     cmd:
@@ -877,21 +882,21 @@ stages:
     outs:
     - path: figtab/anderson2015.new
       hash: md5
-      md5: 5b5ebfa58ab3bffe6b6a5a5c4f3f0333.dir
-      size: 179672
+      md5: cbc7daa8adf1de14e8808960d23b5af1.dir
+      size: 190075
       nfiles: 1
     - path: figtab/anderson2015.original
       hash: md5
-      md5: 499dadb4e81539542cef5d9c0c0b10b5.dir
-      size: 183379
+      md5: 3e26d4af9cf6c456f8997884d0c300c8.dir
+      size: 193670
       nfiles: 1
   analysis-driver-rule-effective-date:
     cmd: "Rscript analysis/driver-rule-effective-date.R\n"
     deps:
     - path: analysis/driver-rule-effective-date.R
       hash: md5
-      md5: 779af7ddd2e57d2dd29e205d8334c1fb
-      size: 3130
+      md5: 360b8ffff854d31391b2b40c0452734b
+      size: 3226
     - path: brick/rule-effective-date-after
       hash: md5
       md5: 5443d6aa379ea48e231086ec016b6e4e.dir
@@ -907,10 +912,15 @@ stages:
       md5: 59a86acc308c6ac883bc751ebac18b44
       size: 10815
     outs:
+    - path: brick/rule-effective-date_processed
+      hash: md5
+      md5: a4330e3c2dc160c6b7b59a45215bf0c7.dir
+      size: 1692827
+      nfiles: 2
     - path: figtab/rule-effective
       hash: md5
-      md5: 180ac882f14cb3929cc1fad29a50a4e7.dir
-      size: 2046379
+      md5: 9b4f721ed59d9e2fb4494ed1be1a3fcb.dir
+      size: 2073723
       nfiles: 10
   build-ctgov-studies-all@yearly_obs36_n-1_20120101:
     cmd:
@@ -1697,8 +1707,8 @@ stages:
     deps:
     - path: analysis/driver-sliding.R
       hash: md5
-      md5: f09469d9cd2ad4a87e07a02842aa4cee
-      size: 1110
+      md5: 8a565a69f139ecf2195eac78dfdb796f
+      size: 1198
     - path: brick/yearly_obs36
       hash: md5
       md5: e42223413aafb8cfae72b046cafe136f.dir
@@ -1709,10 +1719,15 @@ stages:
       md5: 59a86acc308c6ac883bc751ebac18b44
       size: 10815
     outs:
+    - path: brick/yearly_obs36_processed
+      hash: md5
+      md5: 103192c6b313182437881466c4b56f0a.dir
+      size: 4279189
+      nfiles: 13
     - path: figtab/yearly_obs36
       hash: md5
-      md5: ec2c46b8137f1884f1bffc649893726f.dir
-      size: 1341718
+      md5: c04d2380b575f381a748593208ba141f.dir
+      size: 1706369
       nfiles: 3
   build-ctgov-studies-all@pre-post-2017_n-1_20200101:
     cmd:
@@ -1894,3 +1909,30 @@ stages:
       hash: md5
       md5: 2d077c9ba40313578c19d1282734c7c0
       size: 1583593
+  plotter_py:
+    cmd: "python3 analysis/plotter.py\n"
+    deps:
+    - path: analysis/plotter.py
+      hash: md5
+      md5: aec5b3db0c9b2c9f88319fe5f1e6ca49
+      size: 15847
+    - path: analysis/utils.py
+      hash: md5
+      md5: eaac24364b7b89e4d11c23315a970909
+      size: 4888
+    - path: brick/rule-effective-date_processed
+      hash: md5
+      md5: a4330e3c2dc160c6b7b59a45215bf0c7.dir
+      size: 1692827
+      nfiles: 2
+    - path: brick/yearly_obs36_processed
+      hash: md5
+      md5: 103192c6b313182437881466c4b56f0a.dir
+      size: 4279189
+      nfiles: 13
+    outs:
+    - path: figtab/plotter_py
+      hash: md5
+      md5: 3f684049db09a84e24e9d5d3a06665b9.dir
+      size: 102888
+      nfiles: 8
