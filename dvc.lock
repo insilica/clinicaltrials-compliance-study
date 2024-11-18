@@ -895,28 +895,18 @@ stages:
     deps:
     - path: analysis/driver-rule-effective-date.R
       hash: md5
-      md5: 360b8ffff854d31391b2b40c0452734b
-      size: 3226
-    - path: brick/rule-effective-date-after
+      md5: 27638226cea7c95f60fe7d4c84b6d3aa
+      size: 2739
+    - path: brick/rule-effective-date_processed
       hash: md5
-      md5: 5443d6aa379ea48e231086ec016b6e4e.dir
-      size: 26011835
-      nfiles: 2
-    - path: brick/rule-effective-date-before
-      hash: md5
-      md5: eeb78101e84ae3b0b9ef4da5e955cbe2.dir
-      size: 12250678
-      nfiles: 2
+      md5: 3d26c7d1f89242097ae1b7c106e2eb99.dir
+      size: 29292871
+      nfiles: 3
     - path: params.yaml
       hash: md5
       md5: 59a86acc308c6ac883bc751ebac18b44
       size: 10815
     outs:
-    - path: brick/rule-effective-date_processed
-      hash: md5
-      md5: a4330e3c2dc160c6b7b59a45215bf0c7.dir
-      size: 1692827
-      nfiles: 2
     - path: figtab/rule-effective
       hash: md5
       md5: 9b4f721ed59d9e2fb4494ed1be1a3fcb.dir
@@ -1922,17 +1912,155 @@ stages:
       size: 4888
     - path: brick/rule-effective-date_processed
       hash: md5
-      md5: a4330e3c2dc160c6b7b59a45215bf0c7.dir
-      size: 1692827
-      nfiles: 2
+      md5: 3d26c7d1f89242097ae1b7c106e2eb99.dir
+      size: 29292871
+      nfiles: 3
     - path: brick/yearly_obs36_processed
       hash: md5
-      md5: 103192c6b313182437881466c4b56f0a.dir
-      size: 4279189
-      nfiles: 13
+      md5: 1316bbc32455e162f6dd88de47a0cf2e.dir
+      size: 135919195
+      nfiles: 14
     outs:
     - path: figtab/plotter_py
       hash: md5
-      md5: 3f684049db09a84e24e9d5d3a06665b9.dir
+      md5: 2b7c286756f85998663c7b14e62bf71c.dir
       size: 102888
       nfiles: 8
+  process-driver-sliding@long-observe:
+    cmd: Rscript analysis/driver-sliding-process.R params.yaml long-observe
+    deps:
+    - path: analysis/driver-sliding-process.R
+      hash: md5
+      md5: 9e4b8c2f0237470963a29a82f15550d7
+      size: 799
+    - path: brick/long-observe
+      hash: md5
+      md5: 6c67982e1e1b1ddadb623a5c22afc911.dir
+      size: 72658774
+      nfiles: 8
+    - path: params.yaml
+      hash: md5
+      md5: 59a86acc308c6ac883bc751ebac18b44
+      size: 10815
+    outs:
+    - path: brick/long-observe_processed
+      hash: md5
+      md5: 399cefaed480491308fcef23e8323297.dir
+      size: 56869554
+      nfiles: 5
+  process-driver-sliding@yearly_obs36:
+    cmd: Rscript analysis/driver-sliding-process.R params.yaml yearly_obs36
+    deps:
+    - path: analysis/driver-sliding-process.R
+      hash: md5
+      md5: 9e4b8c2f0237470963a29a82f15550d7
+      size: 799
+    - path: brick/yearly_obs36
+      hash: md5
+      md5: e42223413aafb8cfae72b046cafe136f.dir
+      size: 186385871
+      nfiles: 26
+    - path: params.yaml
+      hash: md5
+      md5: 59a86acc308c6ac883bc751ebac18b44
+      size: 10815
+    outs:
+    - path: brick/yearly_obs36_processed
+      hash: md5
+      md5: 1316bbc32455e162f6dd88de47a0cf2e.dir
+      size: 135919195
+      nfiles: 14
+  analysis-driver-sliding@long-observe:
+    cmd: "Rscript analysis/driver-sliding.R params.yaml long-observe\n"
+    deps:
+    - path: analysis/driver-sliding.R
+      hash: md5
+      md5: 2fc642f080c3e17d08a22a6a4ac88325
+      size: 970
+    - path: brick/long-observe_processed
+      hash: md5
+      md5: 399cefaed480491308fcef23e8323297.dir
+      size: 56869554
+      nfiles: 5
+    - path: params.yaml
+      hash: md5
+      md5: 59a86acc308c6ac883bc751ebac18b44
+      size: 10815
+    outs:
+    - path: figtab/long-observe
+      hash: md5
+      md5: 8e983307945ff0c828c2179f207266b6.dir
+      size: 895362
+      nfiles: 3
+  analysis-driver-sliding@yearly_obs36:
+    cmd: "Rscript analysis/driver-sliding.R params.yaml yearly_obs36\n"
+    deps:
+    - path: analysis/driver-sliding.R
+      hash: md5
+      md5: 2fc642f080c3e17d08a22a6a4ac88325
+      size: 970
+    - path: brick/yearly_obs36_processed
+      hash: md5
+      md5: 1316bbc32455e162f6dd88de47a0cf2e.dir
+      size: 135919195
+      nfiles: 14
+    - path: params.yaml
+      hash: md5
+      md5: 59a86acc308c6ac883bc751ebac18b44
+      size: 10815
+    outs:
+    - path: figtab/yearly_obs36
+      hash: md5
+      md5: c04d2380b575f381a748593208ba141f.dir
+      size: 1706369
+      nfiles: 3
+  process-driver-rule-effective-date:
+    cmd: "Rscript analysis/driver-rule-effective-date-process.R\n"
+    deps:
+    - path: analysis/driver-rule-effective-date-process.R
+      hash: md5
+      md5: c3dac5d2b58bb90c583282abdfa65256
+      size: 799
+    - path: brick/rule-effective-date-after
+      hash: md5
+      md5: 5443d6aa379ea48e231086ec016b6e4e.dir
+      size: 26011835
+      nfiles: 2
+    - path: brick/rule-effective-date-before
+      hash: md5
+      md5: eeb78101e84ae3b0b9ef4da5e955cbe2.dir
+      size: 12250678
+      nfiles: 2
+    - path: params.yaml
+      hash: md5
+      md5: 59a86acc308c6ac883bc751ebac18b44
+      size: 10815
+    outs:
+    - path: brick/rule-effective-date_processed
+      hash: md5
+      md5: 3d26c7d1f89242097ae1b7c106e2eb99.dir
+      size: 29292871
+      nfiles: 3
+  aggregate-data:
+    cmd: "Rscript analysis/driver-aggregate-data.R\n"
+    deps:
+    - path: analysis/driver-aggregate-data.R
+      hash: md5
+      md5: b8aa95bfbc0c2ef35c4f05f19f42d989
+      size: 8393
+    - path: brick/rule-effective-date_processed
+      hash: md5
+      md5: 3d26c7d1f89242097ae1b7c106e2eb99.dir
+      size: 29292871
+      nfiles: 3
+    - path: brick/yearly_obs36_processed
+      hash: md5
+      md5: 1316bbc32455e162f6dd88de47a0cf2e.dir
+      size: 135919195
+      nfiles: 14
+    outs:
+    - path: figtab/aggregate-data
+      hash: md5
+      md5: 23a2e0a3f23e283fd9dcc21698aafeea.dir
+      size: 20151
+      nfiles: 1
