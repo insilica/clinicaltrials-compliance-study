@@ -21,3 +21,14 @@ create_date_month_int <- function(year, month) {
 create_date_partial <- function(date_string) {
   parse_date_time(date_string, c('ymd', 'ym'))
 }
+
+# Results reported within an interval (inclusive).
+dateproc.results_reported.within_inc <- function(data, period) {
+  if(period < days(1)) {
+    stop("Period must be greater than days(1).")
+  }
+  return (with(data, {
+        ( interval(common.primary_completion_date_imputed, common.results_received_date) < period + days(1) ) |>
+        replace_na(FALSE)
+  }))
+}
