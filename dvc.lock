@@ -422,36 +422,6 @@ stages:
       hash: md5
       md5: 127686e57d85a4c7ebcb8e1cfe265d80
       size: 1704928
-  analysis-driver-sliding-window:
-    cmd: echo "test"
-    deps:
-    - path: brick/sliding-window
-      hash: md5
-      md5: 78fcb16d97b4959f396aad983f1a6ce4.dir
-      size: 68920013
-      nfiles: 10
-  analysis-driver-sliding_sliding-window:
-    cmd: "Rscript analysis/driver-sliding.R params.yaml sliding-window\n"
-    deps:
-    - path: analysis/driver-sliding.R
-      hash: md5
-      md5: 62e4be02b6c535b8c6b6ec6c250430ca
-      size: 6709
-    - path: brick/sliding-window
-      hash: md5
-      md5: 8a4493ab5c508ad74a96b8362c26b017.dir
-      size: 68661228
-      nfiles: 10
-    - path: params.yaml
-      hash: md5
-      md5: 8a3e78f684c5d24b264f290221bde6c7
-      size: 3685
-    outs:
-    - path: figtab/sliding-window
-      hash: md5
-      md5: 5c1cbae40bca02e2c8e7f240bb5d7a12.dir
-      size: 1891218
-      nfiles: 7
   build-ctgov-studies-all@long-observe_n-1_20170101:
     cmd:
     - mkdir -p $(dirname brick/long-observe/n-1_20170101/ctgov-studies-all.parquet)
@@ -692,33 +662,6 @@ stages:
       hash: md5
       md5: 83ddae3188911ea20acf357821be4542
       size: 1346287
-  analysis-driver-sliding_long-observe:
-    cmd: "Rscript analysis/driver-sliding.R params.yaml long-observe\n"
-    deps:
-    - path: analysis/driver-sliding.R
-      hash: md5
-      md5: 8a565a69f139ecf2195eac78dfdb796f
-      size: 1198
-    - path: brick/long-observe
-      hash: md5
-      md5: 6c67982e1e1b1ddadb623a5c22afc911.dir
-      size: 72658774
-      nfiles: 8
-    - path: params.yaml
-      hash: md5
-      md5: 59a86acc308c6ac883bc751ebac18b44
-      size: 10815
-    outs:
-    - path: brick/long-observe_processed
-      hash: md5
-      md5: 7f114558dc386ab62373d7dec0ff773d.dir
-      size: 4431208
-      nfiles: 4
-    - path: figtab/long-observe
-      hash: md5
-      md5: 8e983307945ff0c828c2179f207266b6.dir
-      size: 895362
-      nfiles: 3
   build-ctgov-studies-all@rule-effective-date-before:
     cmd:
     - mkdir -p $(dirname brick/rule-effective-date-before/ctgov-studies-all.parquet)
@@ -1692,33 +1635,6 @@ stages:
       hash: md5
       md5: 08272293814b8a0a1459baa78718eee4
       size: 454228
-  analysis-driver-sliding_yearly_obs36:
-    cmd: "Rscript analysis/driver-sliding.R params.yaml yearly_obs36\n"
-    deps:
-    - path: analysis/driver-sliding.R
-      hash: md5
-      md5: 8a565a69f139ecf2195eac78dfdb796f
-      size: 1198
-    - path: brick/yearly_obs36
-      hash: md5
-      md5: e42223413aafb8cfae72b046cafe136f.dir
-      size: 186385871
-      nfiles: 26
-    - path: params.yaml
-      hash: md5
-      md5: 59a86acc308c6ac883bc751ebac18b44
-      size: 10815
-    outs:
-    - path: brick/yearly_obs36_processed
-      hash: md5
-      md5: 103192c6b313182437881466c4b56f0a.dir
-      size: 4279189
-      nfiles: 13
-    - path: figtab/yearly_obs36
-      hash: md5
-      md5: c04d2380b575f381a748593208ba141f.dir
-      size: 1706369
-      nfiles: 3
   build-ctgov-studies-all@pre-post-2017_n-1_20200101:
     cmd:
     - mkdir -p $(dirname brick/pre-post-2017/n-1_20200101/ctgov-studies-all.parquet)
