@@ -93,35 +93,21 @@ stages:
       outs:
         - ${item.output.hlact-filtered}
         - brick/flowchart-counts/${key}.csv
-  #analysis-driver-sliding_sliding-window:
-  #  cmd: |
-  #    Rscript analysis/driver-sliding.R params.yaml sliding-window
-  #  deps:
-  #    - brick/sliding-window
-  #    - params.yaml
-  #    - analysis/driver-sliding.R
-  #  outs:
-  #    - figtab/sliding-window
-  analysis-driver-sliding_long-observe:
-    cmd: |
-      Rscript analysis/driver-sliding.R params.yaml long-observe
-    deps:
-      - brick/long-observe
-      - params.yaml
-      - analysis/driver-sliding.R
-    outs:
-      - figtab/long-observe
-      - brick/long-observe_processed
-  analysis-driver-sliding_yearly_obs36:
-    cmd: |
-      Rscript analysis/driver-sliding.R params.yaml yearly_obs36
-    deps:
-      - brick/yearly_obs36
-      - params.yaml
-      - analysis/driver-sliding.R
-    outs:
-      - figtab/yearly_obs36
-      - brick/yearly_obs36_processed
+  analysis-driver-sliding:
+    foreach:
+      #- sliding-window
+      - long-observe
+      - yearly_obs36
+    do:
+      cmd: |
+        Rscript analysis/driver-sliding.R params.yaml ${item}
+      deps:
+        - brick/${item}
+        - params.yaml
+        - analysis/driver-sliding.R
+      outs:
+        - figtab/${item}
+        - brick/${item}_processed
   analysis-driver-anderson2015-compare-stacked:
     cmd: |
       Rscript analysis/driver-anderson2015-compare-stacked.R
