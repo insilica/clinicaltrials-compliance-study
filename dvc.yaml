@@ -93,35 +93,34 @@ stages:
       outs:
         - ${item.output.hlact-filtered}
         - brick/flowchart-counts/${key}.csv
-  #analysis-driver-sliding_sliding-window:
-  #  cmd: |
-  #    Rscript analysis/driver-sliding.R params.yaml sliding-window
-  #  deps:
-  #    - brick/sliding-window
-  #    - params.yaml
-  #    - analysis/driver-sliding.R
-  #  outs:
-  #    - figtab/sliding-window
-  analysis-driver-sliding_long-observe:
-    cmd: |
-      Rscript analysis/driver-sliding.R params.yaml long-observe
-    deps:
-      - brick/long-observe
-      - params.yaml
-      - analysis/driver-sliding.R
-    outs:
-      - figtab/long-observe
-      - brick/long-observe_processed
-  analysis-driver-sliding_yearly_obs36:
-    cmd: |
-      Rscript analysis/driver-sliding.R params.yaml yearly_obs36
-    deps:
-      - brick/yearly_obs36
-      - params.yaml
-      - analysis/driver-sliding.R
-    outs:
-      - figtab/yearly_obs36
-      - brick/yearly_obs36_processed
+  process-driver-sliding:
+    foreach:
+      #- sliding-window
+      - long-observe
+      - yearly_obs36
+    do:
+      cmd:
+        Rscript analysis/driver-sliding-process.R params.yaml ${item}
+      deps:
+        - brick/${item}
+        - params.yaml
+        - analysis/driver-sliding-process.R
+      outs:
+        - brick/${item}_processed
+  analysis-driver-sliding:
+    foreach:
+      #- sliding-window
+      - long-observe
+      - yearly_obs36
+    do:
+      cmd: |
+        Rscript analysis/driver-sliding.R params.yaml ${item}
+      deps:
+        - brick/${item}_processed
+        - params.yaml
+        - analysis/driver-sliding.R
+      outs:
+        - figtab/${item}
   analysis-driver-anderson2015-compare-stacked:
     cmd: |
       Rscript analysis/driver-anderson2015-compare-stacked.R
@@ -133,17 +132,25 @@ stages:
     outs:
       - figtab/anderson2015.original
       - figtab/anderson2015.new
-  analysis-driver-rule-effective-date:
+  process-driver-rule-effective-date:
     cmd: |
-      Rscript analysis/driver-rule-effective-date.R
+      Rscript analysis/driver-rule-effective-date-process.R
     deps:
       - brick/rule-effective-date-before
       - brick/rule-effective-date-after
       - params.yaml
+      - analysis/driver-rule-effective-date-process.R
+    outs:
+      - brick/rule-effective-date_processed
+  analysis-driver-rule-effective-date:
+    cmd: |
+      Rscript analysis/driver-rule-effective-date.R
+    deps:
+      - brick/rule-effective-date_processed
+      - params.yaml
       - analysis/driver-rule-effective-date.R
     outs:
       - figtab/rule-effective
-      - brick/rule-effective-date_processed
   plotter_py:
     cmd: |
       python3 analysis/plotter.py
@@ -154,3 +161,12 @@ stages:
       - brick/yearly_obs36_processed
     outs:
       - figtab/plotter_py
+  aggregate-data:
+    cmd: |
+      Rscript analysis/driver-aggregate-data.R
+    deps:
+      - analysis/driver-aggregate-data.R
+      - brick/rule-effective-date_processed
+      - brick/yearly_obs36_processed
+    outs:
+      - figtab/aggregate-data

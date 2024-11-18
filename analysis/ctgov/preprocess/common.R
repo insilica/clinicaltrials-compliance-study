@@ -20,7 +20,22 @@ preprocess_data.common <- function(data, start_date, stop_date, censor_date) {
       common.pc_year_imputed = year(common.primary_completion_date_imputed),
     ) |>
     preprocess_data.common.survival(censor_date) |>
-    preprocess_data.common.regression(start_date, stop_date)
+    preprocess_data.common.regression(start_date, stop_date) |>
+    preprocess_data.common.reporting()
 
+  return(data)
+}
+
+preprocess_data.common.reporting <- function(data) {
+  data <- data |>
+    # Define the variables for reporting by a particular time, either by
+    mutate(
+      # - 12 months or
+      cr.results_reported_12mo =
+	dateproc.results_reported.within_inc(pick(everything()), months(12)),
+      # - 36 months
+      cr.results_reported_36mo =
+	dateproc.results_reported.within_inc(pick(everything()), months(36)),
+    )
   return(data)
 }

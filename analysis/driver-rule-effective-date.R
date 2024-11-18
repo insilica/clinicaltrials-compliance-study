@@ -6,8 +6,6 @@ pacman::p_load( logger )
 
 source('analysis/ctgov.R')
 
-params <- window.params.read()
-
 window.titles <- list(
   'rule-effective-date-before' = 'Before Rule Effective Date',
   'rule-effective-date-after'  = 'After Rule Effective Date'
@@ -20,19 +18,7 @@ strat.var.labels <- list(
   fit.status        = 'Trial Status'#,
 )
 
-process.compare.rule_effective.agg.window <- function() {
-  params.filtered <- params |>
-    window.params.filter.by.name('^rule-effective-date-(before|after)$') |>
-    window.params.apply.prefix('rule-effective')
-  print(names(params.filtered))
-  agg.windows <- process.windows.init(params.filtered) |>
-    process.windows.amend.results_reported()
-  return(agg.windows)
-}
-
-agg.window.compare.rule_effective <- process.compare.rule_effective.agg.window()
-
-windows.hlact.write('brick/rule-effective-date_processed', agg.window.compare.rule_effective)
+agg.window.compare.rule_effective <- windows.rdata.read('brick/rule-effective-date_processed')
 
 plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE)
 plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE, with_facet = NULL)
