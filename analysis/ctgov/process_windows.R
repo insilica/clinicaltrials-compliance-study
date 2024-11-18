@@ -103,4 +103,14 @@ windows.hlact.write <- function(dirpath, agg.windows) {
   }
 }
 
+windows.rdata.write <- function(dirpath, agg.windows) {
+  fs::dir_create(dirpath)
+  save(agg.windows, file = file.path(dirpath, 'agg.windows.Rdata'))
+}
+
+windows.rdata.read <- function(dirpath, agg.windows) {
+  load(file.path(dirpath, 'agg.windows.Rdata'))
+  return(agg.windows)
+}
+
 # }}}
