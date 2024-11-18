@@ -90,6 +90,8 @@ agg.window.compare.rule_effective <- windows.rdata.read('brick/rule-effective-da
 w1 <- agg.window.compare.rule_effective[["rule-effective-date-before"]]
 w2 <- agg.window.compare.rule_effective[["rule-effective-date-after"]]
 
+agg.windows.yearly_obs36 <- windows.rdata.read('brick/yearly_obs36_processed')
+
 add_data.window_agg.subset <- function(data,
                                        window.hlact,
                                        prefix, name,
@@ -157,6 +159,22 @@ add_data.window_agg <- function(data, window.hlact, prefix, name) {
   return(data)
 }
 
+add_data.window_yearly <- function(data) {
+  for (name in names(agg.windows.yearly_obs36)) {
+    w <- agg.windows.yearly_obs36[[name]]
+    y.start  <- w$window$date$start  |> year()
+    y.stop   <- w$window$date$stop   |> year()
+    y.cutoff <- w$window$date$cutoff |> year()
+    data <- ( data
+      |> add_data.window_agg.subset(w$hlact.studies,
+            prefix = glue("yearly-{y.start}-{y.stop}"),
+            name = glue("Yearly window from {y.start} to {y.stop} with cut-off in {y.cutoff}"),
+            subset.prefix = '', subset.name = 'all')
+    )
+  }
+  return(data)
+}
+
 # Add single values
 data <- ( data
   |> add_data.window_agg(window = w1$hlact.studies,
@@ -170,15 +188,36 @@ data <- ( data
                              - mean(w1$hlact.studies$cr.results_reported_12mo) ) ) |>
                       format.delta.percent(),
               unit  = "delta-percent",
-              comment = "Difference between window2-report-w-in-12-mo and window1-report-w-in-12-mo")
+              comment = "Difference between window2-pct-report-w-in-12-mo and window1-pct-report-w-in-12-mo")
 
   |> add_data(key = "window1-to-2-delta-pct-report-w-in-36-mo",
               value = ( 100*(  mean(w2$hlact.studies$cr.results_reported_36mo)
                              - mean(w1$hlact.studies$cr.results_reported_36mo) ) ) |>
                       format.delta.percent(),
               unit  = "delta-percent",
-              comment = "Difference between window2-report-w-in-36-mo and window1-report-w-in-36-mo")
+              comment = "Difference between window2-pct-report-w-in-36-mo and window1-pct-report-w-in-36-mo")
+
+  |> add_data.window_yearly()
+
+  |> add_data(key = "yearly-2015-2016-to-2016-2017-delta-pct-report-w-in-12-mo",
+              value = {
+                        window.for.year <- \(x.year) {
+                          return(
+                            agg.windows.yearly_obs36
+                            |> keep( ~ .x$window$date$start |> year() == x.year )
+                            |> getElement(1)
+                          )
+                        }
+                        y2016 <- window.for.year(2016)
+                        y2015 <- window.for.year(2015)
+                        ( 100*(  mean(y2016$hlact.studies$cr.results_reported_12mo)
+                               - mean(y2015$hlact.studies$cr.results_reported_12mo) ) )
+                       } |>
+                      format.delta.percent(),
+              unit  = "delta-percent",
+              comment = "Difference between yearly-2016-2017-pct-report-w-in-12-mo and yearly-2015-2016-pct-report-w-in-12-mo")
 )
 
 # Save the dataset
+fs::dir_create("figtab/aggregate-data")
 write.csv(data, "figtab/aggregate-data/data.csv", row.names = FALSE, na = "")

@@ -167,5 +167,6 @@ stages:
     deps:
       - analysis/driver-aggregate-data.R
       - brick/rule-effective-date_processed
+      - brick/yearly_obs36_processed
     outs:
       - figtab/aggregate-data
