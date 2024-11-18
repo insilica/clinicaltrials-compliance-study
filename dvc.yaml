@@ -93,6 +93,20 @@ stages:
       outs:
         - ${item.output.hlact-filtered}
         - brick/flowchart-counts/${key}.csv
+  process-driver-sliding:
+    foreach:
+      #- sliding-window
+      - long-observe
+      - yearly_obs36
+    do:
+      cmd:
+        Rscript analysis/driver-sliding-process.R params.yaml ${item}
+      deps:
+        - brick/${item}
+        - params.yaml
+        - analysis/driver-sliding-process.R
+      outs:
+        - brick/${item}_processed
   analysis-driver-sliding:
     foreach:
       #- sliding-window
@@ -102,12 +116,11 @@ stages:
       cmd: |
         Rscript analysis/driver-sliding.R params.yaml ${item}
       deps:
-        - brick/${item}
+        - brick/${item}_processed
         - params.yaml
         - analysis/driver-sliding.R
       outs:
         - figtab/${item}
-        - brick/${item}_processed
   analysis-driver-anderson2015-compare-stacked:
     cmd: |
       Rscript analysis/driver-anderson2015-compare-stacked.R
