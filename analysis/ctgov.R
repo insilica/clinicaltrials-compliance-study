@@ -20,6 +20,7 @@ pacman::p_load(
   assertthat,
   fs,
   glue,
+  listr,
   logger,
   patchwork,
   purrr,

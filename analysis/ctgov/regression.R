@@ -22,12 +22,10 @@ preprocess_data.common.regression <- function(data, start_date, stop_date) {
     mutate(
       # - 12 months or
       rr.results_reported_12mo =
-        ( interval(common.primary_completion_date_imputed, common.results_received_date) < months(12) + days(1) ) |>
-        replace_na(FALSE),
+	dateproc.results_reported.within_inc(pick(everything()), months(12)),
       # - 5 years.
       rr.results_reported_5yr =
-        ( interval(common.primary_completion_date_imputed, common.results_received_date) < years(5) + days(1) ) |>
-        replace_na(FALSE),
+	dateproc.results_reported.within_inc(pick(everything()), years(5)),
     ) %>%
     # Phase short names
     mutate(rr.phase =

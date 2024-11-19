@@ -1,4 +1,14 @@
 pandas>=2.2.2
 python-calamine
+numpy
+bokeh
+iqplot
+scipy
+tqdm
+
 pyarrow
 fastparquet
+openpyxl
+
+#graphviz
+#duckdb

@@ -22,11 +22,7 @@ if (length(argv) != 2) {
 params_file <- argv[1]
 prefix      <- argv[2]
 
-params <- window.params.read( params_file = params_file )
-windows <- window.params.filter.by.prefix(params, prefix)
-
-agg.windows <- process.windows.init(windows) |>
-  process.windows.amend.results_reported()
+agg.windows <- windows.rdata.read(glue('brick/{prefix}_processed'))
 
 plot.windows.pct.scatterline(agg.windows)
 

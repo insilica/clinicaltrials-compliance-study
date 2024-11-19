@@ -91,4 +91,26 @@ process.windows.amend.model.logistic <- function(agg.windows) {
   }
   return(agg.windows)
 }
+
+windows.hlact.write <- function(dirpath, agg.windows) {
+  fs::dir_create(dirpath)
+  for (name in agg.windows %>% names) {
+    #prefix_file <- gsub('-', '', name %>% substrRight(11))
+    prefix_file <- gsub('-', '', name %>% str_sub(start = -11))
+    file_name <- paste(prefix_file, 'hlact_studies.parquet', sep='_')
+    path2 <- file.path(dirpath, file_name)
+    agg.windows[[name]]$hlact.studies %>% write_parquet(path2)
+  }
+}
+
+windows.rdata.write <- function(dirpath, agg.windows) {
+  fs::dir_create(dirpath)
+  save(agg.windows, file = file.path(dirpath, 'agg.windows.Rdata'))
+}
+
+windows.rdata.read <- function(dirpath, agg.windows) {
+  load(file.path(dirpath, 'agg.windows.Rdata'))
+  return(agg.windows)
+}
+
 # }}}

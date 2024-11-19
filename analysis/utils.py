@@ -31,7 +31,6 @@ def process_months_to_report(df_):
     return df_
 
 
-
 def get_d_rates(df, within):
     groups = ['funding','phase', 'intervention','purpose', 'status'] 
     groups_col = [ 
@@ -91,6 +90,7 @@ def get_prepost_dataframes(
         flatten_d(d_props_overall, rate_col='prop_overall')).merge(
         flatten_d(d_n_overall, rate_col='n_overall')).merge(
         flatten_d(d_N_overall, rate_col='N_overall'))
+
     
     df_prepost = df_pre.merge(df_post, on=['group', 'subgroup'], how='left'
                 ).merge(df_overall, on=['group', 'subgroup'], how='left')
@@ -137,6 +137,7 @@ def get_dataframes(path_pre_processed, path_post_processed):
                                            d_n_pre_36, d_n_post_36, d_n_overall_36,
                                            d_N_pre_36, d_N_post_36, d_N_overall_36
                                           )
+
         
     return df_pre, df_post, df_overall, df_prepost_12, df_prepost_36
 

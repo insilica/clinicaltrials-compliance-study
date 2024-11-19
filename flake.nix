@@ -22,6 +22,10 @@
 
           TemplateToolkitSimple    = final.callPackage ./maint/nixpkg/perl/template-toolkit-simple.nix {};
         };
+
+        rPackages = prev.rPackages // {
+          arrow = final.callPackage ./maint/nixpkg/r/arrow.nix {};
+        };
       };
     } //
     flake-utils.lib.eachDefaultSystem (system:
@@ -53,7 +57,7 @@
               parallelWithPerlEnv = pkgs.stdenv.mkDerivation {
                 name = "parallel-with-perl-env";
                 buildInputs = [ pkgs.parallel pkgs.makeWrapper ];
-                propagatedBuildInputs = [ extraPerlPackages ];
+                propagatedBuildInputs = extraPerlPackages;
                 unpackPhase = "true";
                 installPhase = ''
                   mkdir -p $out/bin
@@ -61,27 +65,52 @@
                     --set PERL5LIB "${with pkgs.perlPackages; makeFullPerlPath (extraPerlPackages)}"
                 '';
               };
+              extraRPackages = with pkgs.rPackages; [
+                  arrow assertthat
+                  blandr broom
+                  ComplexUpset cthist
+                  DBI dotenv dplyr
+                  forcats fs
+                  ggplot2 ggsurvfit glue gtsummary
+                  here
+                  listr logger lubridate
+                  pacman parsedate patchwork purrr
+                  readr rlang RPostgres
+                  scales stringr survival survminer
+                  this_path tidyr tidyverse
+                  vroom
+                  yaml
+                ];
+              rEnv = pkgs.rWrapper.override {
+                packages = extraRPackages;
+              };
+
+              python3PackageOverrides = pkgs.callPackage ./maint/nixpkg/python3/packages.nix { };
+              python = pkgs.python3.override { packageOverrides = python3PackageOverrides; };
+              extraPython3Packages = ps: with ps; [
+                  numpy
+                  pandas
+                  scipy
+                  pyarrow
+                  fastparquet
+                  openpyxl
+                  bokeh
+                  tqdm
+                  iqplot
+                  ipython
+                  selenium
+                ];
+              python3Env = python.withPackages extraPython3Packages ;
                 in {
             buildInputs =
-              [ parallelWithPerlEnv ]
-              ++ oldAttrs.buildInputs
-              ++ [ (pkgs.python3.withPackages (ps: with ps; [ pandas pyarrow fastparquet openpyxl ])) ]
-              ++ (with pkgs.rPackages; [
-                            arrow assertthat
-                            blandr broom
-                            ComplexUpset cthist
-                            DBI dotenv dplyr
-                            forcats fs
-                            ggplot2 ggsurvfit glue gtsummary
-                            here
-                            logger lubridate
-                            pacman parsedate patchwork purrr
-                            readr rlang RPostgres
-                            scales stringr survival survminer
-                            this_path tidyr tidyverse
-                            vroom
-                            yaml
-                    ]);
+              [
+                parallelWithPerlEnv
+                rEnv
+                python3Env
+                pkgs.chromium
+                pkgs.chromedriver
+              ] ++ oldAttrs.buildInputs
+              ;
             env = oldAttrs.env // {
               LC_ALL = "C";
             };
