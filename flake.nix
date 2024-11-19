@@ -109,10 +109,12 @@
                 python3Env
                 pkgs.chromium
                 pkgs.chromedriver
-              ] ++ oldAttrs.buildInputs
+              ]
+	      ++ (pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.glibcLocales ])
+	      ++ oldAttrs.buildInputs
               ;
             env = oldAttrs.env // {
-              LC_ALL = "C";
+	      LC_ALL = "C.UTF-8";
             };
           });
       });
