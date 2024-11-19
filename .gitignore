@@ -5,5 +5,11 @@
 /log
 /_build
 
+# Jupyter
+.ipynb_checkpoints/
+
+# R
 Rplots.pdf
+
+# Python
 __pycache__/
