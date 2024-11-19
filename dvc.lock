@@ -857,13 +857,13 @@ stages:
     outs:
     - path: figtab/anderson2015.new
       hash: md5
-      md5: cbc7daa8adf1de14e8808960d23b5af1.dir
-      size: 190075
+      md5: fbaab6eb0eb9c1a47c64549d2143a672.dir
+      size: 181997
       nfiles: 1
     - path: figtab/anderson2015.original
       hash: md5
-      md5: 3e26d4af9cf6c456f8997884d0c300c8.dir
-      size: 193670
+      md5: feb5ceed9e24a3e81423fec54f39dac0.dir
+      size: 185880
       nfiles: 1
   analysis-driver-rule-effective-date:
     cmd: "Rscript analysis/driver-rule-effective-date.R\n"
@@ -884,8 +884,8 @@ stages:
     outs:
     - path: figtab/rule-effective
       hash: md5
-      md5: 9b4f721ed59d9e2fb4494ed1be1a3fcb.dir
-      size: 2073723
+      md5: 35a8fe793050bacd6fab6d405812dc3b.dir
+      size: 2053614
       nfiles: 10
   build-ctgov-studies-all@yearly_obs36_n-1_20120101:
     cmd:
@@ -2001,8 +2001,8 @@ stages:
     outs:
     - path: figtab/long-observe
       hash: md5
-      md5: 8e983307945ff0c828c2179f207266b6.dir
-      size: 895362
+      md5: 0fdbfc2bd6d4d48d0b6b2dc6cdb28232.dir
+      size: 864072
       nfiles: 3
   analysis-driver-sliding@yearly_obs36:
     cmd: "Rscript analysis/driver-sliding.R params.yaml yearly_obs36\n"
@@ -2023,8 +2023,8 @@ stages:
     outs:
     - path: figtab/yearly_obs36
       hash: md5
-      md5: c04d2380b575f381a748593208ba141f.dir
-      size: 1706369
+      md5: 72bcf2308afc0844a5070672d4dcbed0.dir
+      size: 1664426
       nfiles: 3
   process-driver-rule-effective-date:
     cmd: "Rscript analysis/driver-rule-effective-date-process.R\n"
