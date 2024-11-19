@@ -90,6 +90,7 @@ stages:
         - ${item.output.all}
         - download/aact/db-dump/20240430_clinical_trials.zip
         - sql/params/hlact-filter
+        - script/cthist_hlact_flowchart_partial_sql.sh
       outs:
         - ${item.output.hlact-filtered}
         - brick/flowchart-counts/${key}.csv
