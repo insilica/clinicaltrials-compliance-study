@@ -264,31 +264,7 @@ def plot_boxplot_yearly():
 
 
 
-# PERMUTATION TEST RESULTS
-def permutation_test(df_pre, df_post):
-    q_pre = df_pre['rf_months_to_report'].values
-    q_post = df_post['rf_months_to_report'].values
-    
-    # Pre: 
-    n_pre_12 = len(df_pre.loc[df_pre['rf_months_to_report'].apply(lambda x: x<=12+1/30.5)])
-    n_pre_36 = len(df_pre.loc[df_pre['rf_months_to_report'].apply(lambda x: x<=36+1/30.5)])
-    N_pre = len(q_pre)
-    p_pre_12 = n_pre_12/N_pre
-    p_pre_36 = n_pre_36/N_pre
-    
-    # Post: 
-    n_post_12 = len(df_post.loc[df_post['rf_months_to_report'].apply(lambda x: x<=12+1/30.5)])
-    n_post_36 = len(df_post.loc[df_post['rf_months_to_report'].apply(lambda x: x<=36+1/30.5)])
-    N_post = len(q_post)
-    p_post_12 = n_post_12/N_post
-    p_post_36 = n_post_36/N_post
-    
-    # print(n_pre_12, n_pre_36, n_post_12, n_post_36)
-    
-    # print(N_pre, N_post)
-    # print(p_pre_12, p_post_12, '\n',
-    #       p_pre_36, p_post_36)
-    
+def permutation_test(n_pre, N_pre, n_post, N_post, N_reps=50_000):
     def create_array(n, N):
         return np.hstack([np.ones(n), np.zeros(N-n)])
     
@@ -317,16 +293,63 @@ def permutation_test(df_pre, df_post):
         p_value = np.sum(out >= diff_orig) / len(out)
         print('p-value: ', p_value)
         return diff_orig, p_value
+        
+    diff_orig, p_value = get_p_value(n_pre, N_pre, n_post, N_post, N_reps=N_reps)
+    return diff_orig, p_value
+    
+    
+# PERMUTATION TEST RESULTS
+def permutation_test_overall(df_pre, df_post, N_reps=50_000):
+    q_pre = df_pre['rf_months_to_report'].values
+    q_post = df_post['rf_months_to_report'].values
+    
+    # Pre: 
+    n_pre_12 = len(df_pre.loc[df_pre['rf_months_to_report'].apply(lambda x: x<=12+1/30.5)])
+    n_pre_36 = len(df_pre.loc[df_pre['rf_months_to_report'].apply(lambda x: x<=36+1/30.5)])
+    N_pre = len(q_pre)
+    p_pre_12 = n_pre_12/N_pre
+    p_pre_36 = n_pre_36/N_pre
+    
+    # Post: 
+    n_post_12 = len(df_post.loc[df_post['rf_months_to_report'].apply(lambda x: x<=12+1/30.5)])
+    n_post_36 = len(df_post.loc[df_post['rf_months_to_report'].apply(lambda x: x<=36+1/30.5)])
+    N_post = len(q_post)
+    p_post_12 = n_post_12/N_post
+    p_post_36 = n_post_36/N_post
+    
+    # print(n_pre_12, n_pre_36, n_post_12, n_post_36)
+    
+    # print(N_pre, N_post)
+    # print(p_pre_12, p_post_12, '\n',
+    #       p_pre_36, p_post_36)
     
 
-    d12, p12 = get_p_value(n_pre_12, N_pre, n_post_12, N_post, N_reps=50_000)
-    d36, p36 = get_p_value(n_pre_36, N_pre, n_post_36, N_post, N_reps=50_000)
+    d12, p12 = permutation_test(n_pre_12, N_pre, n_post_12, N_post, N_reps=N_reps)
+    d36, p36 = permutation_test(n_pre_36, N_pre, n_post_36, N_post, N_reps=N_reps)
     results = pd.DataFrame({
         'name':['diff_orig_12mo', 'pvalue_12mo', 'diff_orig_36mo', 'pvalue_36mo'],
         'value':[d12, p12, d36, p36]
     })
     return results
     
+
+def permutation_test_subgroup(row, N_reps=50_000):
+    n_pre, N_pre, n_post, N_post = row.n_pre, row.N_pre, row.n_post, row.N_post
+    diff_orig, p_value = permutation_test(n_pre, N_pre, n_post, N_post, N_reps=N_reps)
+    return p_value
+
+
+def table_pvalues_subgroup_save(df_prepost_12, df_prepost_36):
+    table = df_prepost_12[['group', 'subgroup', 'rate_pre', 'rate_post', 'p_value']].rename(
+        columns={'rate_pre':'rate_pre_12mo',
+                 'rate_post':'rate_post_12mo',
+                 'p_value':'p_value_12mo'}).merge(
+        df_prepost_36[['group', 'subgroup', 'rate_pre', 'rate_post', 'p_value']].rename(
+        columns={'rate_pre':'rate_pre_36mo',
+                 'rate_post':'rate_post_36mo',
+                 'p_value':'p_value_36mo'}))
+    return table
+
 
 # RUN MAIN
 if __name__ == '__main__':
@@ -370,24 +393,32 @@ if __name__ == '__main__':
     print("- p_boxplot_yearly.svg and p_barchart_yearly.svg \n")
     
     p_lollipop_12, p_lollipop_36 = plot_lollipop(df_prepost_12, df_prepost_36)
+    p_lollipop_12.output_backend, p_lollipop_36.output_backend = "svg", "svg"
     bokeh.io.show(bokeh.layouts.row(p_lollipop_12, p_lollipop_36))
-    bokeh.io.export_svg(p_lollipop_12, filename='p_lollipop_12.svg')
-    bokeh.io.export_svg(p_lollipop_36, filename='p_lollipop_36.svg')
+    bokeh.io.export_svg(p_lollipop_12, filename='../figtab/p_lollipop_12.svg')
+    bokeh.io.export_svg(p_lollipop_36, filename='../figtab/p_lollipop_36.svg')
 
     p_boxplot_yearly, p_barchart_yearly = plot_boxplot_yearly()
+    p_boxplot_yearly.output_backend, p_barchart_yearly.output_backend = "svg", "svg"
     bokeh.io.show(bokeh.layouts.column(p_boxplot_yearly, p_barchart_yearly))
-    bokeh.io.export_svg(p_boxplot_yearly, filename='p_boxplot_yearly.svg')
-    bokeh.io.export_svg(p_barchart_yearly, filename='p_barchart_yearly.svg')
-
-
+    bokeh.io.export_svg(p_boxplot_yearly, filename='../figtab/p_boxplot_yearly.svg')
+    bokeh.io.export_svg(p_barchart_yearly, filename='../figtab/p_barchart_yearly.svg')
+    
     
     # Create and save 
     # - permutation_results.csv
     print("\n Creating and saving ../figtab/permutation_results.csv...")
-    
-    permutation_results = permutation_test(df_pre, df_post)
+
+    N_reps = 50_000
+    permutation_results = permutation_test_overall(df_pre, df_post, N_reps=50_000)
     permutation_results.to_csv("../figtab/permutation_results.csv", index=False) 
 
+    df_prepost_12['p_value'] = df_prepost_12.apply(permutation_test_subgroup, axis=1, args=(N_reps,))
+    df_prepost_36['p_value'] = df_prepost_36.apply(permutation_test_subgroup, axis=1, args=(N_reps,))
+
+    permutation_results_subgroup = table_pvalues_subgroup_save(df_prepost_12, df_prepost_36)
+    permutation_results_subgroup.to_csv("../figtab/permutation_results_subgroup.csv", index=False)
+    
     pass
 
 
