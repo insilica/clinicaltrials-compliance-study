@@ -155,6 +155,10 @@ add_data.window_agg <- function(data, window.hlact, prefix, name) {
     |> add_data.window_agg.subset( window.hlact |> filter( common.intervention_type == 'Device' ),
                                   prefix, name,
                                   subset.prefix = '-intervention-devices', subset.name = 'for Devices interventions')
+    ## Intervention Drug / drugs
+    |> add_data.window_agg.subset( window.hlact |> filter( common.intervention_type == 'Drug' ),
+                                  prefix, name,
+                                  subset.prefix = '-intervention-drugs', subset.name = 'for Drugs interventions')
   )
   return(data)
 }
