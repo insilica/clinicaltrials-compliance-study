@@ -2058,8 +2058,8 @@ stages:
     deps:
     - path: analysis/driver-aggregate-data.R
       hash: md5
-      md5: b8aa95bfbc0c2ef35c4f05f19f42d989
-      size: 8393
+      md5: 98eb09682bb149a0ae7b397b069db782
+      size: 8685
     - path: brick/rule-effective-date_processed
       hash: md5
       md5: b9ed705352146e502d688475cb38acee.dir
@@ -2073,6 +2073,6 @@ stages:
     outs:
     - path: figtab/aggregate-data
       hash: md5
-      md5: 23a2e0a3f23e283fd9dcc21698aafeea.dir
-      size: 20151
+      md5: 77f5bc51e4ebbc466f3040970a06710d.dir
+      size: 21815
       nfiles: 1
