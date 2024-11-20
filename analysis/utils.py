@@ -42,13 +42,19 @@ def get_d_rates(df, within):
     ]
 
     d_group_col = dict(zip(groups, groups_col))
-    d_rates, d_props = {}, {}
+    d_rates, d_props, d_n, d_N = {}, {}, {}, {}
     for group in groups:
         col_group = d_group_col[group]
+        # rates: reporting rate n/N, props: proportion of composition, n: reporting within X months, N: total
         d_rates[group] = df.groupby(col_group)['rf_months_to_report'].apply(
             lambda x: (x <= within + 1/30.5).sum()/len(x)).to_dict()
         d_props[group] = df[col_group].value_counts(normalize=True).to_dict()
-    return d_rates, d_props
+        d_N[group] = df.groupby(col_group).size().to_dict()
+        d_n[group] = df.groupby(col_group)['rf_months_to_report'].apply(
+            lambda x: (x <= within + 1/30.5).sum()).to_dict()
+
+    return d_rates, d_props, d_n, d_N
+
 
 
 def flatten_d(d, rate_col = 'rate'):
@@ -66,15 +72,25 @@ def flatten_d(d, rate_col = 'rate'):
 def get_prepost_dataframes(
     d_rates_pre, d_rates_post, d_rates_overall,
     d_props_pre, d_props_post, d_props_overall,
+    d_n_pre, d_n_post, d_n_overall,
+    d_N_pre, d_N_post, d_N_overall,
     ):
+    
     df_pre = flatten_d(d_rates_pre, rate_col='rate_pre').merge(
-        flatten_d(d_props_pre, rate_col='prop_pre'))
+        flatten_d(d_props_pre, rate_col='prop_pre')).merge(
+        flatten_d(d_n_pre, rate_col='n_pre')).merge(
+        flatten_d(d_N_pre, rate_col='N_pre'))
+    
     df_post = flatten_d(d_rates_post, rate_col='rate_post').merge(
-        flatten_d(d_props_post, rate_col='prop_post')
-    )
+        flatten_d(d_props_post, rate_col='prop_post')).merge(
+        flatten_d(d_n_post, rate_col='n_post')).merge(
+        flatten_d(d_N_post, rate_col='N_post'))
+    
     df_overall = flatten_d(d_rates_overall, rate_col='rate_overall').merge(
-        flatten_d(d_props_overall, rate_col='prop_overall')
-    )
+        flatten_d(d_props_overall, rate_col='prop_overall')).merge(
+        flatten_d(d_n_overall, rate_col='n_overall')).merge(
+        flatten_d(d_N_overall, rate_col='N_overall'))
+
     
     df_prepost = df_pre.merge(df_post, on=['group', 'subgroup'], how='left'
                 ).merge(df_overall, on=['group', 'subgroup'], how='left')
@@ -102,19 +118,26 @@ def get_dataframes(path_pre_processed, path_post_processed):
     groups = ['funding','phase', 'intervention','purpose'] 
     groups_col = [ 'rr.funding', 'common.phase.norm', 'rr.intervention_type', 'rr.primary_purpose']
     
-    d_rates_pre_12, d_props_pre_12 = get_d_rates(df_pre, within=12)
-    d_rates_post_12, d_props_post_12 = get_d_rates(df_post, within=12)
-    d_rates_overall_12, d_props_overall_12 = get_d_rates(df_overall, within=12)
+    d_rates_pre_12, d_props_pre_12, d_n_pre_12, d_N_pre_12 = get_d_rates(df_pre, within=12)
+    d_rates_post_12, d_props_post_12, d_n_post_12, d_N_post_12 = get_d_rates(df_post, within=12)
+    d_rates_overall_12, d_props_overall_12, d_n_overall_12, d_N_overall_12 = get_d_rates(df_overall, within=12)
     
-    d_rates_pre_36, d_props_pre_36 = get_d_rates(df_pre, within=36)
-    d_rates_post_36, d_props_post_36 = get_d_rates(df_post, within=36)
-    d_rates_overall_36, d_props_overall_36 = get_d_rates(df_overall, within=36)
+    d_rates_pre_36, d_props_pre_36, d_n_pre_36, d_N_pre_36 = get_d_rates(df_pre, within=36)
+    d_rates_post_36, d_props_post_36, d_n_post_36, d_N_post_36 = get_d_rates(df_post, within=36)
+    d_rates_overall_36, d_props_overall_36, d_n_overall_36, d_N_overall_36 = get_d_rates(df_overall, within=36)
     
     
     df_prepost_12 = get_prepost_dataframes(d_rates_pre_12, d_rates_post_12, d_rates_overall_12, 
-                                           d_props_pre_12, d_props_post_12, d_props_overall_12)
+                                           d_props_pre_12, d_props_post_12, d_props_overall_12,
+                                           d_n_pre_12, d_n_post_12, d_n_overall_12,
+                                           d_N_pre_12, d_N_post_12, d_N_overall_12
+                                          )
     df_prepost_36 = get_prepost_dataframes(d_rates_pre_36, d_rates_post_36, d_rates_overall_36,
-                                           d_props_pre_36, d_props_post_36, d_props_overall_36)
+                                           d_props_pre_36, d_props_post_36, d_props_overall_36,
+                                           d_n_pre_36, d_n_post_36, d_n_overall_36,
+                                           d_N_pre_36, d_N_post_36, d_N_overall_36
+                                          )
+
         
     return df_pre, df_post, df_overall, df_prepost_12, df_prepost_36
 
