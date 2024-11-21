@@ -2,16 +2,20 @@
 #### Plot stacked chart of intervals {{{
 
 categorize_intervals <- function(interval_length, breakpoints) {
+  label_incomplete <- as.character(
+    glue("No results within {max(breakpoints)} months")
+  )
   labels <- c(paste0(breakpoints, " months"),
-              paste0(max(breakpoints), "+ months"))
+              label_incomplete)
 
+  #print(labels)
   # Create bins for cut() function including an Inf for the upper bound of the last interval
   bins <- c(-Inf, as.numeric(months(breakpoints) + days(1)), Inf)
 
   # Vectorized interval categorization using if_else and cut
   result <- if_else(
     is.na(interval_length),
-    "No results",
+    label_incomplete,
     cut(interval_length, bins, labels = labels, right = FALSE)
   ) |> as.factor()
 
