@@ -2,16 +2,20 @@
 #### Plot stacked chart of intervals {{{
 
 categorize_intervals <- function(interval_length, breakpoints) {
+  label_incomplete <- as.character(
+    glue("No results within {max(breakpoints)} months")
+  )
   labels <- c(paste0(breakpoints, " months"),
-              paste0(max(breakpoints), "+ months"))
+              label_incomplete)
 
+  #print(labels)
   # Create bins for cut() function including an Inf for the upper bound of the last interval
   bins <- c(-Inf, as.numeric(months(breakpoints) + days(1)), Inf)
 
   # Vectorized interval categorization using if_else and cut
   result <- if_else(
     is.na(interval_length),
-    "No results",
+    label_incomplete,
     cut(interval_length, bins, labels = labels, right = FALSE)
   ) |> as.factor()
 
@@ -159,12 +163,13 @@ plot.windows.stacked.chart <-
       # scale_fill_brewer(type = 'qual', palette = 1, direction = -1) +
       scale_fill_manual(
         values =
-          ( if(n.groups == 4)
-              c( "#CDCDCD",  "#E69E86", "#CCDB6F", "#34AF92")
-            else
-              c( "#CDCDCD",  "#CC8181","#E69E86", "#CCDB6F", "#34AF92")
-          )
-        # values = c( "#B6B6B6",  "#CCBA5A", "#A7B647", "#12684E")
+            c( "#CDCDCD",  "#E69E86", "#CCDB6F", "#34AF92"),
+          # ( if(n.groups == 4)
+          #     c( "#CDCDCD",  "#E69E86", "#CCDB6F", "#34AF92")
+          #   else
+          #     c( "#CDCDCD",  "#CC8181","#E69E86", "#CCDB6F", "#34AF92")
+          # )
+          # values = c( "#B6B6B6",  "#CCBA5A", "#A7B647", "#12684E")
         ) +
       theme_minimal() +
       theme(axis.text.x = element_text(size = 8))+
