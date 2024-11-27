@@ -38,7 +38,9 @@
         devShells.default = dev-shell.devShells.${system}.default.overrideAttrs
           (oldAttrs:
             let
+
               inherit (pkgs.perlPackages) makePerlPath;
+              # See cpanfile
               extraPerlPackages = with pkgs.perlPackages; [
                     Moo
                     PathTiny
@@ -65,6 +67,8 @@
                     --set PERL5LIB "${with pkgs.perlPackages; makeFullPerlPath (extraPerlPackages)}"
                 '';
               };
+
+              # See analysis/ctgov.R
               extraRPackages = with pkgs.rPackages; [
                   arrow assertthat
                   blandr broom
@@ -85,6 +89,7 @@
                 packages = extraRPackages;
               };
 
+              # See requirements.txt
               python3PackageOverrides = pkgs.callPackage ./maint/nixpkg/python3/packages.nix { };
               python = pkgs.python3.override { packageOverrides = python3PackageOverrides; };
               extraPython3Packages = ps: with ps; [
@@ -101,6 +106,7 @@
                   selenium
                 ];
               python3Env = python.withPackages extraPython3Packages ;
+
                 in {
             buildInputs =
               [
