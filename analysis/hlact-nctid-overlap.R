@@ -152,7 +152,9 @@ upset_df <- data.frame(
 
 ## old data from first run of HLACT filtering
 plot(upset(upset_df, c("ctgov_hlact", "anderson2015"), name = "ID source"))
-ggsave("nctid-overlap-all.png", width = 12, height = 8)
+for (fmt in c("png", "svg")) {
+  ggsave(paste0("nctid-overlap-all.", fmt), width = 12, height = 8)
+}
 
 all_ids <- unique(c(query_df$nct_id, paper_df$NCT_ID))
 upset_df <- data.frame(
@@ -160,4 +162,10 @@ upset_df <- data.frame(
     anderson2015 = all_ids %in% paper_df$NCT_ID
 )
 plot(upset(upset_df, c("ctgov_hlact", "anderson2015"), name = "ID source"))
-ggsave("hlact-overlap-historical.png", width = 12, height = 8)
+for (fmt in c("png", "svg")) {
+  ggsave(
+    paste0("hlact-overlap-historical.", fmt),
+    width = 12,
+    height = 8
+  )
+}

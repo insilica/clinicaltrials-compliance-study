@@ -64,9 +64,11 @@ for(window.name in names(survival.fits)) {
           #)
   )
   show(fig)
-  plot.output.path <- fs::path(glue(
-      "figtab/{agg.window.compare.rule_effective[[1]]$window$prefix}/fig.window-{window.name}.surv.strat-{strat.var}.png"))
-  fs::dir_create(path_dir(plot.output.path))
-  ggsave(plot.output.path, width = 8, height = 8)
+  plot.output.base <- fs::path(glue(
+      "figtab/{agg.window.compare.rule_effective[[1]]$window$prefix}/fig.window-{window.name}.surv.strat-{strat.var}"))
+  fs::dir_create(path_dir(plot.output.base))
+  for (ext in c("png", "svg")) {
+    ggsave(paste0(plot.output.base, ".", ext), width = 8, height = 8)
+  }
 }
 }
