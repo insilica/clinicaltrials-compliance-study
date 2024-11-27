@@ -181,9 +181,11 @@ plot.windows.stacked.chart <-
   show(fig.result_reported_within.stacked_area)
 
   faceted_by.file_part <- gsub('\\.', '-', faceted_by.label)
-  plot.output.path <- fs::path(glue(
-      "figtab/{agg.windows[[1]]$window$prefix}/fig.result_reported_within.facet_{faceted_by.file_part}.stacked_area.png"))
-  fs::dir_create(path_dir(plot.output.path))
-  ggsave(plot.output.path, width = 12, height = 8)
+  plot.output.path.base <- fs::path(glue(
+      "figtab/{agg.windows[[1]]$window$prefix}/fig.result_reported_within.facet_{faceted_by.file_part}.stacked_area"))
+  fs::dir_create(path_dir(plot.output.path.base))
+  for (ext in c("png", "svg")) {
+    ggsave(paste0(plot.output.path.base, ".", ext), width = 12, height = 8)
+  }
 }
 # }}}

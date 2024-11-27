@@ -69,19 +69,27 @@ ggsave.partial <- partial(ggsave, ... = ,
 # Fig 2
 show(fig.surv.funding <- plot_survfit_with_title(fits$fit.funding,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Funding"))
-ggsave.partial('figtab/anderson2015/fig_2.survfit.funding.png')
+for (ext in c("png", "svg")) {
+  ggsave.partial(paste0('figtab/anderson2015/fig_2.survfit.funding', ".", ext))
+}
 
 # Fig S1
 show(fig.surv.phase <- plot_survfit_with_title(fits$fit.phase,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Phase"))
-ggsave.partial('figtab/anderson2015/fig_s1.survfit.phase.png')
+for (ext in c("png", "svg")) {
+  ggsave.partial(paste0('figtab/anderson2015/fig_s1.survfit.phase', ".", ext))
+}
 
 # Fig S2
 show(fig.surv.interventions <- plot_survfit_with_title(fits$fit.interventions,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Intervention Type"))
-ggsave.partial('figtab/anderson2015/fig_s2.survfit.interventions.png')
+for (ext in c("png", "svg")) {
+  ggsave.partial(paste0('figtab/anderson2015/fig_s2.survfit.interventions', ".", ext))
+}
 
 # Fig S3
 show(fig.surv.status <- plot_survfit_with_title(fits$fit.status,
      "Trials Reporting Results versus Months from Primary Completion Date Stratified by Terminated/Completed Status"))
-ggsave.partial('figtab/anderson2015/fig_s3.survfit.status.png')
+for (ext in c("png", "svg")) {
+  ggsave.partial(paste0('figtab/anderson2015/fig_s3.survfit.status', ".", ext))
+}

@@ -41,8 +41,10 @@ plot.windows.pct.scatterline <- function(agg.windows) {
                          'Percentage HLACTs out of all studies')
   )
   show(fig.pct.all)
-  plot.output.path <- fs::path(glue("figtab/{agg.windows[[1]]$window$prefix}/fig.percentage.all.png"))
-  fs::dir_create(path_dir(plot.output.path))
-  ggsave(plot.output.path, width = 12, height = 8)
+  plot.output.base <- fs::path(glue("figtab/{agg.windows[[1]]$window$prefix}/fig.percentage.all"))
+  fs::dir_create(path_dir(plot.output.base))
+  for (ext in c("png", "svg")) {
+    ggsave(paste0(plot.output.base, ".", ext), width = 12, height = 8)
+  }
 }
 # }}}

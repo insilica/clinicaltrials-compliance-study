@@ -870,8 +870,8 @@ stages:
     deps:
     - path: analysis/driver-rule-effective-date.R
       hash: md5
-      md5: 27638226cea7c95f60fe7d4c84b6d3aa
-      size: 2739
+      md5: 0392cc2c4034dd88b69559660caf72d4
+      size: 2792
     - path: brick/rule-effective-date_processed
       hash: md5
       md5: b9ed705352146e502d688475cb38acee.dir
@@ -884,9 +884,9 @@ stages:
     outs:
     - path: figtab/rule-effective
       hash: md5
-      md5: 35a8fe793050bacd6fab6d405812dc3b.dir
-      size: 2053614
-      nfiles: 10
+      md5: 552605c625c3f521842634ccbf9753bf.dir
+      size: 3165270
+      nfiles: 20
   build-ctgov-studies-all@yearly_obs36_n-1_20120101:
     cmd:
     - mkdir -p $(dirname brick/yearly_obs36/n-1_20120101/ctgov-studies-all.parquet)
@@ -1916,7 +1916,7 @@ stages:
     deps:
     - path: analysis/plotter.py
       hash: md5
-      md5: ec8a95ab2fbc58f75105030b364cd447
+      md5: 4cbb7c1836f6664d3d9ce139e41cb668
       size: 17319
     - path: analysis/utils.py
       hash: md5
@@ -1935,7 +1935,7 @@ stages:
     outs:
     - path: figtab/plotter_py
       hash: md5
-      md5: a48b49028823a33e73885ea79f9b7119.dir
+      md5: 85919576252f35ec34351b5ec951c10a.dir
       size: 104750
       nfiles: 9
   process-driver-sliding@long-observe:

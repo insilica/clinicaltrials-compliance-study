@@ -50,7 +50,9 @@ upset_df <- data.frame(
 ## Plot the UpSet diagram
 
 plot( upset( upset_df, c('stanford_db20240430', 'stanford_historical', 'anderson2015'), name = 'ID source' ) )
-ggsave('nctid-overlap-all.png', width = 12, height = 8)
+for (fmt in c('png', 'svg')) {
+  ggsave(paste0('nctid-overlap-all.', fmt), width = 12, height = 8)
+}
 
 all_ids <- unique(c(relevant_df$nctid, paper_df$NCT_ID))
 upset_df <- data.frame(
@@ -59,4 +61,6 @@ upset_df <- data.frame(
 	anderson2015 = all_ids %in% paper_df$NCT_ID
 )
 plot( upset( upset_df, c('stanford_historical', 'anderson2015'), name = 'ID source' ) )
-ggsave('nctid-overlap-historical.png', width = 12, height = 8)
+for (fmt in c('png', 'svg')) {
+  ggsave(paste0('nctid-overlap-historical.', fmt), width = 12, height = 8)
+}

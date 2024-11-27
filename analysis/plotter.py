@@ -392,10 +392,10 @@ if __name__ == '__main__':
 
     
     # Create and save 
-    # - p_lollipop_12.png : shows subgroups pre/post rr12mo on lollipop chart
-    # - p_lollipop_36.png : shows subgroups pre/post rr36mo on lollipop chart
-    # - p_boxplot_yearly.png  : shows boxplots of time to report of those who report within 36mo
-    # - p_barchart_yearly.png : shows proportion of those who report within 36mo
+    # - p_lollipop_12.svg : shows subgroups pre/post rr12mo on lollipop chart
+    # - p_lollipop_36.svg : shows subgroups pre/post rr36mo on lollipop chart
+    # - p_boxplot_yearly.svg  : shows boxplots of time to report of those who report within 36mo
+    # - p_barchart_yearly.svg : shows proportion of those who report within 36mo
 
     print(f"\n Creating and saving in {output_dir}")
     print("- p_lollipop_12.svg and _36.svg")
