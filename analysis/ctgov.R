@@ -26,6 +26,7 @@ pacman::p_load(
   purrr,
   rlang,
   scales,
+  svglite,
   yaml
 )
 

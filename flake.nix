@@ -76,7 +76,7 @@
                   listr logger lubridate
                   pacman parsedate patchwork purrr
                   readr rlang RPostgres
-                  scales stringr survival survminer
+                  scales stringr survival survminer svglite
                   this_path tidyr tidyverse
                   vroom
                   yaml
