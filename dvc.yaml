@@ -122,6 +122,14 @@ stages:
         - analysis/driver-sliding.R
       outs:
         - figtab/${item}
+  analysis-driver-anderson2015-survival:
+    cmd: |
+      Rscript analysis/driver-anderson2015-survival.R
+    deps:
+      - brick/anderson2015
+      - analysis/driver-anderson2015-survival.R
+    outs:
+      - figtab/anderson2015
   analysis-driver-anderson2015-compare-stacked:
     cmd: |
       Rscript analysis/driver-anderson2015-compare-stacked.R
