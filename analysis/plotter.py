@@ -357,6 +357,7 @@ def table_pvalues_subgroup_save(df_prepost_12, df_prepost_36):
 
 # RUN MAIN
 if __name__ == '__main__':
+    np.random.seed(10) # set seed
     output_dir = Path('figtab/plotter_py')
     output_dir.mkdir(parents=True, exist_ok=True)
     # Get dataframes
