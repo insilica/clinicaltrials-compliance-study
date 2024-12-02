@@ -10,6 +10,7 @@ source('analysis/ctgov.R')
 map_unit <- function(unit_str) {
   unit_map <- list(
     "count" = "count",
+    "month" = "month",
     "percent" = "\\percent",
     "delta-percent" = "\\percent"
   )
@@ -213,6 +214,38 @@ add_data.window_yearly <- function(data) {
     unit = "delta-percent",
     comment = "Range of year-over-year changes in 12-month reporting rate (excluding outlier period 2015-2016)"
   )
+
+  stats_by_window <- agg.windows.yearly_obs36 |>
+    map(~ list(
+      window_start = .x$window$date$start,
+      window_end   = .x$window$date$stop,
+      quantile.stats = .x$hlact.studies
+        |> subset(cr.months_to_results_no_censor <= 36)
+        |> pull(cr.months_to_results_no_censor)
+        |> quantile(probs = c(0.25, 0.5, 0.75), na.rm = TRUE )
+    ))
+
+  for (window in list(first = stats_by_window[[1]],
+                      last = stats_by_window[[length(stats_by_window)]])) {
+    year_start <- year(window$window_start)
+    year_end   <- year(window$window_end)
+    window_desc <- glue("{year_start}-{year_end}")
+
+    data <- data |>
+      add_data(
+        key = glue("window-{window_desc}-time-to-report-iqr-months"),
+        value0 = window$quantile.stats["25%"],
+        value1 = window$quantile.stats["75%"],
+        unit = "month",
+        comment = glue("Time in months to report IQR (25th-75th percentile) for {window_desc} window")
+      ) |>
+      add_data(
+        key = glue("window-{window_desc}-time-to-report-median-months"),
+        value = window$quantile.stats["50%"],
+        unit = "month",
+        comment = glue("Median time in months to report for {window_desc} window")
+      )
+  }
 
   return(data)
 }
