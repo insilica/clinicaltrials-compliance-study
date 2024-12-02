@@ -36,6 +36,9 @@ preprocess_data.common.reporting <- function(data) {
       # - 36 months
       cr.results_reported_36mo =
 	dateproc.results_reported.within_inc(pick(everything()), months(36)),
+
+      cr.months_to_results_no_censor =
+        interval(common.primary_completion_date_imputed, common.results_received_date) / months(1)
     )
   return(data)
 }
