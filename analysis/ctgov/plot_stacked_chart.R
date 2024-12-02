@@ -1,5 +1,20 @@
 
 #### Plot stacked chart of intervals {{{
+###
+###
+
+# Local override of str_squish to preserve &nbsp;
+local_str_squish <- function(string) {
+  stringi::stri_trim_both(stringr::str_replace_all(string, '[[\\s]-[\u00A0]]+', " "))
+}
+
+orig.str_split <- stringr::str_split
+local_str_split <- function (string, pattern, n = Inf, simplify = FALSE) {
+  if( pattern == "[[:space:]]+" ) {
+    pattern <- "[[:space:]-[\u00A0]]+"
+  }
+  orig.str_split(string, pattern, n, simplify)
+}
 
 categorize_intervals <- function(interval_length, breakpoints) {
   label_incomplete <- as.character(
@@ -99,6 +114,9 @@ plot.windows.stacked.chart <-
     list_rbind()
 
   fig.result_reported_within.stacked_area <- {
+    # Cleaner than `assignInNamespace`
+    local_mocked_bindings(str_squish = local_str_squish, .package = 'stringr')
+    local_mocked_bindings(str_split = local_str_split, .package = 'stringr')
     df <-
       windows.result_reported_within |>
         mutate(

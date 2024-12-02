@@ -81,7 +81,7 @@
                   pacman parsedate patchwork purrr
                   readr rlang RPostgres
                   scales stringr survival survminer svglite
-                  this_path tidyr tidyverse
+                  testthat this_path tidyr tidyverse
                   vroom
                   yaml
                 ];

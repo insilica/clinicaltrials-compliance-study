@@ -19,6 +19,7 @@ pacman::p_load(
   broom,
   tidyr,
   assertthat,
+  testthat,
   fs,
   glue,
   listr,
