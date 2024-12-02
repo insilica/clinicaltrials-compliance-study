@@ -32,19 +32,22 @@ plot.windows.pct.scatterline <- function(agg.windows) {
              ) ) |>
     list_rbind() |> tibble()
 
-  fig.pct.all <-
-  (  plot.pct.scatterline(df, rr.results_reported_12mo.pct,
-                        'Percentage results reported within 12 months')
-   + plot.pct.scatterline(df, rr.results_reported_5yr.pct,
-                         'Percentage results reported within 5 years')
-   + plot.pct.scatterline(df, hlact.pct,
-                         'Percentage HLACTs out of all studies')
+  plots <- list(
+    plot.pct.scatterline(df, rr.results_reported_12mo.pct,
+			'Percentage results reported within 12 months'),
+    plot.pct.scatterline(df, rr.results_reported_5yr.pct,
+			 'Percentage results reported within 5 years'),
+    plot.pct.scatterline(df, hlact.pct,
+			 'Percentage HLACTs out of all studies')
   )
+
+  # Combine using cowplot
+  fig.pct.all <- cowplot::plot_grid(plotlist = plots, ncol = 1)
   show(fig.pct.all)
   plot.output.base <- fs::path(glue("figtab/{agg.windows[[1]]$window$prefix}/fig.percentage.all"))
   fs::dir_create(path_dir(plot.output.base))
   for (ext in c("png", "svg")) {
-    ggsave(paste0(plot.output.base, ".", ext), width = 12, height = 8)
+    ggsave(paste0(plot.output.base, ".", ext), width = 8, height = 12)
   }
 }
 # }}}

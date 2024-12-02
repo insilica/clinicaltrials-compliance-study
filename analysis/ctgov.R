@@ -11,6 +11,7 @@ pacman::p_load(
   survival,
   ggplot2,
   ggtext,
+  cowplot,
   survminer,
   ggsurvfit,
   forcats,

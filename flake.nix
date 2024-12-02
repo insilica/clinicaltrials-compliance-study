@@ -72,7 +72,7 @@
               extraRPackages = with pkgs.rPackages; [
                   arrow assertthat
                   blandr broom
-                  ComplexUpset cthist
+                  ComplexUpset cowplot cthist
                   DBI dotenv dplyr
                   forcats fs
                   ggplot2 ggsurvfit ggtext glue gridtext gtsummary
