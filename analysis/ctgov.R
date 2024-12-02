@@ -10,6 +10,7 @@ pacman::p_load(
   lubridate,
   survival,
   ggplot2,
+  ggtext,
   survminer,
   ggsurvfit,
   forcats,
