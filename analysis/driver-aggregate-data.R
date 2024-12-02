@@ -176,6 +176,44 @@ add_data.window_yearly <- function(data) {
             subset.prefix = '', subset.name = 'all')
     )
   }
+
+  yearly_deltas <- list()
+  for (i in 1:(length(agg.windows.yearly_obs36)-1)) {
+    w1 <- agg.windows.yearly_obs36[[i]]
+    w2 <- agg.windows.yearly_obs36[[i+1]]
+    y1.start <- w1$window$date$start |> year()
+    y1.stop  <- w1$window$date$stop  |> year()
+    y2.start <- w2$window$date$start |> year()
+    y2.stop  <- w2$window$date$stop  |> year()
+
+    # Calculate raw delta
+    delta <- 100*(mean(w2$hlact.studies$cr.results_reported_12mo) -
+                  mean(w1$hlact.studies$cr.results_reported_12mo))
+
+    # Store in list
+    yearly_deltas[[glue("{y1.start}-{y1.stop}")]] <- delta
+
+    # Add formatted version to data frame
+    data <- data |>
+      add_data(
+        key = glue("yearly-{y1.start}-{y1.stop}-to-{y2.start}-{y2.stop}-delta-pct-report-w-in-12-mo"),
+        value = delta |> format.delta.percent(),
+        unit = "delta-percent",
+        comment = glue("Year-over-year change in 12-month reporting rate from {y1.start}-{y1.stop} to {y2.start}-{y2.stop}")
+      )
+  }
+
+  delta_range <- (
+    yearly_deltas[!names(yearly_deltas) %in% c('2015-2016')]
+    |> range() )
+  data <- data |> add_data(
+    key = "yearly-delta-pct-report-w-in-12mo-range-excluding-2015-2016",
+    value0 = delta_range[1] |> format.delta.percent(),
+    value1 = delta_range[2] |> format.delta.percent(),
+    unit = "delta-percent",
+    comment = "Range of year-over-year changes in 12-month reporting rate (excluding outlier period 2015-2016)"
+  )
+
   return(data)
 }
 
@@ -202,24 +240,6 @@ data <- ( data
               comment = "Difference between window2-pct-report-w-in-36-mo and window1-pct-report-w-in-36-mo")
 
   |> add_data.window_yearly()
-
-  |> add_data(key = "yearly-2015-2016-to-2016-2017-delta-pct-report-w-in-12-mo",
-              value = {
-                        window.for.year <- \(x.year) {
-                          return(
-                            agg.windows.yearly_obs36
-                            |> keep( ~ .x$window$date$start |> year() == x.year )
-                            |> getElement(1)
-                          )
-                        }
-                        y2016 <- window.for.year(2016)
-                        y2015 <- window.for.year(2015)
-                        ( 100*(  mean(y2016$hlact.studies$cr.results_reported_12mo)
-                               - mean(y2015$hlact.studies$cr.results_reported_12mo) ) )
-                       } |>
-                      format.delta.percent(),
-              unit  = "delta-percent",
-              comment = "Difference between yearly-2016-2017-pct-report-w-in-12-mo and yearly-2015-2016-pct-report-w-in-12-mo")
 )
 
 # Save the dataset
