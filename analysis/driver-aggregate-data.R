@@ -43,6 +43,10 @@ format.delta.percent <- function(value) {
   return( sprintf("%+.2f", value) )
 }
 
+format.months.fractional <- function(value) {
+  return( sprintf("%.1f", value) )
+}
+
 add_data <- function(df, key,
                      value = NULL,
                      value0 = NULL, value1 = NULL,
@@ -234,14 +238,14 @@ add_data.window_yearly <- function(data) {
     data <- data |>
       add_data(
         key = glue("window-{window_desc}-time-to-report-iqr-months"),
-        value0 = window$quantile.stats["25%"],
-        value1 = window$quantile.stats["75%"],
+        value0 = window$quantile.stats["25%"] |> format.months.fractional(),
+        value1 = window$quantile.stats["75%"] |> format.months.fractional(),
         unit = "month",
         comment = glue("Time in months to report IQR (25th-75th percentile) for {window_desc} window")
       ) |>
       add_data(
         key = glue("window-{window_desc}-time-to-report-median-months"),
-        value = window$quantile.stats["50%"],
+        value = window$quantile.stats["50%"] |> format.months.fractional(),
         unit = "month",
         comment = glue("Median time in months to report for {window_desc} window")
       )
