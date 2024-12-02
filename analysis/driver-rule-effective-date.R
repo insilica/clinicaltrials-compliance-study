@@ -11,6 +11,11 @@ window.titles <- list(
   'rule-effective-date-after'  = 'After Rule Effective Date'
 )
 
+window.names <- list(
+  'rule-effective-date-before' = 'Window 1',
+  'rule-effective-date-after'  = 'Window 2'
+)
+
 strat.var.labels <- list(
   fit.funding       = 'Funding',
   fit.phase         = 'Phase',
@@ -20,8 +25,21 @@ strat.var.labels <- list(
 
 agg.window.compare.rule_effective <- windows.rdata.read('brick/rule-effective-date_processed')
 
-plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE)
-plot.windows.stacked.chart(agg.window.compare.rule_effective, with_names = TRUE, with_facet = NULL)
+( agg.window.compare.rule_effective.short.names <-
+    agg.window.compare.rule_effective
+    |> setNames(window.names[names(agg.window.compare.rule_effective)]) )
+
+plot.windows.stacked.chart(agg.window.compare.rule_effective.short.names,
+			   with_names = TRUE,
+			   with_facet = "common.funding",
+			   window.time.label.oneline = TRUE )
+
+plot.windows.stacked.chart(agg.window.compare.rule_effective.short.names,
+			   with_names = TRUE,
+			   with_facet = NULL,
+			   window.time.label.oneline = TRUE,
+			   ggsave.opts = c(width = 8, height = 8)
+			  )
 
 survival.fits <- map(agg.window.compare.rule_effective,
     ~ create_survfit_models(.x$hlact.studies))
