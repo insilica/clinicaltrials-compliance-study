@@ -206,7 +206,8 @@ plot.windows.stacked.chart <-
       scale_y_continuous(labels = label_percent()) +
       labs(
         title = glue("Percentage of Studies Reporting Results Within Different Time Frames ({faceted_by.label})"),
-        x = "Cut-off date",
+        #x = "Cut-off date", # use the geom_richtext() to represent x-axis labels
+        x = "",              # but still need margins for axis.title.x
         y = "Percentage",
         fill = "Reporting Within Time Frame"
       ) +
