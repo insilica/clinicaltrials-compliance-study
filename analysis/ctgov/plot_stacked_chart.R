@@ -82,8 +82,9 @@ plot.windows.stacked.chart <-
              with_names = FALSE,
              with_facet = "common.funding",
              window.time.label.oneline = FALSE,
-             ggsave.opts = c(width = 12,
-                             height = 8)
+             ggsave.opts = list(width = 12,
+                             height = 8),
+             fig.cb = NULL
      ) {
 
   window_names <- names(agg.windows)
@@ -133,13 +134,20 @@ plot.windows.stacked.chart <-
     }
 
     #print(df)
+    (span.style.primary <-
+      ( if( is.null(with_facet) ) { 'color:black; font-size:16pt' }
+        else { 'color:black; font-size:12pt' } ) )
+    ( span.style.secondary <-
+      ( if( is.null(with_facet) ) { 'color: #8a8a8a; font-size:12pt' }
+        else { 'color: #8a8a8a' } ) )
     if( window.time.label.oneline ) {
-      window.year.glue_format <- "<span style='color: grey30'>{year(start)}–{year(stop)}<br>Cutoff {year(cutoff)}</span>"
+      window.year.glue_format <- "<span style='{span.style.secondary}'>{year(start)}–{year(stop)}<br>Cutoff {year(cutoff)}</span>"
+
     } else {
-      window.year.glue_format <- "<span style='color: grey30'>{year(start)}–<br>{year(stop)}<br>Cutoff {year(cutoff)}</span>"
+      window.year.glue_format <- "<span style='{span.style.secondary}'>{year(start)}–<br>{year(stop)}<br>Cutoff {year(cutoff)}</span>"
     }
     if( with_names ) {
-      name.glue_format <- "<span style='color:black; font-size:12pt'><b>{
+      name.glue_format <- "<span style='{span.style.primary}'><b>{
             str_replace_all(window_name, ' ', '\u00A0') |>
             str_wrap(20) |>
               str_replace_all('\n', '<br>')
@@ -148,7 +156,7 @@ plot.windows.stacked.chart <-
       name.glue_format <- ""
     }
 
-    count.label.glue_format <- "<span style='color: grey30'>(N = {scales::comma(n)})</span>"
+    count.label.glue_format <- "<span style='{span.style.secondary}'>(N = {scales::comma(n)})</span>"
 
     time.label.glue_format <- paste(name.glue_format,
                                     window.year.glue_format,
@@ -186,12 +194,13 @@ plot.windows.stacked.chart <-
     fig <- fig +
       geom_bar(stat = "identity") +
       geom_text(aes(label = ifelse(pct > 0.01, sprintf("%1.0f%%", 100*pct), '')),
-                position = position_stack(vjust = 0.5), size = 6, family='mono',
+                position = position_stack(vjust = 0.5),
+                size = 6, family='mono', fontface = 'bold',
                 color = "black" # "#fdfdfd" "black"
                 ) +
       ggtext::geom_richtext(
         data = time.label.df,
-        aes(x = time, y = -0.02, label = full.label),
+        aes(x = time, y = -0.05, label = full.label),
         stat = "identity",
         position = "identity",
         inherit.aes = FALSE,
@@ -240,6 +249,10 @@ plot.windows.stacked.chart <-
             #panel.spacing.y = unit(40, "pt"),  # add space between plot and strips
       )
 
+    if( !is.null(fig.cb) ) {
+      fig <- fig.cb(fig)
+    }
+
     fig
   }
   show(fig.result_reported_within.stacked_area)
@@ -249,9 +262,11 @@ plot.windows.stacked.chart <-
       "figtab/{agg.windows[[1]]$window$prefix}/fig.result_reported_within.facet_{faceted_by.file_part}.stacked_area"))
   fs::dir_create(path_dir(plot.output.path.base))
   for (ext in c("png", "svg", "pdf")) {
+    local_opts <- ggsave.opts
+    if (ext == "pdf") local_opts[["device"]] <- cairo_pdf
     rlang::inject(
       ggsave(paste0(plot.output.path.base, ".", ext),
-             !!!ggsave.opts)
+             !!!local_opts)
     )
   }
 }

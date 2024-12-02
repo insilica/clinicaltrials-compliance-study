@@ -38,7 +38,16 @@ plot.windows.stacked.chart(agg.window.compare.rule_effective.short.names,
 			   with_names = TRUE,
 			   with_facet = NULL,
 			   window.time.label.oneline = TRUE,
-			   ggsave.opts = c(width = 8, height = 8)
+			   ggsave.opts = list(width = 8, height = 8),
+                           fig.cb = \(x) {
+                             ( x
+                              + ggtitle(paste("Percentage of Studies Reporting Results",
+                                              "Window 1 and Window 2", sep = "\n") )
+                              + theme(
+                                  plot.title = element_text(size = 18, face = "bold")
+                                )
+                             )
+                           }
 			  )
 
 survival.fits <- map(agg.window.compare.rule_effective,
