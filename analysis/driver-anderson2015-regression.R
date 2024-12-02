@@ -45,6 +45,6 @@ plot.blandr.or.df(or.df)
 fig.compare.logistic <- plot.compare.logistic(or.combined)
 show(fig.compare.logistic)
 plot.output.base <- "figtab/anderson2015/compare.table_s7.or"
-for (ext in c("png", "svg")) {
+for (ext in c("png", "svg", "pdf")) {
   ggsave(paste0(plot.output.base, ".", ext), width = 12, height = 8)
 }

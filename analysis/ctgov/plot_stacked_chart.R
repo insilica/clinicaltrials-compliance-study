@@ -247,7 +247,7 @@ plot.windows.stacked.chart <-
   plot.output.path.base <- fs::path(glue(
       "figtab/{agg.windows[[1]]$window$prefix}/fig.result_reported_within.facet_{faceted_by.file_part}.stacked_area"))
   fs::dir_create(path_dir(plot.output.path.base))
-  for (ext in c("png", "svg")) {
+  for (ext in c("png", "svg", "pdf")) {
     rlang::inject(
       ggsave(paste0(plot.output.path.base, ".", ext),
              !!!ggsave.opts)
