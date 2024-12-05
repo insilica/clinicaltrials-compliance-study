@@ -1916,8 +1916,8 @@ stages:
     deps:
     - path: analysis/plotter.py
       hash: md5
-      md5: 81094f30dfa3d24759fa46bdd79d8648
-      size: 17353
+      md5: 14f73335e0a804f5680c5734b8a9f385
+      size: 20638
     - path: analysis/utils.py
       hash: md5
       md5: 1046a0decdef6683c7d3f7aa5748237b
@@ -1935,9 +1935,9 @@ stages:
     outs:
     - path: figtab/plotter_py
       hash: md5
-      md5: 8031757442219f1431d9786711106707.dir
-      size: 104748
-      nfiles: 9
+      md5: 6cede49ebd3d94824769b788cd917650.dir
+      size: 104980
+      nfiles: 10
   process-driver-sliding@long-observe:
     cmd: Rscript analysis/driver-sliding-process.R params.yaml long-observe
     deps:
