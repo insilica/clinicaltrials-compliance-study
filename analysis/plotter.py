@@ -268,10 +268,81 @@ def plot_boxplot_yearly():
 
 
 
-def permutation_test(n_pre, N_pre, n_post, N_post, N_reps=50_000):
-    def create_array(n, N):
-        return np.hstack([np.ones(n), np.zeros(N-n)])
+# GET N's FOR CONFINTS + PERMUTATION TEST
+def get_Ns(df_pre, df_post):
+    q_pre = df_pre['rf_months_to_report'].values
+    q_post = df_post['rf_months_to_report'].values
     
+    # Pre: 
+    n_pre_12 = len(df_pre.loc[df_pre['rf_months_to_report'].apply(lambda x: x<=12+1/30.5)])
+    n_pre_36 = len(df_pre.loc[df_pre['rf_months_to_report'].apply(lambda x: x<=36+1/30.5)])
+    N_pre = len(q_pre)
+    p_pre_12 = n_pre_12/N_pre
+    p_pre_36 = n_pre_36/N_pre
+    
+    # Post: 
+    n_post_12 = len(df_post.loc[df_post['rf_months_to_report'].apply(lambda x: x<=12+1/30.5)])
+    n_post_36 = len(df_post.loc[df_post['rf_months_to_report'].apply(lambda x: x<=36+1/30.5)])
+    N_post = len(q_post)
+    p_post_12 = n_post_12/N_post
+    p_post_36 = n_post_36/N_post
+
+    return (n_pre_12, n_pre_36, N_pre, p_pre_12, p_pre_36, 
+            n_post_12, n_post_36, N_post, p_post_12, p_post_36)
+
+
+# BOOTSTRAP CONFIDENCE INTERVALS
+def draw_bs_sample(data):
+    """Draw a bootstrap sample from a 1D data set."""
+    np.random.shuffle(data)
+    return np.random.choice(data, size=len(data))
+
+def draw_conf_ints(arr_pre, arr_post, N_reps=10_000, percentiles=[2.5,97.5]):
+    out = np.empty(N_reps)
+    for i in tqdm(range(N_reps)):
+        rep_pre = draw_bs_sample(arr_pre)
+        rep_post = draw_bs_sample(arr_post)
+        rep_diff = rep_post.mean() - rep_pre.mean()
+        out[i] = rep_diff
+    q_min, q_max = np.percentile(out, percentiles)
+    return q_min, q_max
+
+
+def get_confints(df_pre, df_post, N_reps, percentiles_confints):
+    n_pre_12, n_pre_36, N_pre, p_pre_12, p_pre_36, \
+            n_post_12, n_post_36, N_post, p_post_12, p_post_36 = get_Ns(df_pre, df_post)
+    
+    arr_pre_12 = create_array(n_pre_12, N_pre) # pre
+    arr_post_12  = create_array(n_post_12, N_post) # post
+    
+    arr_pre_36 = create_array(n_pre_36, N_pre) # pre
+    arr_post_36  = create_array(n_post_36, N_post) # post
+    
+    confints_12 = draw_conf_ints(arr_pre_12, arr_post_12, N_reps=N_reps, percentiles=percentiles_confints)
+    confints_36 = draw_conf_ints(arr_pre_36, arr_post_36, N_reps=N_reps, percentiles=percentiles_confints)
+    
+    point_estimate_12 = arr_post_12.mean() - arr_pre_12.mean()
+    point_estimate_36 = arr_post_36.mean() - arr_pre_36.mean()
+
+    return point_estimate_12, confints_12, point_estimate_36, confints_36
+
+
+def table_confints_save(point_estimate_12, confints_12, point_estimate_36, confints_36, percentiles):
+    df_confints = pd.DataFrame({'interval': ['12 mo.', '36 mo.'],
+                       'point_estimate': [point_estimate_12, point_estimate_36], 
+                       'percentile_min': [percentiles[0], percentiles[0]], 
+                       'percentile_max': [percentiles[1], percentiles[1]], 
+                       'conf_int_min': [confints_12[0], confints_36[0]], 
+                       'conf_int_max': [confints_12[1], confints_36[1]]})
+    return df_confints
+
+
+# PERMUTATION TEST RESULTS
+def create_array(n, N):
+    return np.hstack([np.ones(n), np.zeros(N-n)])
+
+def permutation_test(n_pre, N_pre, n_post, N_post, N_reps=50_000):
+
     def test_statistic(a, b):
         return np.mean(b) - np.mean(a)
     
@@ -300,27 +371,15 @@ def permutation_test(n_pre, N_pre, n_post, N_post, N_reps=50_000):
         
     diff_orig, p_value = get_p_value(n_pre, N_pre, n_post, N_post, N_reps=N_reps)
     return diff_orig, p_value
-    
-    
-# PERMUTATION TEST RESULTS
+
+
 def permutation_test_overall(df_pre, df_post, N_reps=50_000):
     q_pre = df_pre['rf_months_to_report'].values
     q_post = df_post['rf_months_to_report'].values
     
-    # Pre: 
-    n_pre_12 = len(df_pre.loc[df_pre['rf_months_to_report'].apply(lambda x: x<=12+1/30.5)])
-    n_pre_36 = len(df_pre.loc[df_pre['rf_months_to_report'].apply(lambda x: x<=36+1/30.5)])
-    N_pre = len(q_pre)
-    p_pre_12 = n_pre_12/N_pre
-    p_pre_36 = n_pre_36/N_pre
-    
-    # Post: 
-    n_post_12 = len(df_post.loc[df_post['rf_months_to_report'].apply(lambda x: x<=12+1/30.5)])
-    n_post_36 = len(df_post.loc[df_post['rf_months_to_report'].apply(lambda x: x<=36+1/30.5)])
-    N_post = len(q_post)
-    p_post_12 = n_post_12/N_post
-    p_post_36 = n_post_36/N_post
-    
+    n_pre_12, n_pre_36, N_pre, p_pre_12, p_pre_36, \
+            n_post_12, n_post_36, N_post, p_post_12, p_post_36 = get_Ns(df_pre, df_post)
+
     # print(n_pre_12, n_pre_36, n_post_12, n_post_36)
     
     # print(N_pre, N_post)
@@ -355,14 +414,17 @@ def table_pvalues_subgroup_save(df_prepost_12, df_prepost_36):
                  'p_value':'p_value_36mo'}))
     return table
 
+
+
+
 # RUN MAIN
 if __name__ == '__main__':
     np.random.seed(10) # set seed
-    output_dir = Path('figtab/plotter_py')
+    output_dir = Path('../figtab/plotter_py')
     output_dir.mkdir(parents=True, exist_ok=True)
     # Get dataframes
-    path_pre_processed = "brick/rule-effective-date_processed/datebefore_hlact_studies.parquet"
-    path_post_processed = "brick/rule-effective-date_processed/dateafter_hlact_studies.parquet"
+    path_pre_processed = "../brick/rule-effective-date_processed/datebefore_hlact_studies.parquet"
+    path_post_processed = "../brick/rule-effective-date_processed/dateafter_hlact_studies.parquet"
     df_pre, df_post, df_overall, df_prepost_12, df_prepost_36 = utils.get_dataframes(
         path_pre_processed, 
         path_post_processed
@@ -414,6 +476,22 @@ if __name__ == '__main__':
     bokeh.io.export_svg(p_barchart_yearly, filename=output_dir / 'p_barchart_yearly.svg')
 
 
+    # Create and save 
+    # - confidence_intervals.csv
+    output_confidence_path = output_dir / "confidence_intervals.csv"
+    print(f"\n Creating and saving {output_confidence_path}...")
+    
+    N_reps_confints = 10_000
+    percentiles_confints=[2.5,97.5]
+    point_estimate_12, confints_12, point_estimate_36, confints_36 = \
+        get_confints(df_pre, df_post, N_reps_confints, percentiles_confints)
+    
+    print('confidence interval percentiles', percentiles_confints)
+    print('point estimate & confint 12 mo.', point_estimate_12, confints_12)
+    print('point estimate & confint 36 mo.', point_estimate_36, confints_36)
+    
+    confints_table = table_confints_save(point_estimate_12, confints_12, point_estimate_36, confints_36, percentiles_confints)
+    confints_table.to_csv( output_dir / "confidence_intervals.csv", index=False)
 
     
     # Create and save 
