@@ -21,8 +21,9 @@ COPY (
     FROM
         read_ndjson_auto(
             'download/ctgov/historical/NCT*/*.jsonl',
+            maximum_depth = 1,
             maximum_sample_files = 32768,
-            ignore_errors = true
+            ignore_errors = false
         )
     WHERE
             studyRecord IS NOT NULL
