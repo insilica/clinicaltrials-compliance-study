@@ -88,6 +88,7 @@ plot.windows.stacked.chart <-
      ) {
 
   window_names <- names(agg.windows)
+  is_yearly_obs36 <- str_starts(window_names[1], "yearly_obs36")
 
   faceted_by.label <- with_facet
   if( is.null(with_facet) ) {
@@ -142,9 +143,10 @@ plot.windows.stacked.chart <-
         else { 'color: #8a8a8a' } ) )
     if( window.time.label.oneline ) {
       window.year.glue_format <- "<span style='{span.style.secondary}'>{year(start)}–{year(stop)}<br>Cutoff {year(cutoff)}</span>"
-
     } else {
-      window.year.glue_format <- "<span style='{span.style.secondary}'>{year(start)}–<br>{year(stop)}<br>Cutoff {year(cutoff)}</span>"
+      window.year.glue_format <-
+        if(is_yearly_obs36) "<span style='{span.style.secondary}; text-align:left'>{year(start)}–<br>{year(stop)}</span>"
+        else "<span style='{span.style.secondary}'>{year(start)}–<br>{year(stop)}<br>Cutoff {year(cutoff)}</span>"
     }
     if( with_names ) {
       name.glue_format <- "<span style='{span.style.primary}'><b>{
@@ -162,6 +164,10 @@ plot.windows.stacked.chart <-
                                     window.year.glue_format,
                                     count.label.glue_format,
                                     sep = '<br>')
+    if(is_yearly_obs36) {
+      time.label.glue_format <- paste(window.year.glue_format,
+                                      sep = '<br>')
+    }
 
     # Create time labels with facet-specific N values
     time.label.df <- df |>
