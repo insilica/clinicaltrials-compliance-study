@@ -5,7 +5,7 @@ preprocess_data.common.survival <- function(data, censor_date) {
     mutate(
       surv.event = if_else(!is.na(common.results_received_date) & common.results_received_date <= censor_date, 1, 0),
       surv.time_months = pmin(
-        interval(common.primary_completion_date_imputed, common.results_received_date) / months(1),
+        cr.interval_to_results_no_extensions_no_censor / months(1),
         interval(common.primary_completion_date_imputed, censor_date) / months(1),
         na.rm = TRUE
       )

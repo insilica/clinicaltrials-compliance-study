@@ -28,7 +28,7 @@ dateproc.results_reported.within_inc <- function(data, period) {
     stop("Period must be greater than days(1).")
   }
   return (with(data, {
-        ( interval(common.primary_completion_date_imputed, common.results_received_date) < period + days(1) ) |>
+        ( cr.interval_to_results_default < period + days(1) ) |>
         replace_na(FALSE)
   }))
 }

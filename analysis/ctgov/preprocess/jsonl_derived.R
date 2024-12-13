@@ -56,6 +56,10 @@ standardize.jsonl_derived.dates <- function(data) {
     ) |>
     mutate(
            common.start_date = create_date_partial(schema1.start_date),
+           common.disp_submit_date = as.Date(schema1.disp_submit_date),
+    ) |>
+    mutate(
+           common.delayed = !is.na(common.disp_submit_date)
     )
   return(data)
 }
