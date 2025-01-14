@@ -1,5 +1,6 @@
 # if(!sys.nframe()) { argv <- c('params.yaml', 'sliding-window'); source('analysis/driver-sliding.R') }
 # if(!sys.nframe()) { argv <- c('params.yaml', 'long-observe'  ); source('analysis/driver-sliding.R') }
+# if(!sys.nframe()) { argv <- c('params.yaml', 'yearly_obs36'  ); source('analysis/driver-sliding.R') }
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
