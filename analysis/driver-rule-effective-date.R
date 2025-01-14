@@ -54,7 +54,8 @@ survival.fits <- map(agg.window.compare.rule_effective,
     ~ create_survfit_models(.x$hlact.studies))
 
 plot_survifit_wrap <- function(data, fit) {
-  time_months.max <- max(data$hlact.studies$surv.time_months, na.rm = TRUE)
+  #time_months.max <- max(data$hlact.studies$surv.time_months, na.rm = TRUE)
+  time_months.max <- 36 # 36 months
   breaks.risktable.less_than <- seq(0, time_months.max, by = 12) - 1
   breaks.risktable.less_than[1] <- 0
   breaks.fig <- seq(0, time_months.max, by = 6)
