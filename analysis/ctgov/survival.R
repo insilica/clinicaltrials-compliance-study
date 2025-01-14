@@ -33,7 +33,7 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
   fit |>
     ggsurvfit(type = 'risk', 
               size=1.5
-              ) +
+    ) +
     add_risktable(
       risktable_stats = c("n.risk"),
       times = breaks.risktable.less_than,
@@ -42,8 +42,7 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
       # theme = theme_risktable_plain(),
       risktable_height = 0.20,
       size = 2.5, # font size
-                  ) +
-    
+    ) +
     # theme_risktable(base_size = 14) +
     scale_ggsurvfit(
       #x_scales = list(breaks = breaks.fig, limits=c(0, 60)),
@@ -67,12 +66,3 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
     xlab("Months after primary completion date") + 
     ylab("Trials (%)") 
 }
-
-
-
-
-
-
-
-
-
