@@ -75,7 +75,7 @@
                   ComplexUpset cowplot cthist
                   DBI dotenv dplyr
                   forcats fs
-                  ggplot2 ggsurvfit ggtext glue gridtext gtsummary
+                  ggplot2 ggpubr ggsurvfit ggtext glue gridtext gtsummary
                   here
                   listr logger lubridate
                   pacman parsedate patchwork purrr

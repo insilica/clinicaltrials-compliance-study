@@ -100,3 +100,50 @@ for(window.name in names(survival.fits)) {
   }
 }
 }
+
+
+window.legend.position <- list(
+  'rule-effective-date-before' = 'none',
+  'rule-effective-date-after'  = 'right'
+)
+for(strat.var in names(strat.var.labels)) {
+  plots <- list()
+  for(window.name in names(survival.fits)) {
+    print(window.name)
+    print(strat.var)
+    # Create and build the plot
+    plots[[window.name]] <- ggsurvfit_build(
+      plot_survifit_wrap(
+        agg.window.compare.rule_effective[[window.name]],
+        survival.fits[[window.name]][[strat.var]]
+      )
+      + ggtitle(window.names[[window.name]])
+      + theme(legend.position = window.legend.position[[window.name]])
+    )
+  }
+
+  combined_plot <- ggarrange(
+    plots[['rule-effective-date-before']],
+    plots[['rule-effective-date-after']],
+    ncol = 2,
+    common.legend = TRUE, legend = "right"
+  )
+
+  # Add the overall title
+  combined_plot <- annotate_figure(combined_plot,
+    top = text_grob(glue("Cumulative % of Trials Reporting to ClinicalTrials.gov Stratified by {strat.var.labels[[strat.var]]}"),
+                    size = 14)
+  )
+
+  print(combined_plot)
+
+  # Save combined plot
+  plot.output.base <- fs::path(glue(
+    "figtab/{agg.window.compare.rule_effective[[1]]$window$prefix}/fig.combined.surv.strat-{strat.var}"))
+  fs::dir_create(path_dir(plot.output.base))
+  for (ext in c("png", "svg", "pdf")) {
+    ggsave(paste0(plot.output.base, ".", ext),
+           plot = combined_plot,
+           width = 12, height = 8)
+  }
+}
