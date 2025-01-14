@@ -167,7 +167,9 @@ plot.windows.stacked.chart <-
                                     count.label.glue_format,
                                     sep = '<br>')
     if(is_yearly_obs36) {
+      count.label.glue_format <- "<span style='color: {color.text.secondary}; font-size:6pt'>(N = {scales::comma(n)})</span>"
       time.label.glue_format <- paste(window.year.glue_format,
+                                      count.label.glue_format,
                                       sep = '<br>')
     }
 
