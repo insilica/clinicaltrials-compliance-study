@@ -35,9 +35,11 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
               size=1.5
     ) +
     add_risktable(
-      risktable_stats = c("n.risk"),
       times = breaks.risktable.less_than,
       #times = c(0, 12, 24, 36, 48, 60)
+      #risktable_stats = c("n.risk"),
+      risktable_stats = c("{paste0(' ', n.risk)}"),
+      stats_label = c('N trials that have not reported results'),
       #theme = theme_risktable_boxed(),
       # theme = theme_risktable_plain(),
       risktable_height = 0.20,
