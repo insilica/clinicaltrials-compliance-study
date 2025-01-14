@@ -135,12 +135,14 @@ plot.windows.stacked.chart <-
     }
 
     #print(df)
+    color.text.primary <- 'black'
+    color.text.secondary <- '#8a8a8a'
     (span.style.primary <-
-      ( if( is.null(with_facet) ) { 'color:black; font-size:16pt' }
-        else { 'color:black; font-size:12pt' } ) )
+      ( if( is.null(with_facet) ) { glue('color:{color.text.primary}; font-size:16pt') }
+        else { glue('color:{color.text.primary}; font-size:12pt') } ) )
     ( span.style.secondary <-
-      ( if( is.null(with_facet) ) { 'color: #8a8a8a; font-size:12pt' }
-        else { 'color: #8a8a8a' } ) )
+      ( if( is.null(with_facet) ) { glue('color: {color.text.secondary}; font-size:12pt') }
+        else { glue('color: {color.text.secondary}') } ) )
     if( window.time.label.oneline ) {
       window.year.glue_format <- "<span style='{span.style.secondary}'>{year(start)}–{year(stop)}<br>Cutoff {year(cutoff)}</span>"
     } else {
