@@ -53,7 +53,7 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
     ) +
     scale_color_brewer(palette = "Dark2") + 
     theme(
-      text = element_text(family = "Tahoma"),
+      #text = element_text(family = "Tahoma"),
       axis.title.x = element_text(size = 16),  # X-axis title font size
       axis.title.y = element_text(size = 16),  # Y-axis title font size
       axis.text.x = element_text(size = 14),   # X-axis text size

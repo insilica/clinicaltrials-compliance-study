@@ -81,9 +81,9 @@ for(window.name in names(survival.fits)) {
           +
           # Position the legend inside the plot
           theme(
-            legend.position = c(0.20, 0.95),  # Adjust these values as needed
+            legend.position.inside = c(0.20, 0.95),  # Adjust these values as needed
             legend.justification = c("right", "top"),  # This aligns the legend box's corner to the position
-            legend.background = element_rect(fill = "white", color = "NA", size = 0.5),  # Optional: make background semi-transparent or solid
+            legend.background = element_rect(fill = "white", color = "NA", linewidth = 0.5),  # Optional: make background semi-transparent or solid
             legend.key = element_rect(fill = "white", colour = "white")  # Adjust key background
           )
           #+ theme(
