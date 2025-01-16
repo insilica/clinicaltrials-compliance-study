@@ -118,7 +118,8 @@ for(strat.var in names(strat.var.labels)) {
         survival.fits[[window.name]][[strat.var]]
       )
       + ggtitle(window.names[[window.name]])
-      + theme(legend.position = window.legend.position[[window.name]])
+      + theme(legend.position = window.legend.position[[window.name]],
+              plot.margin = margin(t = 5, r = 20, b = 5, l = 5, unit = "pt"))
     )
   }
 
