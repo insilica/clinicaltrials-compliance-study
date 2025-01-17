@@ -102,10 +102,6 @@ for(window.name in names(survival.fits)) {
 }
 
 
-window.legend.position <- list(
-  'rule-effective-date-before' = 'none',
-  'rule-effective-date-after'  = 'right'
-)
 for(strat.var in names(strat.var.labels)) {
   plots <- list()
   for(window.name in names(survival.fits)) {
@@ -118,17 +114,28 @@ for(strat.var in names(strat.var.labels)) {
         survival.fits[[window.name]][[strat.var]]
       )
       + ggtitle(window.names[[window.name]])
-      + theme(legend.position = window.legend.position[[window.name]],
-              plot.margin = margin(t = 5, r = 20, b = 5, l = 5, unit = "pt"))
+      + theme(legend.position = 'none')
     )
   }
+
+  # Create an unbuilt version just for legend extraction
+  (legend_plot <-
+     plot_survifit_wrap(agg.window.compare.rule_effective[['rule-effective-date-after']],
+                        survival.fits[['rule-effective-date-after']][[strat.var]])
+     + theme(legend.direction = "vertical",
+             legend.position = "right")
+  )
+  # Extract the legend
+  shared_legend <- get_legend(legend_plot)
 
   combined_plot <- ggarrange(
     plots[['rule-effective-date-before']],
     plots[['rule-effective-date-after']],
     ncol = 2,
-    common.legend = TRUE, legend = "right"
-  )
+    #common.legend = TRUE,
+    legend = "right",
+    legend.grob = shared_legend
+  ) + theme(plot.margin = margin(t = 5, r = 25, b = 5, l = 5, unit = "pt"))
 
   # Add the overall title
   combined_plot <- annotate_figure(combined_plot,
