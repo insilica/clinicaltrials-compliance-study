@@ -224,8 +224,8 @@ add_data.window_yearly <- function(data) {
       window_start = .x$window$date$start,
       window_end   = .x$window$date$stop,
       quantile.stats = .x$hlact.studies
-        |> subset(cr.months_to_results_no_censor <= 36)
-        |> pull(cr.months_to_results_no_censor)
+        |> subset(cr.months_to_results_no_extensions_no_censor <= 36)
+        |> pull(cr.months_to_results_no_extensions_no_censor)
         |> quantile(probs = c(0.25, 0.5, 0.75), na.rm = TRUE )
     ))
 
@@ -275,6 +275,23 @@ data <- ( data
                       format.delta.percent(),
               unit  = "delta-percent",
               comment = "Difference between window2-pct-report-w-in-36-mo and window1-pct-report-w-in-36-mo")
+
+  ## Add delta values for extensions
+  |> add_data(key = "window1-to-2-delta-pct-report-w-in-12-mo-with-ext",
+              value = (( 100*(mean(dateproc.results_reported.within_inc( w2$hlact.studies |> mutate(cr.interval_to_results_default = cr.interval_to_results_with_extensions_no_censor), months(12)))
+                             -
+                             mean(dateproc.results_reported.within_inc( w1$hlact.studies |> mutate(cr.interval_to_results_default = cr.interval_to_results_with_extensions_no_censor), months(12)))) )
+                      |> format.delta.percent()),
+              unit  = "delta-percent",
+              comment = "Difference between Window 2 and Window 1 12-month reporting rates (with extensions)")
+
+  |> add_data(key = "window1-to-2-delta-pct-report-w-in-36-mo-with-ext",
+              value = (( 100*(mean(dateproc.results_reported.within_inc(w2$hlact.studies |> mutate(cr.interval_to_results_default = cr.interval_to_results_with_extensions_no_censor), months(36)))
+                              -
+                              mean(dateproc.results_reported.within_inc(w1$hlact.studies |> mutate(cr.interval_to_results_default = cr.interval_to_results_with_extensions_no_censor), months(36)))) )
+                      |> format.delta.percent()),
+              unit  = "delta-percent",
+              comment = "Difference between Window 2 and Window 1 36-month reporting rates (with extensions)")
 
   |> add_data.window_yearly()
 )

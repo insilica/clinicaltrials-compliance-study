@@ -37,10 +37,14 @@ categorize_intervals <- function(interval_length, breakpoints) {
   return(result)
 }
 
+agg.window.with_interval_column.default <- "cr.interval_to_results_no_extensions_no_censor"
+
 
 process.single.agg.window.amend.agg.interval.groups <-
     function(agg.window.single,
-             with_facet = "common.funding" ) {
+             with_facet = "common.funding",
+             with_interval_column = agg.window.with_interval_column.default
+             ) {
   # Define breakpoints in months
   breakpoints <- 12*sequence(3)
   # ( 12*sequence(5) == c(12, 24, 36, 48, 60) ) |> all()
@@ -48,7 +52,7 @@ process.single.agg.window.amend.agg.interval.groups <-
   agg.window.single$agg.interval.groups <-
     agg.window.single$hlact.studies |>
   mutate( agg.interval =
-            interval(common.primary_completion_date_imputed, common.results_received_date),
+            .data[[with_interval_column]],
        ) |>
   mutate( agg.results_reported_within =
             categorize_intervals(agg.interval, breakpoints)
@@ -64,11 +68,15 @@ process.single.agg.window.amend.agg.interval.groups <-
 }
 
 process.all.agg.window.amend.agg.interval.groups <-
-  function(agg.windows, with_facet = NULL ) {
+  function(agg.windows,
+           with_facet = NULL,
+           with_interval_column = NULL
+           ) {
   for(w_name in names(agg.windows)) {
     agg.windows[[w_name]] <- agg.windows[[w_name]] |>
       process.single.agg.window.amend.agg.interval.groups(
-        with_facet = with_facet
+        with_facet = with_facet,
+        with_interval_column = with_interval_column
       )
   }
   agg.windows[[1]]$agg.interval.groups |> names()
@@ -81,6 +89,7 @@ plot.windows.stacked.chart <-
     function(agg.windows,
              with_names = FALSE,
              with_facet = "common.funding",
+             with_interval_column = agg.window.with_interval_column.default,
              window.time.label.oneline = FALSE,
              ggsave.opts = list(width = 12,
                              height = 8),
@@ -97,7 +106,10 @@ plot.windows.stacked.chart <-
   faceted_by.label <- gsub("^common\\.", "", faceted_by.label)
 
   agg.windows <- agg.windows |>
-    process.all.agg.window.amend.agg.interval.groups(with_facet = with_facet)
+    process.all.agg.window.amend.agg.interval.groups(
+        with_facet = with_facet,
+        with_interval_column = with_interval_column
+    )
 
   #agg.windows |>
   #  map( ~ .x$agg.interval.groups |> print() )
@@ -269,8 +281,14 @@ plot.windows.stacked.chart <-
   show(fig.result_reported_within.stacked_area)
 
   faceted_by.file_part <- gsub('\\.', '-', faceted_by.label)
+  interval_column.file_part <- (if(with_interval_column == agg.window.with_interval_column.default) ''
+                                else paste0('.interval-column_', gsub('\\.', '-', with_interval_column)))
   plot.output.path.base <- fs::path(glue(
-      "figtab/{agg.windows[[1]]$window$prefix}/fig.result_reported_within.facet_{faceted_by.file_part}.stacked_area"))
+      "figtab/{agg.windows[[1]]$window$prefix}/fig.result_reported_within.facet_{
+        faceted_by.file_part
+      }{
+        interval_column.file_part
+      }.stacked_area"))
   fs::dir_create(path_dir(plot.output.path.base))
   for (ext in c("png", "svg", "pdf")) {
     local_opts <- ggsave.opts

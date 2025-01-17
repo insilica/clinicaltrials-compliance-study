@@ -34,21 +34,24 @@ plot.windows.stacked.chart(agg.window.compare.rule_effective.short.names,
 			   with_facet = "common.funding",
 			   window.time.label.oneline = TRUE )
 
-plot.windows.stacked.chart(agg.window.compare.rule_effective.short.names,
-			   with_names = TRUE,
-			   with_facet = NULL,
-			   window.time.label.oneline = TRUE,
-			   ggsave.opts = list(width = 8, height = 8),
-                           fig.cb = \(x) {
-                             ( x
-                              + ggtitle(paste("Percentage of Studies Reporting Results",
-                                              "Window 1 and Window 2", sep = "\n") )
-                              + theme(
-                                  plot.title = element_text(size = 18, face = "bold")
-                                )
-                             )
-                           }
-			  )
+for (interval.col in c("cr.interval_to_results_no_extensions_no_censor", "cr.interval_to_results_with_extensions_no_censor")) {
+  plot.windows.stacked.chart(agg.window.compare.rule_effective.short.names,
+                             with_names = TRUE,
+                             with_facet = NULL,
+                             with_interval_column = interval.col,
+                             window.time.label.oneline = TRUE,
+                             ggsave.opts = list(width = 8, height = 8),
+                             fig.cb = \(x) {
+                               ( x
+                                + ggtitle(paste("Percentage of Studies Reporting Results",
+                                                "Window 1 and Window 2", sep = "\n") )
+                                + theme(
+                                    plot.title = element_text(size = 18, face = "bold")
+                                  )
+                               )
+                             }
+                            )
+}
 
 survival.fits <- map(agg.window.compare.rule_effective,
     ~ create_survfit_models(.x$hlact.studies))

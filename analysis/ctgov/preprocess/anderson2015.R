@@ -16,6 +16,8 @@ standardize.anderson2015 <- function(df) {
            common.allocation = schema0.allocation,
            common.number_of_arms = schema0.NUMBER_OF_ARMS,
            common.masking = schema0.masking,
+
+           common.delayed = schema0.delayed,
     )
 }
 
@@ -43,7 +45,9 @@ standardize.anderson2015.type <- function(data) {
                schema0.radiation,
                schema0.otherint), \(x) x == 'Yes'),
       # results12 is stored as { "Yes",  "No" }
-      across(c(schema0.results12), \(x) x == 'Yes'),
+      across(c(schema0.results12,
+               schema0.delayed,
+               schema0.delayed12), \(x) x == 'Yes'),
     )
   return(data)
 }
@@ -62,6 +66,7 @@ standardize.anderson2015.dates <- function(data) {
     ) |>
     mutate(
            common.start_date = create_date_month_name(schema0.start_year, schema0.start_month),
+           common.disp_submit_date = as.Date(schema0.dr_received_dt),
     )
   return(data)
 }
