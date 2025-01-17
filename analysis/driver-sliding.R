@@ -1,5 +1,6 @@
 # if(!sys.nframe()) { argv <- c('params.yaml', 'sliding-window'); source('analysis/driver-sliding.R') }
 # if(!sys.nframe()) { argv <- c('params.yaml', 'long-observe'  ); source('analysis/driver-sliding.R') }
+# if(!sys.nframe()) { argv <- c('params.yaml', 'yearly_obs36'  ); source('analysis/driver-sliding.R') }
 
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
@@ -36,4 +37,13 @@ plot.windows.compare.logistic(agg.windows)
 
 plot.windows.stacked.chart(agg.windows)
 
-plot.windows.stacked.chart(agg.windows, with_facet = NULL)
+plot.windows.stacked.chart(agg.windows, with_facet = NULL,
+  fig.cb = \(fig) {
+    fig +
+      labs(
+           title = paste("Percentage of studies reporting results within different time frames",
+                         "Up to 36 months",
+                         sep = "\n"),
+      ) +
+      xlab('Trial Completion Window')
+})

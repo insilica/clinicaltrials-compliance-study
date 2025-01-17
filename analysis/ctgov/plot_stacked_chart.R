@@ -18,7 +18,7 @@ local_str_split <- function (string, pattern, n = Inf, simplify = FALSE) {
 
 categorize_intervals <- function(interval_length, breakpoints) {
   label_incomplete <- as.character(
-    glue("No results within {max(breakpoints)} months")
+    glue("Not reported within {max(breakpoints)} mo.")
   )
   labels <- c(paste0(breakpoints, " months"),
               label_incomplete)
@@ -135,12 +135,14 @@ plot.windows.stacked.chart <-
     }
 
     #print(df)
+    color.text.primary <- 'black'
+    color.text.secondary <- '#8a8a8a'
     (span.style.primary <-
-      ( if( is.null(with_facet) ) { 'color:black; font-size:16pt' }
-        else { 'color:black; font-size:12pt' } ) )
+      ( if( is.null(with_facet) ) { glue('color:{color.text.primary}; font-size:16pt') }
+        else { glue('color:{color.text.primary}; font-size:12pt') } ) )
     ( span.style.secondary <-
-      ( if( is.null(with_facet) ) { 'color: #8a8a8a; font-size:12pt' }
-        else { 'color: #8a8a8a' } ) )
+      ( if( is.null(with_facet) ) { glue('color: {color.text.secondary}; font-size:12pt') }
+        else { glue('color: {color.text.secondary}') } ) )
     if( window.time.label.oneline ) {
       window.year.glue_format <- "<span style='{span.style.secondary}'>{year(start)}–{year(stop)}<br>Cutoff {year(cutoff)}</span>"
     } else {
@@ -165,7 +167,9 @@ plot.windows.stacked.chart <-
                                     count.label.glue_format,
                                     sep = '<br>')
     if(is_yearly_obs36) {
+      count.label.glue_format <- "<span style='color: {color.text.secondary}; font-size:9pt'>(N = {scales::comma(n)})</span>"
       time.label.glue_format <- paste(window.year.glue_format,
+                                      count.label.glue_format,
                                       sep = '<br>')
     }
 
@@ -224,7 +228,7 @@ plot.windows.stacked.chart <-
         #x = "Cut-off date", # use the geom_richtext() to represent x-axis labels
         x = "",              # but still need margins for axis.title.x
         y = "Percentage",
-        fill = "Reporting Within Time Frame"
+        fill = "Reporting within"
       ) +
       # scale_fill_brewer(type = 'qual', palette = 1, direction = -1) +
       scale_fill_manual(
@@ -239,6 +243,7 @@ plot.windows.stacked.chart <-
         ) +
       theme_minimal() +
       theme(
+            plot.title = element_text(face = "bold"),
             #axis.text.x = element_text(angle = 45, hjust = 1),
             #axis.text.x = element_markdown(size = 8),
             axis.text.x = element_blank(),
