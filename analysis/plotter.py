@@ -337,6 +337,45 @@ def table_confints_save(point_estimate_12, confints_12, point_estimate_36, confi
     return df_confints
 
 
+def get_confints_subcat(r, N_reps=10_000, percentiles_confints=[2.5,97.5]):
+    n_pre = r.n_pre
+    n_post = r.n_post
+    N_pre = r.N_pre
+    N_post = r.N_post
+    
+    arr_pre = create_array(n_pre, N_pre) # pre
+    arr_post  = create_array(n_post, N_post) # post
+    
+    confints = draw_conf_ints(arr_pre, arr_post, N_reps=N_reps, percentiles=percentiles_confints)    
+    point_estimate = arr_post.mean() - arr_pre.mean()
+
+    return (point_estimate, *confints)
+
+
+def table_confints_subcat_save(df_prepost_12, df_prepost_36, N_reps=10_000, percentiles_confints=[2.5,97.5]):
+    
+    df_confints_subcat = df_prepost_36[['group','subgroup']].copy()
+    
+    df_confints_subcat['confints_12'] = df_prepost_12.apply(
+        get_confints_subcat, 
+        N_reps=N_reps_confints, percentiles_confints=percentiles_confints,
+        axis=1
+    )
+    
+    df_confints_subcat['confints_36'] = df_prepost_36.apply(
+        get_confints_subcat, 
+        N_reps=N_reps, percentiles_confints=percentiles_confints,
+        axis=1
+    )
+    
+    df_confints_subcat[['diff_rate_12', 'confints_12_min', 'confints_12_max']] = df_confints_subcat['confints_12'].apply(pd.Series)
+    df_confints_subcat[['diff_rate_36', 'confints_36_min', 'confints_36_max']] = df_confints_subcat['confints_36'].apply(pd.Series)
+    
+    df_confints_subcat = df_confints_subcat.drop(columns=['confints_12', 'confints_36'])
+    
+    return df_confints_subcat
+    
+    
 # PERMUTATION TEST RESULTS
 def create_array(n, N):
     return np.hstack([np.ones(n), np.zeros(N-n)])
@@ -490,9 +529,14 @@ if __name__ == '__main__':
     print('point estimate & confint 12 mo.', point_estimate_12, confints_12)
     print('point estimate & confint 36 mo.', point_estimate_36, confints_36)
     
-    confints_table = table_confints_save(point_estimate_12, confints_12, point_estimate_36, confints_36, percentiles_confints)
+    confints_table = table_confints_save(
+        point_estimate_12, confints_12, point_estimate_36, confints_36, percentiles_confints)
     confints_table.to_csv( output_dir / "confidence_intervals.csv", index=False)
 
+    df_confints_subcat = table_confints_subcat_save(
+        df_prepost_12, df_prepost_36, N_reps = N_reps_confints, percentiles_confints=percentiles_confints)
+    df_confints_subcat.to_csv( output_dir / "confidence_intervals_subcat.csv", index=False)
+    
     
     # Create and save 
     # - permutation_results.csv
