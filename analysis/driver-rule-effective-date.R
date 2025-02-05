@@ -158,3 +158,62 @@ for(strat.var in names(strat.var.labels)) {
            width = 12, height = 8)
   }
 }
+
+survival.logranks <- (
+  agg.window.compare.rule_effective
+    %>% set_names(str_remove(names(.), "rule-effective-date-"))
+    %>% create_logranks.all()
+)
+
+survival.logranks$overall |> map( ~ .x$pvalue )
+
+survival.logranks$strata |> map( ~ .x$pvalue )
+
+survival.logranks$pairwise
+
+# Extract and adjust p-values
+pvalues <- survival.logranks$pairwise |>
+  map(~map_dbl(.x, ~.x$pvalue)) |>
+  unlist()
+print(tidy(pvalues))
+adjusted_pvalues <- p.adjust(pvalues, method = "hochberg")
+print( tidy(adjusted_pvalues) )
+
+pvalue_df <- survival.logranks$pairwise |>
+  map(\(group_tests)
+    imap(group_tests, \(stratum_test, idx) tibble(
+      stratum = idx,
+      pvalue  = stratum_test$pvalue
+    )) |> list_rbind()
+  ) |>
+  list_rbind(names_to = "group") |>
+  mutate(group = str_to_title(str_remove(group, "logrank\\."))) |>
+  group_by(group) |>
+  mutate(p.adjusted = p.adjust(pvalue, method = "hochberg")) |>
+  ungroup()
+print(pvalue_df)
+
+pvalue_df |>
+	  knitr::kable(
+	    format = "latex",
+	    digits = 2,
+	    scientific = TRUE,
+	    col.names = c("Group", "Stratum", "P-value", "Adjusted P-value")
+	  ) |>
+	  kableExtra::row_spec(c(3, 7, 11), extra_css = "border-bottom: 1px solid")
+
+
+pvalue_df |>
+  mutate(
+    pvalue = formatC(pvalue, format = "e", digits = 2),
+    p.adjusted = formatC(p.adjusted, format = "e", digits = 2)
+  ) |>
+  group_by(group) |>
+  mutate(group = if_else(row_number() == 1, group, "")) |>
+  ungroup() |>
+  knitr::kable(
+    format = "latex",
+    booktabs = TRUE,
+    col.names = c("Group", "Stratum", "P-value", "Adjusted P-value")
+  ) |>
+  kableExtra::pack_rows(index = table(pvalue_df$group))
