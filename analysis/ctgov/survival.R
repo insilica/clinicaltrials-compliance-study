@@ -68,3 +68,14 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
     xlab("Months after primary completion date") + 
     ylab("Trials (%)") 
 }
+
+
+# Function to perform Log-Rank Test
+perform_logrank_tests <- function(data) {
+  list(
+    logrank.funding       = survdiff(Surv(surv.time_months, surv.event) ~ common.funding, data = data),
+    logrank.phase         = survdiff(Surv(surv.time_months, surv.event) ~ common.phase.norm, data = data),
+    logrank.interventions = survdiff(Surv(surv.time_months, surv.event) ~ common.intervention_type, data = data),
+    logrank.status        = survdiff(Surv(surv.time_months, surv.event) ~ common.overall_status, data = data)
+  )
+}

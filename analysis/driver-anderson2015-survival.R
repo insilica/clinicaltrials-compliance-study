@@ -93,3 +93,21 @@ show(fig.surv.status <- plot_survfit_with_title(fits$fit.status,
 for (ext in c("png", "svg", "pdf")) {
   ggsave.partial(paste0('figtab/anderson2015/fig_s3.survfit.status', ".", ext))
 }
+
+
+
+
+# Log rank test
+logrank_results <- perform_logrank_tests(hlact.studies)
+logrank_results %>% View()
+
+# Function to extract p-values from log-rank test results
+extract_p_values <- function(logrank_results) {
+  sapply(logrank_results, function(res) {
+    p_value <- res$pvalue
+    return(p_value)
+  })
+}
+
+logrank_p_values <- extract_p_values(logrank_results)
+logrank_p_values %>% View()
