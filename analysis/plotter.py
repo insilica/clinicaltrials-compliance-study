@@ -526,7 +526,7 @@ if __name__ == '__main__':
     print(f"\n Creating and saving in {output_dir}")
     print(f"- table_IQR_12mo_primary_cats")
     df_IQR = IQR_12mo_primary_cats(table_rates_subgroup_save)
-    df_IQR.to_csv("table_IQR_12mo_primary_cats.csv", index=False)
+    df_IQR.to_csv(output_dir / "table_IQR_12mo_primary_cats.csv", index=False)
     print(df_IQR)
     
     # Create and save 
