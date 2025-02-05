@@ -456,6 +456,37 @@ def table_pvalues_subgroup_save(df_prepost_12, df_prepost_36):
 
 
 
+# Helper function for writing results section
+# Approximates % improvement across primary categories 
+def IQR_12mo_primary_cats(table_rates_subgroup_save):
+    '''
+    Used to fill in the following statement: 
+    While primary categories saw improvements in timely reporting within 12 months
+    of approximately ____%, trials classified as ‘Other’ ... showed minimal change.
+    '''
+    
+    # Take out Other and NA groups
+    df_IQR = table_rates_subgroup_save.loc[table_rates_subgroup_save['subgroup'] != 'Other']
+    df_IQR = df_IQR.loc[~pd.isna(df_IQR['subgroup'])]
+    df_IQR = df_IQR.loc[df_IQR['subgroup'] != 'N/A']    
+
+    # Get percentiles of those reporting in primary categories
+    x_12 = df_IQR['diff_rate_12mo (%)']
+    x_36 = df_IQR['diff_rate_36mo (%)']
+    
+    percentiles_12 = np.percentile(x_12, [25, 50, 75])
+    percentiles_36 = np.percentile(x_36, [25, 50, 75])
+    
+    df_12 = pd.DataFrame({'percentile':[25, 50, 75], 'value':percentiles_12, 'group': ['reporting within 12 mo (%)'] * 3}) 
+    df_36 = pd.DataFrame({'percentile':[25, 50, 75], 'value':percentiles_36, 'group': ['reporting within 36 mo (%)'] * 3}) 
+    
+    df_final = pd.concat([df_12, df_36])
+    df_final = df_final.pivot(columns='group',index='percentile', values='value').reset_index()
+    df_final.columns.name = None
+    
+    return df_final
+    
+
 # RUN MAIN
 if __name__ == '__main__':
     np.random.seed(10) # set seed
@@ -490,8 +521,13 @@ if __name__ == '__main__':
     table_composition_subgroup_save = table_composition_subgroup(df_prepost_12) 
     table_composition_subgroup_save.to_csv(output_dir / "table_composition_subgroup.csv", index=False) 
 
-
-
+    # Create and save
+    # - table_IQR_12mo_primary_cats : 25th, 50th, 75th percentile in 12 & 36 mo. improvement for primary categories
+    print(f"\n Creating and saving in {output_dir}")
+    print(f"- table_IQR_12mo_primary_cats")
+    df_IQR = IQR_12mo_primary_cats(table_rates_subgroup_save)
+    df_IQR.to_csv("table_IQR_12mo_primary_cats.csv", index=False)
+    print(df_IQR)
     
     # Create and save 
     # - p_lollipop_12.svg : shows subgroups pre/post rr12mo on lollipop chart
@@ -554,6 +590,7 @@ if __name__ == '__main__':
     permutation_results_subgroup.to_csv( output_dir / "permutation_results_subgroup.csv", index=False)
     
 
+    
     pass
 
 
