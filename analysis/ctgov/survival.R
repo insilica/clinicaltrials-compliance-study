@@ -70,8 +70,8 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
 }
 
 
-# Function to perform Log-Rank Test
-create_logranks <- function(agg.window) {
+# Functions to perform Log-Rank Test
+create_logranks.overall <- function(agg.window) {
   combined_data <- agg.window |>
     imap(~mutate(.x$hlact.studies, window_name = .y)) |>
     bind_rows()
@@ -84,5 +84,122 @@ create_logranks <- function(agg.window) {
                                     data = combined_data),
     logrank.status        = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.overall_status),
                                     data = combined_data)
+  )
+}
+
+create_logranks.strata <- function(agg.window) {
+  combined_data <- agg.window |>
+    imap(~mutate(.x$hlact.studies, window_name = .y)) |>
+    bind_rows()
+  list(
+    logrank.funding       = survdiff(Surv(surv.time_months, surv.event) ~ window_name + strata(common.funding),
+                                data = combined_data),
+    logrank.phase         = survdiff(Surv(surv.time_months, surv.event) ~ window_name + strata(common.phase.norm),
+                                    data = combined_data),
+    logrank.interventions = survdiff(Surv(surv.time_months, surv.event) ~ window_name + strata(common.intervention_type),
+                                    data = combined_data),
+    logrank.status        = survdiff(Surv(surv.time_months, surv.event) ~ window_name + strata(common.overall_status),
+                                    data = combined_data)
+  )
+}
+
+create_logranks.pairwise <- function(agg.window) {
+  combined_data <- agg.window |>
+    imap(~mutate(.x$hlact.studies, window_name = .y)) |>
+    bind_rows()
+  #list(
+  #  logrank.funding       = pairwise_survdiff(Surv(surv.time_months, surv.event) ~ window_name + common.funding,
+  #                                            data = combined_data),
+  #  logrank.phase         = pairwise_survdiff(Surv(surv.time_months, surv.event) ~ window_name + common.phase.norm,
+  #                                            data = combined_data),
+  #  logrank.interventions = pairwise_survdiff(Surv(surv.time_months, surv.event) ~ window_name + common.intervention_type,
+  #                                            data = combined_data),
+  #  logrank.status        = pairwise_survdiff(Surv(surv.time_months, surv.event) ~ window_name + common.overall_status,
+  #                                  data = combined_data)
+  #)
+
+  #list(
+  #  logrank.funding = combined_data |>
+  #    group_by(common.funding) |>
+  #    group_modify(~broom::tidy(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x))),
+  #  logrank.phase = combined_data |>
+  #    group_by(common.phase.norm) |>
+  #    group_modify(~broom::tidy(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x))),
+  #  logrank.interventions = combined_data |>
+  #    group_by(common.intervention_type) |>
+  #    group_modify(~broom::tidy(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x))),
+  #  logrank.status = combined_data |>
+  #    group_by(common.overall_status) |>
+  #    group_modify(~broom::tidy(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)))
+  #)
+
+  #list(
+  #  logrank.funding = combined_data |>
+  #    group_by(common.funding) |>
+  #    group_map(~survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+  #  logrank.phase = combined_data |>
+  #    group_by(common.phase.norm) |>
+  #    group_map(~survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+  #  logrank.interventions = combined_data |>
+  #    group_by(common.intervention_type) |>
+  #    group_map(~survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+  #  logrank.status = combined_data |>
+  #    group_by(common.overall_status) |>
+  #    group_map(~survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x))
+  #)
+
+  #list(
+  #  logrank.funding = combined_data |>
+  #    group_by(common.funding) |>
+  #    group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+  #                       .y$common.funding)) |>
+  #    unlist(recursive = FALSE),
+
+  #  logrank.phase = combined_data |>
+  #    group_by(common.phase.norm) |>
+  #    group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+  #                       .y$common.phase.norm)) |>
+  #    unlist(recursive = FALSE),
+
+  #  logrank.interventions = combined_data |>
+  #    group_by(common.intervention_type) |>
+  #    group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+  #                       .y$common.intervention_type)) |>
+  #    unlist(recursive = FALSE),
+
+  #  logrank.status = combined_data |>
+  #    group_by(common.overall_status) |>
+  #    group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+  #                       .y$common.overall_status)) |>
+  #    unlist(recursive = FALSE)
+  #)
+
+  list(
+    logrank.funding = combined_data |>
+      group_by(common.funding) |>
+      group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+                          pull(.y))) |> unlist(recursive = FALSE),
+    logrank.phase = combined_data |>
+      group_by(common.phase.norm) |>
+      group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+                          pull(.y))) |> unlist(recursive = FALSE),
+
+    logrank.interventions = combined_data |>
+      group_by(common.intervention_type) |>
+      group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+                          pull(.y))) |> unlist(recursive = FALSE),
+
+    logrank.status = combined_data |>
+      group_by(common.overall_status) |>
+      group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
+                          pull(.y))) |> unlist(recursive = FALSE)
+  )
+}
+
+create_logranks.all <- function(agg.window) {
+  list(
+    overall = create_logranks.overall(agg.window),
+    strata  = create_logranks.strata(agg.window),
+    pairwise = create_logranks.pairwise(agg.window)
   )
 }

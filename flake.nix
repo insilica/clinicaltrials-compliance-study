@@ -77,6 +77,7 @@
                   forcats fs
                   ggplot2 ggpubr ggsurvfit ggtext glue gridtext gtsummary
                   here
+                  knitr kableExtra
                   listr logger lubridate
                   pacman parsedate patchwork purrr
                   readr rlang RPostgres
