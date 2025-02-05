@@ -217,3 +217,61 @@ pvalue_df |>
     col.names = c("Group", "Stratum", "P-value", "Adjusted P-value")
   ) |>
   kableExtra::pack_rows(index = table(pvalue_df$group))
+
+
+####
+
+create_prop_tests <- function(agg.windows, var_name) {
+  agg.windows |>
+    bind_rows(.id = "period") |>
+    mutate(period = factor(period, levels = c("rule-effective-date-before", "rule-effective-date-after"))) |>
+    group_by(!!rlang::sym(var_name)) |>
+    summarise(
+      table = list(table(!rr.results_reported_12mo, period))
+    ) |>
+    tibble::deframe() |>
+    map(~prop.test(.x, alternative = 'less'))
+}
+
+# Create all tests
+h <- map(agg.window.compare.rule_effective, ~ .x$hlact.studies )
+chisq.tests <- list(
+    funding       = h |> create_prop_tests("common.funding"),
+    phase         = h |> create_prop_tests("common.phase.norm"),
+    interventions = h |> create_prop_tests("common.intervention_type"),
+    status        = h |> create_prop_tests("common.overall_status")
+)
+print(chisq.tests)
+
+# Create prop tests with correction table
+chisq_df <- chisq.tests |>
+  imap_dfr(\(group_tests, group_name) {
+    imap_dfr(group_tests, \(test, stratum_name) {
+      tibble(
+        group = group_name,
+        stratum = stratum_name,
+        pvalue = test$p.value
+      )
+    })
+  }) |>
+  group_by(group) |>
+  mutate(p.adjusted = p.adjust(pvalue, method = "hochberg")) |>
+  ungroup()
+print(chisq_df)
+
+# Create table like logrank
+chisq_table <- chisq_df |>
+  mutate(
+    pvalue = formatC(pvalue, format = "e", digits = 2),
+    p.adjusted = formatC(p.adjusted, format = "e", digits = 2),
+    group = str_to_title(group)
+  ) |>
+  group_by(group) |>
+  mutate(group = if_else(row_number() == 1, group, "")) |>
+  ungroup() |>
+  knitr::kable(
+    format = "latex",
+    booktabs = TRUE,
+    col.names = c("Group", "Stratum", "P-value", "Adjusted P-value")
+  ) |>
+  kableExtra::pack_rows(index = table(chisq_df$group))
