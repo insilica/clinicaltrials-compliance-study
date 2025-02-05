@@ -158,3 +158,11 @@ for(strat.var in names(strat.var.labels)) {
            width = 12, height = 8)
   }
 }
+
+survival.logranks <- (
+  agg.window.compare.rule_effective
+    %>% set_names(str_remove(names(.), "rule-effective-date-"))
+    %>% create_logranks()
+)
+
+survival.logranks |> map( ~ .x$pvalue )

@@ -71,11 +71,18 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
 
 
 # Function to perform Log-Rank Test
-perform_logrank_tests <- function(data) {
+create_logranks <- function(agg.window) {
+  combined_data <- agg.window |>
+    imap(~mutate(.x$hlact.studies, window_name = .y)) |>
+    bind_rows()
   list(
-    logrank.funding       = survdiff(Surv(surv.time_months, surv.event) ~ common.funding, data = data),
-    logrank.phase         = survdiff(Surv(surv.time_months, surv.event) ~ common.phase.norm, data = data),
-    logrank.interventions = survdiff(Surv(surv.time_months, surv.event) ~ common.intervention_type, data = data),
-    logrank.status        = survdiff(Surv(surv.time_months, surv.event) ~ common.overall_status, data = data)
+    logrank.funding       = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.funding),
+                                data = combined_data),
+    logrank.phase         = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.phase.norm),
+                                    data = combined_data),
+    logrank.interventions = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.intervention_type),
+                                    data = combined_data),
+    logrank.status        = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.overall_status),
+                                    data = combined_data)
   )
 }
