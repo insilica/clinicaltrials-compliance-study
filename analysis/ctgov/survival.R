@@ -31,7 +31,7 @@ create_survfit_models <- function(data) {
 # Function to plot Kaplan-Meier curves
 plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
   fit |>
-    ggsurvfit(type = 'risk', 
+    ggsurvfit(type = 'risk',
               size=1.5
     ) +
     add_risktable(
@@ -51,7 +51,7 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
       x_scales = list(breaks = breaks.fig, limits=c(0, max(breaks.fig))),
       y_scales = list(limits = c(0, 1))
     ) +
-    scale_color_brewer(palette = "Dark2") + 
+    scale_color_brewer(palette = "Dark2") +
     theme(
       #text = element_text(family = "Tahoma"),
       axis.title.x = element_text(size = 16),  # X-axis title font size
@@ -63,10 +63,10 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
       panel.background = element_blank(),
       panel.grid.minor = element_line(color = "#eaeaea"),
       panel.grid.major = element_line(color = "#eaeaea"),
-      
-    ) + 
-    xlab("Months after primary completion date") + 
-    ylab("Trials (%)") 
+
+    ) +
+    xlab("Months after primary completion date") +
+    ylab("Trials (%)")
 }
 
 
