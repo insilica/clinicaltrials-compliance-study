@@ -96,6 +96,9 @@ chisq.tests <- local({
       funding       = h |> create_prop_tests("common.funding"),
       phase         = h |> create_prop_tests("common.phase.norm"),
       intervention  = h |> create_prop_tests("common.intervention_type"),
+      purpose       = h |>
+        map( ~ filter(.x, !is.na(rr.primary_purpose) ) ) |>
+        create_prop_tests("rr.primary_purpose"),
       status        = h |> create_prop_tests("common.overall_status")
   )
 })
