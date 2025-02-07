@@ -61,7 +61,10 @@ print(lr.pvalue_df)
 lr.pvalue_df |>
   mutate(
     pvalue = formatC(pvalue, format = "e", digits = 2),
-    p.adjusted = formatC(p.adjusted, format = "e", digits = 2)
+    p.adjusted = paste0(
+      formatC(p.adjusted, format = "e", digits = 2),
+      symnum(p.adjusted, cutpoints = c(0, 0.001, 1), symbols = c("*", ""))
+    )
   ) |>
   group_by(group) |>
   #mutate(group = if_else(row_number() == 1, group, "")) |>
@@ -127,8 +130,10 @@ print(chisq.pvalue_df)
 chisq.pvalue_df |>
   mutate(
     pvalue = formatC(pvalue, format = "e", digits = 2),
-    p.adjusted = formatC(p.adjusted, format = "e", digits = 2),
-    group = str_to_title(group)
+    p.adjusted = paste0(
+      formatC(p.adjusted, format = "e", digits = 2),
+      symnum(p.adjusted, cutpoints = c(0, 0.001, 1), symbols = c("*", ""))
+    )
   ) |>
   group_by(group) |>
   #mutate(group = if_else(row_number() == 1, group, "")) |>
