@@ -142,8 +142,8 @@ create_logranks.pairwise <- function(agg.window) {
 
 create_logranks.all <- function(agg.window) {
   list(
-    overall = create_logranks.overall(agg.window),
-    strata  = create_logranks.strata(agg.window),
+    overall  = create_logranks.overall(agg.window),
+    strata   = create_logranks.strata(agg.window),
     pairwise = create_logranks.pairwise(agg.window)
   )
 }
