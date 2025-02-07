@@ -95,7 +95,7 @@ chisq.tests <- local({
   list(
       funding       = h |> create_prop_tests("common.funding"),
       phase         = h |> create_prop_tests("common.phase.norm"),
-      interventions = h |> create_prop_tests("common.intervention_type"),
+      intervention  = h |> create_prop_tests("common.intervention_type"),
       status        = h |> create_prop_tests("common.overall_status")
   )
 })

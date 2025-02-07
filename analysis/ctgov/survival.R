@@ -80,7 +80,7 @@ create_logranks.overall <- function(agg.window) {
                                 data = combined_data),
     logrank.phase         = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.phase.norm),
                                     data = combined_data),
-    logrank.interventions = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.intervention_type),
+    logrank.intervention  = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.intervention_type),
                                     data = combined_data),
     logrank.status        = survdiff(Surv(surv.time_months, surv.event) ~ window_name + (common.overall_status),
                                     data = combined_data)
@@ -96,7 +96,7 @@ create_logranks.strata <- function(agg.window) {
                                 data = combined_data),
     logrank.phase         = survdiff(Surv(surv.time_months, surv.event) ~ window_name + strata(common.phase.norm),
                                     data = combined_data),
-    logrank.interventions = survdiff(Surv(surv.time_months, surv.event) ~ window_name + strata(common.intervention_type),
+    logrank.intervention  = survdiff(Surv(surv.time_months, surv.event) ~ window_name + strata(common.intervention_type),
                                     data = combined_data),
     logrank.status        = survdiff(Surv(surv.time_months, surv.event) ~ window_name + strata(common.overall_status),
                                     data = combined_data)
@@ -118,7 +118,7 @@ create_logranks.pairwise <- function(agg.window) {
       group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
                           pull(.y))) |> unlist(recursive = FALSE),
 
-    logrank.interventions = combined_data |>
+    logrank.intervention = combined_data |>
       group_by(common.intervention_type) |>
       group_map(~setNames(list(survdiff(Surv(surv.time_months, surv.event) ~ window_name, data = .x)),
                           pull(.y))) |> unlist(recursive = FALSE),
