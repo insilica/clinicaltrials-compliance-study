@@ -160,6 +160,15 @@ stages:
       - analysis/driver-rule-effective-date.R
     outs:
       - figtab/rule-effective
+  analysis-driver-rule-effective-date-extra-analysis:
+    cmd: |
+      Rscript analysis/driver-rule-effective-date-extra-analysis.R
+    deps:
+      - brick/rule-effective-date_processed
+      - params.yaml
+      - analysis/driver-rule-effective-date-extra-analysis.R
+    outs:
+      - figtab/rule-effective-extra-analysis
   plotter_py:
     cmd: |
       python3 analysis/plotter.py

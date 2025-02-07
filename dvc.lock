@@ -2094,3 +2094,25 @@ stages:
       md5: 71787654e3e84f88ddd229b8af810bcd.dir
       size: 871938
       nfiles: 12
+  analysis-driver-rule-effective-date-extra-analysis:
+    cmd: "Rscript analysis/driver-rule-effective-date-extra-analysis.R\n"
+    deps:
+    - path: analysis/driver-rule-effective-date-extra-analysis.R
+      hash: md5
+      md5: 55eb42f146359584465579847e74105e
+      size: 4962
+    - path: brick/rule-effective-date_processed
+      hash: md5
+      md5: c1837f9afeba78ba1a78edc7f89f993f.dir
+      size: 30231617
+      nfiles: 3
+    - path: params.yaml
+      hash: md5
+      md5: 59a86acc308c6ac883bc751ebac18b44
+      size: 10815
+    outs:
+    - path: figtab/rule-effective-extra-analysis
+      hash: md5
+      md5: e58639e56ec98f051710b92449c1b9cd.dir
+      size: 2183
+      nfiles: 2
