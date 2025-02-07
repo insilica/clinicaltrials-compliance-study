@@ -10,7 +10,7 @@ fs::dir_create("figtab/rule-effective-extra-analysis")
 
 agg.window.compare.rule_effective <- windows.rdata.read('brick/rule-effective-date_processed')
 
-analysis.groups <- c("Funding", "Phase", "Intervention", "Purpose", "Status")
+analysis.groups <- c("Funding", "Phase", "Intervention", "Purpose")
 
 ### Log-rank test ###
 
@@ -58,6 +58,9 @@ lr.pvalue_df <- survival.logranks$pairwise |>
   ungroup()
 print(lr.pvalue_df)
 
+local({
+lr.pvalue_df <- lr.pvalue_df |>
+  filter( group != 'Status' )
 lr.pvalue_df |>
   mutate(
     pvalue = formatC(pvalue, format = "e", digits = 2),
@@ -78,6 +81,7 @@ lr.pvalue_df |>
   kableExtra::pack_rows(index = table(factor(lr.pvalue_df$group, levels = analysis.groups))) |>
   paste0("\n") |>
   cat(file = "figtab/rule-effective-extra-analysis/log-rank-pval.tab.tex")
+})
 
 
 ####
@@ -128,6 +132,9 @@ chisq.pvalue_df <- chisq.tests |>
 print(chisq.pvalue_df)
 
 # Create table like logrank
+local({
+chisq.pvalue_df <- chisq.pvalue_df |>
+  filter( group != 'Status' )
 chisq.pvalue_df |>
   mutate(
     pvalue = formatC(pvalue, format = "e", digits = 2),
@@ -148,3 +155,4 @@ chisq.pvalue_df |>
   kableExtra::pack_rows(index = table(factor(chisq.pvalue_df$group, levels = analysis.groups))) |>
   paste0("\n") |>
   cat(file = "figtab/rule-effective-extra-analysis/chisq-pval.table.tex")
+})
