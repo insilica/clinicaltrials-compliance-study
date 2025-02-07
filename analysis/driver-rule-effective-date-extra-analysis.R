@@ -10,6 +10,8 @@ fs::dir_create("figtab/rule-effective-extra-analysis")
 
 agg.window.compare.rule_effective <- windows.rdata.read('brick/rule-effective-date_processed')
 
+analysis.groups <- c("Funding", "Phase", "Intervention", "Purpose", "Status")
+
 ### Log-rank test ###
 
 survival.logranks <- (
@@ -62,14 +64,15 @@ lr.pvalue_df |>
     p.adjusted = formatC(p.adjusted, format = "e", digits = 2)
   ) |>
   group_by(group) |>
-  mutate(group = if_else(row_number() == 1, group, "")) |>
+  #mutate(group = if_else(row_number() == 1, group, "")) |>
   ungroup() |>
+  mutate(group = "") |>
   knitr::kable(
     format = "latex",
     booktabs = TRUE,
     col.names = c("Group", "Stratum", "P-value", "Adjusted P-value")
   ) |>
-  kableExtra::pack_rows(index = table(lr.pvalue_df$group)) |>
+  kableExtra::pack_rows(index = table(factor(lr.pvalue_df$group, levels = analysis.groups))) |>
   cat(file = "figtab/rule-effective-extra-analysis/log-rank-pval.tab.tex")
 
 
@@ -109,7 +112,7 @@ chisq.pvalue_df <- chisq.tests |>
   imap_dfr(\(group_tests, group_name) {
     imap_dfr(group_tests, \(test, stratum_name) {
       tibble(
-        group = group_name,
+        group = str_to_title(group_name),
         stratum = stratum_name,
         pvalue = test$p.value
       )
@@ -128,12 +131,13 @@ chisq.pvalue_df |>
     group = str_to_title(group)
   ) |>
   group_by(group) |>
-  mutate(group = if_else(row_number() == 1, group, "")) |>
+  #mutate(group = if_else(row_number() == 1, group, "")) |>
   ungroup() |>
+  mutate(group = "") |>
   knitr::kable(
     format = "latex",
     booktabs = TRUE,
     col.names = c("Group", "Stratum", "P-value", "Adjusted P-value")
   ) |>
-  kableExtra::pack_rows(index = table(chisq.pvalue_df$group)) |>
+  kableExtra::pack_rows(index = table(factor(chisq.pvalue_df$group, levels = analysis.groups))) |>
   cat(file = "figtab/rule-effective-extra-analysis/chisq-pval.table.tex")
