@@ -76,6 +76,7 @@ lr.pvalue_df |>
     col.names = c("Group", "Stratum", "P-value", "Adjusted P-value")
   ) |>
   kableExtra::pack_rows(index = table(factor(lr.pvalue_df$group, levels = analysis.groups))) |>
+  paste0("\n") |>
   cat(file = "figtab/rule-effective-extra-analysis/log-rank-pval.tab.tex")
 
 
@@ -145,4 +146,5 @@ chisq.pvalue_df |>
     col.names = c("Group", "Stratum", "P-value", "Adjusted P-value")
   ) |>
   kableExtra::pack_rows(index = table(factor(chisq.pvalue_df$group, levels = analysis.groups))) |>
+  paste0("\n") |>
   cat(file = "figtab/rule-effective-extra-analysis/chisq-pval.table.tex")
