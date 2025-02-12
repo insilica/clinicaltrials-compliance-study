@@ -88,17 +88,26 @@ lr.pvalue_df |>
 
 ### Chi-squared proportions test ###
 
-create_prop_tests <- function(agg.windows, var_name) {
+create_prop_tests <- function(agg.windows, var_name = NULL) {
   agg.windows |>
     bind_rows(.id = "period") |>
     mutate(period = factor(period, levels = c("rule-effective-date-before", "rule-effective-date-after"))) |>
-    group_by(!!rlang::sym(var_name)) |>
+    (if (is.null(var_name)) identity else \(x) group_by(x, !!rlang::sym(var_name)))() |>
     summarise(
       table = list(table(!rr.results_reported_12mo, period))
     ) |>
     tibble::deframe() |>
     map(~prop.test(.x, alternative = 'less'))
 }
+
+chisq.tests.all <- local({
+  h <- map(agg.window.compare.rule_effective, ~ .x$hlact.studies )
+  h |> create_prop_tests()
+});
+cat(paste0(
+     "Chi-squared over all data\n",
+     chisq.tests.all |> str.print()
+))
 
 # Create all tests
 chisq.tests <- local({
