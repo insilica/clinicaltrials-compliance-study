@@ -94,7 +94,7 @@ create_prop_tests <- function(agg.windows, var_name = NULL) {
     mutate(period = factor(period, levels = c("rule-effective-date-before", "rule-effective-date-after"))) |>
     (if (is.null(var_name)) identity else \(x) group_by(x, !!rlang::sym(var_name)))() |>
     summarise(
-      table = list(table(!rr.results_reported_12mo, period))
+      table = list(table(period, !rr.results_reported_12mo))
     ) |>
     tibble::deframe() |>
     map(~prop.test(.x, alternative = 'less'))
