@@ -20,6 +20,13 @@ survival.logranks <- (
     %>% create_logranks.all()
 )
 
+print("All data log-rank")
+(
+  agg.window.compare.rule_effective
+    %>% set_names(str_remove(names(.), "rule-effective-date-"))
+    %>% create_logranks.all_data()
+) |> print()
+
 ## H0: The survival curves are the same across all groups
 ## H1: At least one curve differs from the others
 print("Overall test p-values (testing if any curves differ):")

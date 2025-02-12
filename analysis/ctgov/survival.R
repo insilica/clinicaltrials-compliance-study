@@ -69,6 +69,13 @@ plot_survfit <- function(fit, breaks.fig, breaks.risktable.less_than) {
     ylab("Trials (%)")
 }
 
+create_logranks.all_data <- function(agg.window) {
+  combined_data <- agg.window |>
+    imap(~mutate(.x$hlact.studies, window_name = .y)) |>
+    bind_rows()
+  survdiff(Surv(surv.time_months, surv.event) ~ window_name,
+           data = combined_data)
+}
 
 # Functions to perform Log-Rank Test
 create_logranks.overall <- function(agg.window) {
