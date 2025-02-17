@@ -20,6 +20,13 @@ survival.logranks <- (
     %>% create_logranks.all()
 )
 
+print("All data log-rank")
+(
+  agg.window.compare.rule_effective
+    %>% set_names(str_remove(names(.), "rule-effective-date-"))
+    %>% create_logranks.all_data()
+) |> print()
+
 ## H0: The survival curves are the same across all groups
 ## H1: At least one curve differs from the others
 print("Overall test p-values (testing if any curves differ):")
@@ -88,17 +95,26 @@ lr.pvalue_df |>
 
 ### Chi-squared proportions test ###
 
-create_prop_tests <- function(agg.windows, var_name) {
+create_prop_tests <- function(agg.windows, var_name = NULL) {
   agg.windows |>
     bind_rows(.id = "period") |>
     mutate(period = factor(period, levels = c("rule-effective-date-before", "rule-effective-date-after"))) |>
-    group_by(!!rlang::sym(var_name)) |>
+    (if (is.null(var_name)) identity else \(x) group_by(x, !!rlang::sym(var_name)))() |>
     summarise(
-      table = list(table(!rr.results_reported_12mo, period))
+      table = list(table(period, !rr.results_reported_12mo))
     ) |>
     tibble::deframe() |>
     map(~prop.test(.x, alternative = 'less'))
 }
+
+chisq.tests.all <- local({
+  h <- map(agg.window.compare.rule_effective, ~ .x$hlact.studies )
+  h |> create_prop_tests()
+});
+cat(paste0(
+     "Chi-squared over all data\n",
+     chisq.tests.all |> str.print()
+))
 
 # Create all tests
 chisq.tests <- local({
