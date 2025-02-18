@@ -1,5 +1,15 @@
 # clinicaltrials-compliance-study
 
+## Paper
+
+**Compliance with Results Reporting at ClinicalTrials.gov Before and After the 2017 FDAAA Final Rule: A Comparative Analysis**
+
+- Publication: [Compliance with Results Reporting at ClinicalTrials.gov Before and After the 2017 FDAAA Final Rule: A Comparative Analysis](https://publichealth.realclearjournals.org/research-articles/2025/01/compliance-with-results-reporting-at-clinicaltrials-gov-before-and-after-the-2017-fdaaa-final-rule-a-comparative-analysis/)
+- DOI: <https://doi.org/10.70542/rcj-japh-art-vr3aga>
+
+
+## Description
+
 Steps towards reproducing results of:
 
 > Anderson ML, Chiswell K, Peterson ED, Tasneem A, Topping J, Califf RM.
