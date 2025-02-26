@@ -2116,3 +2116,85 @@ stages:
       md5: e58639e56ec98f051710b92449c1b9cd.dir
       size: 2183
       nfiles: 2
+  build-ctgov-studies-all@post-rule-to-20240430:
+    cmd:
+    - mkdir -p $(dirname brick/post-rule-to-20240430/ctgov-studies-all.parquet)
+    - ". .env;\n(\n  if [ -n \"$MY_DUCKDB_TEMP_DIR\" ] && [ -d \"$MY_DUCKDB_TEMP_DIR\"\
+      \ ]; then\n    echo \"Setting the DuckDB temp_directory to $MY_DUCKDB_TEMP_DIR\"\
+      \ >&2 ;\n    echo \"SET temp_directory='$MY_DUCKDB_TEMP_DIR';\" ;\n  fi;\n \
+      \ if [ -n \"$MY_DUCKDB_MEMORY_LIMIT\" ]; then\n    echo \"Setting the DuckDB
+      memory_limit to $MY_DUCKDB_MEMORY_LIMIT\" >&2 ;\n    echo \"SET memory_limit
+      = '$MY_DUCKDB_MEMORY_LIMIT';\" ;\n  fi;\n  script/tt-render-by-param post-rule-to-20240430
+      sql/create_cthist_all.sql\n) | duckdb\n"
+    deps:
+    - path: brick/ctgov/historical/records.parquet
+      hash: md5
+      md5: 988d90eaa5fb17013faefda819041dc8
+      size: 15053123261
+    - path: sql/create_cthist_all.sql
+      hash: md5
+      md5: 4f72841767ed5eb80e48274cc84fd491
+      size: 10048
+    outs:
+    - path: brick/post-rule-to-20240430/ctgov-studies-all.parquet
+      hash: md5
+      md5: 6df3543ab7925b2a793ead6515ac9b3e
+      size: 26050118
+  build-ctgov-studies-hlact-filtered@post-rule-to-20240430:
+    cmd:
+    - make docker-compose-up
+    - mkdir -p $(dirname brick/post-rule-to-20240430/ctgov-studies-hlact.parquet)
+      brick/flowchart-counts
+    - . .env; script/tt-render-by-param post-rule-to-20240430 sql/create_cthist_hlact.sql
+      | duckdb
+    - . .env; script/cthist_hlact_flowchart_partial_sql.sh post-rule-to-20240430 >
+      brick/flowchart-counts/post-rule-to-20240430.csv
+    deps:
+    - path: brick/post-rule-to-20240430/ctgov-studies-all.parquet
+      hash: md5
+      md5: 6df3543ab7925b2a793ead6515ac9b3e
+      size: 26050118
+    - path: download/aact/db-dump/20240430_clinical_trials.zip
+      hash: md5
+      md5: dd7dd067786f58bbd6cd43758fc1a3da
+      size: 1831128430
+    - path: script/cthist_hlact_flowchart_partial_sql.sh
+      hash: md5
+      md5: 1db79b15a5092fe0ee8a047765603488
+      size: 612
+    - path: sql/create_cthist_hlact.sql
+      hash: md5
+      md5: d718da8627c47d826273ca017f299f7c
+      size: 6315
+    - path: sql/params/hlact-filter
+      hash: md5
+      md5: e38c532719f7c8259be3ff8384d09290.dir
+      size: 4050
+      nfiles: 9
+    outs:
+    - path: brick/flowchart-counts/post-rule-to-20240430.csv
+      hash: md5
+      md5: be804ba9bc1576ba6cbc5d413fd62db2
+      size: 158
+    - path: brick/post-rule-to-20240430/ctgov-studies-hlact.parquet
+      hash: md5
+      md5: c11282c994aa878ff35ac3aa22310f06
+      size: 2388745
+  analysis-post-rule-to-20240430-by_sponsor:
+    cmd: "Rscript analysis/driver-results-compliance-by-sponsor.R\n"
+    deps:
+    - path: analysis/driver-results-compliance-by-sponsor.R
+      hash: md5
+      md5: b285f9df38bcbb720cc4f441e503a9cf
+      size: 2005
+    - path: brick/post-rule-to-20240430
+      hash: md5
+      md5: 49f180f9b638082160d55408f84aaa6e.dir
+      size: 28438863
+      nfiles: 2
+    outs:
+    - path: figtab/post-rule-to-20240430-by_sponsor
+      hash: md5
+      md5: ccc319c6053b8c5414242021a25144c7.dir
+      size: 596618
+      nfiles: 1
