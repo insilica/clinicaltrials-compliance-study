@@ -10,16 +10,7 @@ params <- window.params.read()
 output.path.base <- 'figtab/post-rule-to-20240430-by_sponsor'
 fs::dir_create(output.path.base)
 
-process.postrule.agg.window <- function() {
-  params.filtered <- params |>
-    window.params.filter.by.name('^post-rule-to-20240430$')
-  print(names(params.filtered))
-  agg.windows <- process.windows.init(params.filtered) |>
-    process.windows.amend.results_reported()
-  return(agg.windows)
-}
-
-agg.window.postrule <- process.postrule.agg.window()
+agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed')
 
 agg.window.postrule[[1]]$hlact.studies |>
   mutate(
