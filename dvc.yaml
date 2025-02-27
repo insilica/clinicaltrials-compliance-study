@@ -193,6 +193,7 @@ stages:
       Rscript analysis/driver-post-rule-to-20240430-process.R
     deps:
       - analysis/driver-post-rule-to-20240430-process.R
+      - params.yaml
       - brick/post-rule-to-20240430
     outs:
       - brick/post-rule-to-20240430_processed
