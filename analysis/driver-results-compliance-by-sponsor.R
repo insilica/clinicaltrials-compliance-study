@@ -41,7 +41,12 @@ agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed
    wilson.conf.low  = map_dbl(wilson.ci, `[`, 1),
    wilson.conf.high = map_dbl(wilson.ci, `[`, 2)
  )
- |> select(!'wilson.ci')
+ |> select(!wilson.ci)
+ |> select(
+   # Move NCT columns to end
+   !c(starts_with("ncts.")),
+   starts_with("ncts.")
+ )
 )
 
 
