@@ -2185,16 +2185,38 @@ stages:
     deps:
     - path: analysis/driver-results-compliance-by-sponsor.R
       hash: md5
-      md5: b285f9df38bcbb720cc4f441e503a9cf
-      size: 2005
+      md5: 10da93bd333e933ded081bff660862ea
+      size: 8968
+    - path: brick/post-rule-to-20240430_processed
+      hash: md5
+      md5: c052612ddd06fa4235e662c529fd019b.dir
+      size: 24151229
+      nfiles: 2
+    outs:
+    - path: figtab/post-rule-to-20240430-by_sponsor
+      hash: md5
+      md5: 94ae272c2096f22e6844db4c9dc774d0.dir
+      size: 2785487
+      nfiles: 3
+  process-post-rule-to-20240430:
+    cmd: "Rscript analysis/driver-post-rule-to-20240430-process.R\n"
+    deps:
+    - path: analysis/driver-post-rule-to-20240430-process.R
+      hash: md5
+      md5: c11811ca64d77f4f676ab39d51b18cd1
+      size: 668
     - path: brick/post-rule-to-20240430
       hash: md5
       md5: 49f180f9b638082160d55408f84aaa6e.dir
       size: 28438863
       nfiles: 2
-    outs:
-    - path: figtab/post-rule-to-20240430-by_sponsor
+    - path: params.yaml
       hash: md5
-      md5: ccc319c6053b8c5414242021a25144c7.dir
-      size: 596618
-      nfiles: 1
+      md5: f3639f0a85510f7af426389ffa3bdc2a
+      size: 11097
+    outs:
+    - path: brick/post-rule-to-20240430_processed
+      hash: md5
+      md5: c052612ddd06fa4235e662c529fd019b.dir
+      size: 24151229
+      nfiles: 2
