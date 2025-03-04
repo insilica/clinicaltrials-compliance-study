@@ -188,7 +188,8 @@ server <- function(input, output, session) {
 	filter(schema1.lead_sponsor_name == selected_sponsor)
 
       # Create HTML for compliant studies
-      compliant_links <- if (length(selected_data$ncts.compliant[[1]]) > 0) {
+      compliant_links <- if (!is.na(selected_data$ncts.compliant)
+			     && length(selected_data$ncts.compliant[[1]]) > 0) {
 	paste(
 	  sapply(selected_data$ncts.compliant[[1]], function(nct) {
 	    sprintf('<a href="https://clinicaltrials.gov/study/%s" target="_blank">%s</a>',
@@ -201,7 +202,8 @@ server <- function(input, output, session) {
       }
 
       # Create HTML for non-compliant studies
-      noncompliant_links <- if (length(selected_data$ncts.noncompliant[[1]]) > 0) {
+      noncompliant_links <- if (!is.na(selected_data$ncts.noncompliant)
+				&& length(selected_data$ncts.noncompliant[[1]]) > 0) {
 	paste(
 	  sapply(selected_data$ncts.noncompliant[[1]], function(nct) {
 	    sprintf('<a href="https://clinicaltrials.gov/study/%s" target="_blank">%s</a>',
