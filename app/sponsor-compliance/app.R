@@ -100,6 +100,9 @@ server <- function(input, output, session) {
   output$compliance_plot <- renderPlotly({
     data <- sponsor_data()
 
+    range_min <- min(1, min(data$n.total), min(data$n.success))
+    range_max <- max(max(data$n.total), max(data$n.success))
+
     # Create base ggplot
     p <- ggplot(data, aes(x = n.total, y = n.success,
 			 text = paste0(
@@ -118,6 +121,7 @@ server <- function(input, output, session) {
       ), size = 4) +
       scale_x_log10() +
       scale_y_log10() +
+      coord_fixed() + # Force square aspect ratio
       labs(
 	x = "Total Trials (log scale)",
 	y = "Compliant Trials (log scale)",
@@ -133,13 +137,11 @@ server <- function(input, output, session) {
 	legend.position = "bottom"
       )
 
-    # Convert to plotly with custom configuration
-    ggplotly(p, tooltip = "text") %>%
-      layout(
-	hoverlabel = list(bgcolor = "white"),
-	legend = list(orientation = "h", y = -0.2),
-	autosize = TRUE
-      ) %>%
+      plt <- ggplotly(p, tooltip = "text") %>%
+        layout(
+          hoverlabel = list(bgcolor = "white"),
+	  autosize = TRUE
+        ) %>%
       config(
 	scrollZoom = TRUE,
 	displayModeBar = TRUE,
