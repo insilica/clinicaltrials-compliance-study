@@ -6,7 +6,7 @@ library(textutils)
 library(plotly)
 
 # UI definition
-ui <- fillPage(
+ui <- fluidPage(
   titlePanel("Clinical Trial Sponsor Compliance Analysis"),
 
   sidebarLayout(
