@@ -177,6 +177,19 @@ server <- function(input, output, session) {
       formatRound(c("Compliance Rate", "Wilson LCB"), digits = 3)
   })
 
+  # Helper function to create ordered list of NCT links
+  listify <- function(ncts) {
+    if (!is.na(ncts) && length(ncts) > 0) {
+      links <- sapply(ncts, function(nct) {
+	sprintf('<li><a href="https://clinicaltrials.gov/study/%s" target="_blank">%s</a></li>',
+	       nct, nct)
+      })
+      sprintf('<ol>%s</ol>', paste(links, collapse = ""))
+    } else {
+      "None"
+    }
+  }
+
   # Modal for displaying NCT details
   observeEvent(input$sponsor_table_rows_selected, {
     if (!is.null(input$sponsor_table_rows_selected)) {
@@ -187,46 +200,18 @@ server <- function(input, output, session) {
       selected_data <- raw_data %>%
 	filter(schema1.lead_sponsor_name == selected_sponsor)
 
-      # Create HTML for compliant studies
-      compliant_links <- if (!is.na(selected_data$ncts.compliant)
-			     && length(selected_data$ncts.compliant[[1]]) > 0) {
-	paste(
-	  sapply(selected_data$ncts.compliant[[1]], function(nct) {
-	    sprintf('<a href="https://clinicaltrials.gov/study/%s" target="_blank">%s</a>',
-		   nct, nct)
-	  }),
-	  collapse = "<br>"
-	)
-      } else {
-	"None"
-      }
-
-      # Create HTML for non-compliant studies
-      noncompliant_links <- if (!is.na(selected_data$ncts.noncompliant)
-				&& length(selected_data$ncts.noncompliant[[1]]) > 0) {
-	paste(
-	  sapply(selected_data$ncts.noncompliant[[1]], function(nct) {
-	    sprintf('<a href="https://clinicaltrials.gov/study/%s" target="_blank">%s</a>',
-		   nct, nct)
-	  }),
-	  collapse = "<br>"
-	)
-      } else {
-	"None"
-      }
-
       showModal(modalDialog(
 	title = paste("Trial Details for", selected_data$schema1.lead_sponsor_name),
 
 	div(
 	  style = "max-height: 400px; overflow-y: auto;",
 	  h4("Compliant Trials"),
-	  HTML(compliant_links),
+	  HTML(listify(selected_data$ncts.compliant[[1]])),
 
 	  hr(),
 
 	  h4("Non-compliant Trials"),
-	  HTML(noncompliant_links)
+	  HTML(listify(selected_data$ncts.noncompliant[[1]]))
 	),
 
 	size = "l",
