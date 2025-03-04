@@ -249,7 +249,7 @@ server <- function(input, output, session) {
 
   # Helper function to create ordered list of NCT links
   listify <- function(ncts) {
-    if (!is.na(ncts) && length(ncts) > 0) {
+    if (!all(is.na(ncts)) && length(ncts) > 0) {
       links <- sapply(ncts, function(nct) {
 	sprintf('<li><a href="https://clinicaltrials.gov/study/%s" target="_blank">%s</a></li>',
 	       nct, nct)
