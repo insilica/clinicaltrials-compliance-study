@@ -30,11 +30,26 @@ ui <- fillPage(
 		    "Zero Compliance" = "zero_compliance"
 		  )),
 
+      numericInput("top_n", "Number of Sponsors in Extremes Tables:",
+		  value = 10,
+		  min = 1,
+		  max = 50,
+		  step = 1),
+
       width = 3
     ),
 
     mainPanel(
       tabsetPanel(
+	tabPanel("Extremes",
+		 fluidRow(
+		   column(6,
+			  uiOutput("top_title"),
+			  DTOutput("top_table")),
+		   column(6,
+			  uiOutput("bottom_title"),
+			  DTOutput("bottom_table"))
+		 )),
 	tabPanel("Data Table",
 		 DTOutput("sponsor_table")),
 	tabPanel("Interactive Plot",
@@ -154,6 +169,61 @@ server <- function(input, output, session) {
 	  "toImage"
 	))
       )
+  })
+
+  # Helper function for table formatting
+  format_sponsor_table <- function(data) {
+    datatable(data,
+	      options = list(
+		pageLength = 10,
+		#dom = 't',  # Only show table, no controls
+		scrollX = TRUE,
+		scrollY = TRUE
+	      )) %>%
+      formatRound(c("Compliance Rate", "Wilson LCB"), digits = 3)
+  }
+
+  # Dynamic titles for extremes tables
+  output$top_title <- renderUI({
+    h4(paste0("Top ", input$top_n, " by Compliance Rate"))
+  })
+
+  output$bottom_title <- renderUI({
+    h4(paste0("Bottom ", input$top_n, " by Compliance Rate"))
+  })
+
+  # Top N table
+  output$top_table <- renderDT({
+    data <- sponsor_data() %>%
+      arrange(desc(rr.with_extensions), desc(n.total)) %>%
+      select(
+	Sponsor = schema1.lead_sponsor_name,
+	`Funding Source` = schema1.lead_sponsor_funding_source,
+	`Total Trials` = n.total,
+	`Compliant Trials` = n.success,
+	`Compliance Rate` = rr.with_extensions,
+	`Wilson LCB` = wilson.conf.low
+      ) %>%
+      head(input$top_n)
+
+    format_sponsor_table(data)
+  })
+
+  # Bottom N table
+  output$bottom_table <- renderDT({
+    data <- sponsor_data() %>%
+      arrange(rr.with_extensions, desc(n.total)) %>%
+      select(
+	Sponsor = schema1.lead_sponsor_name,
+	`Funding Source` = schema1.lead_sponsor_funding_source,
+	`Total Trials` = n.total,
+	`Compliant Trials` = n.success,
+	`Compliance Rate` = rr.with_extensions,
+	`Wilson LCB` = wilson.conf.low
+      ) %>%
+      head(input$top_n)
+
+    format_sponsor_table(data)
   })
 
   # Data table
