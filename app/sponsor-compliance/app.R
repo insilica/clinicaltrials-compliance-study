@@ -182,7 +182,8 @@ server <- function(input, output, session) {
 		#dom = 't',  # Only show table, no controls
 		scrollX = TRUE,
 		scrollY = TRUE
-	      )) %>%
+	      ),
+	      selection = 'single') %>%
       formatRound(c("Compliance Rate", "Wilson LCB"), digits = 3)
   }
 
@@ -195,43 +196,21 @@ server <- function(input, output, session) {
     h4(paste0("Bottom ", input$top_n, " by Compliance Rate"))
   })
 
-  # Top N table
-  output$top_table <- renderDT({
-    data <- sponsor_data() %>%
+  # Reactive expressions for top and bottom N data
+  top_n_data <- reactive({
+    sponsor_data() %>%
       arrange(desc(rr.with_extensions), desc(n.total)) %>%
-      select(
-	Sponsor = schema1.lead_sponsor_name,
-	`Funding Source` = schema1.lead_sponsor_funding_source,
-	`Total Trials` = n.total,
-	`Compliant Trials` = n.success,
-	`Compliance Rate` = rr.with_extensions,
-	`Wilson LCB` = wilson.conf.low
-      ) %>%
       head(input$top_n)
-
-    format_sponsor_table(data)
   })
 
-  # Bottom N table
-  output$bottom_table <- renderDT({
-    data <- sponsor_data() %>%
+  bottom_n_data <- reactive({
+    sponsor_data() %>%
       arrange(desc(rr.with_extensions), desc(n.total)) %>%
-      select(
-	Sponsor = schema1.lead_sponsor_name,
-	`Funding Source` = schema1.lead_sponsor_funding_source,
-	`Total Trials` = n.total,
-	`Compliant Trials` = n.success,
-	`Compliance Rate` = rr.with_extensions,
-	`Wilson LCB` = wilson.conf.low
-      ) %>%
       tail(input$top_n)
-
-    format_sponsor_table(data)
   })
 
-  # Data table
-  output$sponsor_table <- renderDT({
-    data <- sponsor_data() %>%
+  format_table_cols <- function(data) {
+    data %>%
       select(
 	Sponsor = schema1.lead_sponsor_name,
 	`Funding Source` = schema1.lead_sponsor_funding_source,
@@ -240,6 +219,22 @@ server <- function(input, output, session) {
 	`Compliance Rate` = rr.with_extensions,
 	`Wilson LCB` = wilson.conf.low
       )
+  }
+
+  # Top N table
+  output$top_table <- renderDT({
+    format_sponsor_table(format_table_cols(top_n_data()))
+  })
+
+  # Bottom N table
+  output$bottom_table <- renderDT({
+    format_sponsor_table(format_table_cols(bottom_n_data()))
+  })
+
+  # Data table
+  output$sponsor_table <- renderDT({
+    data <- sponsor_data() |>
+      format_table_cols()
 
     datatable(data,
 	      options = list(
@@ -265,35 +260,47 @@ server <- function(input, output, session) {
     }
   }
 
-  # Modal for displaying NCT details
+  # Helper function for creating the trial details modal
+  show_trial_modal <- function(selected_sponsor) {
+    selected_data <- raw_data %>%
+      filter(schema1.lead_sponsor_name == selected_sponsor)
+
+    showModal(modalDialog(
+      title = paste("Trial Details for", selected_data$schema1.lead_sponsor_name),
+      div(
+	style = "max-height: 400px; overflow-y: auto;",
+	h4("Compliant Trials"),
+	HTML(listify(selected_data$ncts.compliant[[1]])),
+	hr(),
+	h4("Non-compliant Trials"),
+	HTML(listify(selected_data$ncts.noncompliant[[1]]))
+      ),
+      size = "l",
+      easyClose = TRUE,
+      footer = modalButton("Close")
+    ))
+  }
+
+  # Modal for displaying NCT details - separate handlers for each table
   observeEvent(input$sponsor_table_rows_selected, {
-    if (!is.null(input$sponsor_table_rows_selected)) {
-      # Get the sponsor name from the filtered data
-      selected_sponsor <- sponsor_data()[input$sponsor_table_rows_selected, ]$schema1.lead_sponsor_name
+    req(input$sponsor_table_rows_selected)
+    selected_sponsor <- sponsor_data()[input$sponsor_table_rows_selected, ]$schema1.lead_sponsor_name
+    show_trial_modal(selected_sponsor)
+    dataTableProxy('sponsor_table') %>% selectRows(NULL)
+  })
 
-      # Find matching row in raw_data
-      selected_data <- raw_data %>%
-	filter(schema1.lead_sponsor_name == selected_sponsor)
+  observeEvent(input$top_table_rows_selected, {
+    req(input$top_table_rows_selected)
+    selected_sponsor <- top_n_data()[input$top_table_rows_selected, ]$schema1.lead_sponsor_name
+    show_trial_modal(selected_sponsor)
+    dataTableProxy('top_table') %>% selectRows(NULL)
+  })
 
-      showModal(modalDialog(
-	title = paste("Trial Details for", selected_data$schema1.lead_sponsor_name),
-
-	div(
-	  style = "max-height: 400px; overflow-y: auto;",
-	  h4("Compliant Trials"),
-	  HTML(listify(selected_data$ncts.compliant[[1]])),
-
-	  hr(),
-
-	  h4("Non-compliant Trials"),
-	  HTML(listify(selected_data$ncts.noncompliant[[1]]))
-	),
-
-	size = "l",
-	easyClose = TRUE,
-	footer = modalButton("Close")
-      ))
-    }
+  observeEvent(input$bottom_table_rows_selected, {
+    req(input$bottom_table_rows_selected)
+    selected_sponsor <- bottom_n_data()[input$bottom_table_rows_selected, ]$schema1.lead_sponsor_name
+    show_trial_modal(selected_sponsor)
+    dataTableProxy('bottom_table') %>% selectRows(NULL)
   })
 }
 
