@@ -6,7 +6,7 @@ library(textutils)
 library(plotly)
 
 # UI definition
-ui <- fluidPage(
+ui <- fillPage(
   titlePanel("Clinical Trial Sponsor Compliance Analysis"),
 
   sidebarLayout(
@@ -37,10 +37,10 @@ ui <- fluidPage(
 
     mainPanel(
       tabsetPanel(
-	tabPanel("Interactive Plot",
-		 plotlyOutput("compliance_plot", height = "700px")),
 	tabPanel("Data Table",
-		 DTOutput("sponsor_table"))
+		 DTOutput("sponsor_table")),
+	tabPanel("Interactive Plot",
+		 plotlyOutput("compliance_plot", height = "90vh"))
       ),
       width = 9  # Make main panel wider
     )
@@ -127,10 +127,11 @@ server <- function(input, output, session) {
     }
 
     # Convert to plotly with custom configuration
-    ggplotly(p, tooltip = "text", height = 600) %>%
+    ggplotly(p, tooltip = "text") %>%
       layout(
 	hoverlabel = list(bgcolor = "white"),
-	legend = list(orientation = "h", y = -0.2)
+	legend = list(orientation = "h", y = -0.2),
+	autosize = TRUE
       ) %>%
       config(
 	scrollZoom = TRUE,
@@ -162,7 +163,8 @@ server <- function(input, output, session) {
 	      options = list(
 		pageLength = 25,
 		order = list(list(4, 'desc')),
-		scrollX = TRUE
+		scrollX = TRUE,
+		scrollY = TRUE
 	      )) %>%
       formatRound(c("Compliance Rate", "Wilson LCB"), digits = 3)
   })
