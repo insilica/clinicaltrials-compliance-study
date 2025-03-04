@@ -21,8 +21,6 @@ ui <- fillPage(
       sliderInput("compliance_range", "Compliance Rate Range:",
 		  min = 0, max = 1, value = c(0, 1), step = 0.1),
 
-      checkboxInput("show_labels", "Show Sponsor Labels", value = TRUE),
-
       selectInput("analysis_type", "Analysis View:",
 		  choices = c(
 		    "All Sponsors" = "summary",
@@ -127,15 +125,6 @@ server <- function(input, output, session) {
 	legend.text = element_text(size = 11),
 	legend.position = "bottom"
       )
-
-    if (input$show_labels) {
-      p <- p + geom_text(
-	aes(label = schema1.lead_sponsor_name),
-	size = 4,
-	check_overlap = TRUE,
-	hjust = -0.1
-      )
-    }
 
     # Convert to plotly with custom configuration
     ggplotly(p, tooltip = "text") %>%
