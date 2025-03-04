@@ -3,6 +3,7 @@ library(tidyverse)
 library(ggrepel)
 library(DT)
 library(textutils)
+library(plotly)
 
 # UI definition
 ui <- fluidPage(
@@ -29,16 +30,19 @@ ui <- fluidPage(
 		    "High Compliance (>50%)" = "high_compliance",
 		    "Low Compliance (<10%)" = "low_compliance",
 		    "Zero Compliance" = "zero_compliance"
-		  ))
+		  )),
+
+      width = 3
     ),
 
     mainPanel(
       tabsetPanel(
-	tabPanel("Scatter Plot",
-		 plotOutput("compliance_plot", height = "600px")),
+	tabPanel("Interactive Plot",
+		 plotlyOutput("compliance_plot", height = "700px")),
 	tabPanel("Data Table",
 		 DTOutput("sponsor_table"))
-      )
+      ),
+      width = 9  # Make main panel wider
     )
   )
 )
@@ -76,31 +80,27 @@ server <- function(input, output, session) {
     filtered
   })
 
-  # Scatter plot
-  output$compliance_plot <- renderPlot({
+  # Interactive scatter plot
+  output$compliance_plot <- renderPlotly({
     data <- sponsor_data()
 
-    p <- ggplot(data, aes(x = n.total, y = n.success)) +
+    # Create base ggplot
+    p <- ggplot(data, aes(x = n.total, y = n.success,
+			 text = paste0(
+			   "Sponsor: ", schema1.lead_sponsor_name,
+			   "<br>Total Trials: ", n.total,
+			   "<br>Compliant Trials: ", n.success,
+			   "<br>Compliance Rate: ", round(rr.with_extensions * 100, 1), "%",
+			   "<br>Wilson LCB: ", round(wilson.conf.low * 100, 1), "%"
+			 ))) +
       geom_abline(slope = 1, linetype = "dashed", color = "gray50") +
       geom_point(aes(
 	shape = schema1.lead_sponsor_funding_source,
 	color = cut(wilson.conf.low,
 		   breaks = seq(0, 1, by=0.1),
 		   labels = sprintf("%.1f-%.1f", seq(0, 0.9, by=0.1), seq(0.1, 1, by=0.1)))
-      ), size = 3)
-
-    if (input$show_labels) {
-      p <- p + geom_text_repel(
-	aes(label = schema1.lead_sponsor_name,
-	    color = cut(wilson.conf.low,
-		       breaks = seq(0, 1, by=0.1),
-		       labels = sprintf("%.1f-%.1f", seq(0, 0.9, by=0.1), seq(0.1, 1, by=0.1)))),
-	size = 3,
-	max.overlaps = 20
-      )
-    }
-
-    p + scale_x_log10() +
+      ), size = 4) +
+      scale_x_log10() +
       scale_y_log10() +
       labs(
 	x = "Total Trials (log scale)",
@@ -109,7 +109,41 @@ server <- function(input, output, session) {
 	color = "Wilson LCB Group"
       ) +
       theme_minimal() +
-      theme(legend.position = "bottom")
+      theme(
+	axis.title = element_text(size = 14),
+	axis.text = element_text(size = 12),
+	legend.title = element_text(size = 12),
+	legend.text = element_text(size = 11),
+	legend.position = "bottom"
+      )
+
+    if (input$show_labels) {
+      p <- p + geom_text(
+	aes(label = schema1.lead_sponsor_name),
+	size = 4,
+	check_overlap = TRUE,
+	hjust = -0.1
+      )
+    }
+
+    # Convert to plotly with custom configuration
+    ggplotly(p, tooltip = "text", height = 600) %>%
+      layout(
+	hoverlabel = list(bgcolor = "white"),
+	legend = list(orientation = "h", y = -0.2)
+      ) %>%
+      config(
+	scrollZoom = TRUE,
+	displayModeBar = TRUE,
+	modeBarButtons = list(list(
+	  "zoom2d",
+	  "pan2d",
+	  "zoomIn2d",
+	  "zoomOut2d",
+	  "resetScale2d",
+	  "toImage"
+	))
+      )
   })
 
   # Data table

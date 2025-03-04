@@ -25,6 +25,7 @@
 
         rPackages = prev.rPackages // {
           arrow = final.callPackage ./maint/nixpkg/r/arrow.nix {};
+          plotly = final.callPackage ./maint/nixpkg/r/plotly.nix {};
         };
       };
     } //
@@ -80,7 +81,7 @@
                   knitr kableExtra
                   listr logger lubridate
                   openxlsx
-                  pacman parsedate patchwork purrr
+                  pacman parsedate patchwork plotly purrr
                   readr rlang RPostgres
                   scales shiny stringr survival survminer svglite
                   testthat textutils this_path tidyr tidyverse
