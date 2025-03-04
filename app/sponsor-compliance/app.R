@@ -12,7 +12,7 @@ ui <- fillPage(
   sidebarLayout(
     sidebarPanel(
       selectInput("funding_source", "Funding Source:",
-		  choices = c("All", "INDUSTRY", "OTHER"),
+		  choices = c("All"),
 		  selected = "All"),
 
       sliderInput("trial_threshold", "Minimum Number of Trials:",
@@ -55,8 +55,15 @@ server <- function(input, output, session) {
       ncts.noncompliant = strsplit(ncts.noncompliant, "\\|")
     )
 
-  # Update trial threshold slider once on initialization
+  # Update on initialisation
   observe({
+    # Update funding sources
+    funding_sources <- c("All", sort(unique(raw_data$schema1.lead_sponsor_funding_source)))
+    updateSelectInput(session, "funding_source",
+		     choices = funding_sources,
+		     selected = "All")
+
+    # Update trial threshold
     min_trials <- min(raw_data$n.total)
     max_trials <- max(raw_data$n.total)
     updateSliderInput(session, "trial_threshold",
