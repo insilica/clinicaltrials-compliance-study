@@ -49,16 +49,27 @@ ui <- fillPage(
 
 # Server logic
 server <- function(input, output, session) {
-  # Read data
-  sponsor_data <- reactive({
-    ( data <- read_csv("../../figtab/post-rule-to-20240430-by_sponsor/sponsor_compliance_summary.csv")
-     |> mutate(
-	       schema1.lead_sponsor_name = textutils::HTMLdecode(schema1.lead_sponsor_name)
-     )
+  # Initial data load
+  raw_data <- read_csv("../../figtab/post-rule-to-20240430-by_sponsor/sponsor_compliance_summary.csv") %>%
+    mutate(
+      schema1.lead_sponsor_name = textutils::HTMLdecode(schema1.lead_sponsor_name),
+      ncts.compliant = strsplit(ncts.compliant, "\\|"),
+      ncts.noncompliant = strsplit(ncts.noncompliant, "\\|")
     )
 
+  # Update trial threshold slider once on initialization
+  observe({
+    min_trials <- min(raw_data$n.total)
+    max_trials <- max(raw_data$n.total)
+    updateSliderInput(session, "trial_threshold",
+		     min = min_trials,
+		     max = max_trials,
+		     value = min_trials)
+  }, priority = 1000)
+
+  sponsor_data <- reactive({
     # Apply filters
-    filtered <- data %>%
+    filtered <- raw_data %>%
       filter(n.total >= input$trial_threshold,
 	     rr.with_extensions >= input$compliance_range[1],
 	     rr.with_extensions <= input$compliance_range[2])
