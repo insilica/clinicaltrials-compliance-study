@@ -75,10 +75,11 @@
                   ComplexUpset cowplot cthist
                   DBI dotenv dplyr
                   forcats fs
-                  ggplot2 ggpubr ggsurvfit ggtext glue gridtext gtsummary
+                  ggplot2 ggpubr ggrepel ggsurvfit ggtext glue gridtext gtsummary
                   here
                   knitr kableExtra
                   listr logger lubridate
+                  openxlsx
                   pacman parsedate patchwork purrr
                   readr rlang RPostgres
                   scales stringr survival survminer svglite
