@@ -43,10 +43,13 @@ ui <- fillPage(
       tabsetPanel(
 	tabPanel("Extremes",
 		 fluidRow(
-		   column(6,
+		   column(12,
 			  uiOutput("top_title"),
-			  DTOutput("top_table")),
-		   column(6,
+			  DTOutput("top_table"))
+		 ),
+		 br(),
+		 fluidRow(
+		   column(12,
 			  uiOutput("bottom_title"),
 			  DTOutput("bottom_table"))
 		 )),
