@@ -215,7 +215,7 @@ server <- function(input, output, session) {
   # Bottom N table
   output$bottom_table <- renderDT({
     data <- sponsor_data() %>%
-      arrange(rr.with_extensions, desc(n.total)) %>%
+      arrange(desc(rr.with_extensions), desc(n.total)) %>%
       select(
 	Sponsor = schema1.lead_sponsor_name,
 	`Funding Source` = schema1.lead_sponsor_funding_source,
@@ -224,7 +224,7 @@ server <- function(input, output, session) {
 	`Compliance Rate` = rr.with_extensions,
 	`Wilson LCB` = wilson.conf.low
       ) %>%
-      head(input$top_n)
+      tail(input$top_n)
 
     format_sponsor_table(data)
   })
