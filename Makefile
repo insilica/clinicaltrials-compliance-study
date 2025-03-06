@@ -120,3 +120,12 @@ psql-list-aact-databases:
 .PHONY: build-docs
 build-docs:
 	latexmk -outdir=_build report/code-review.tex
+
+define APP_SPONSOR_COMPLIANCE_R :=
+library(shiny);
+shiny::runApp("app/sponsor-compliance", port=6710, launch.browser=F)
+endef
+export APP_SPONSOR_COMPLIANCE_R
+.PHONY: run-app-sponsor-compliance
+run-app-sponsor-compliance:
+	Rscript -e "$$APP_SPONSOR_COMPLIANCE_R"
