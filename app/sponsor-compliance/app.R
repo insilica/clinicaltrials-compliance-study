@@ -176,10 +176,11 @@ server <- function(input, output, session) {
   })
 
   # Helper function for table formatting
-  format_sponsor_table <- function(data) {
+  format_extreme_table <- function(data, sort_col_idx) {
     datatable(data,
 	      options = list(
 		pageLength = 10,
+		order = list(list(sort_col_idx, 'desc')),
 		#dom = 't',  # Only show table, no controls
 		scrollX = TRUE,
 		scrollY = TRUE
@@ -224,12 +225,18 @@ server <- function(input, output, session) {
 
   # Top N table
   output$top_table <- renderDT({
-    format_sponsor_table(format_table_cols(top_n_data()))
+    data <- format_table_cols(top_n_data())
+    compliance_col_idx <- which(names(data) == "Compliance Rate")
+
+    format_extreme_table(data, compliance_col_idx)
   })
 
   # Bottom N table
   output$bottom_table <- renderDT({
-    format_sponsor_table(format_table_cols(bottom_n_data()))
+    data <- format_table_cols(bottom_n_data())
+    compliance_col_idx <- which(names(data) == "Compliance Rate")
+
+    format_extreme_table(data, compliance_col_idx)
   })
 
   # Data table
