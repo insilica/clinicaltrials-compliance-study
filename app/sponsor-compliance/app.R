@@ -93,6 +93,7 @@ server <- function(input, output, session) {
   sponsor_data <- reactive({
     # Apply filters
     filtered <- raw_data %>%
+      arrange(desc(wilson.conf.low), desc(n.total)) %>%
       filter(n.total >= input$trial_threshold,
 	     rr.with_extensions >= input$compliance_range[1],
 	     rr.with_extensions <= input$compliance_range[2])
@@ -236,10 +237,12 @@ server <- function(input, output, session) {
     data <- sponsor_data() |>
       format_table_cols()
 
+    wilson_col_idx <- which(names(data) == "Wilson LCB")
+
     datatable(data,
 	      options = list(
 		pageLength = 25,
-		order = list(list(4, 'desc')),
+		order = list(list(wilson_col_idx, 'desc')),
 		scrollX = TRUE,
 		scrollY = TRUE
 	      ),
