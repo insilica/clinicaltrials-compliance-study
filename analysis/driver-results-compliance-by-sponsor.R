@@ -1,7 +1,7 @@
 # if(!sys.nframe()) { source('analysis/driver-results-compliance-by-sponsor.R') }
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load( logger, readr, ggrepel, openxlsx )
+pacman::p_load( logger, readr, ggrepel, openxlsx ) # nolint
 
 source('analysis/ctgov.R')
 
@@ -29,8 +29,8 @@ agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed
     ncts.compliant    = list(schema1.nct_id[cr.results_reported_12mo_with_extensions == TRUE]),
     ncts.noncompliant = list(schema1.nct_id[cr.results_reported_12mo_with_extensions == FALSE]),
     n.total   = n(),
-    n.success = sapply(ncts.compliant,length),
-    n.failure = sapply(ncts.noncompliant,length)
+    n.success = sapply(ncts.compliant, length),
+    n.failure = sapply(ncts.noncompliant, length)
   )
  |> mutate(
    # Use Wilson score interval from binom.test
@@ -103,6 +103,7 @@ ggsave(fs::path(output.path.base, 'sponsor_compliance_scatter.png'),
 
 ################################################################################
 # Analysis definitions
+# nolint start: line_length_linter.
 analyses <- list(
   list(
     name = "summary",
@@ -135,6 +136,7 @@ analyses <- list(
     arrange = list(quote(desc(wilson.conf.low)), quote(desc(n.total)))
   )
 )
+# nolint end
 
 # Funding source filters
 funding_sources <- c("ALL" = NA, "INDUSTRY" = "INDUSTRY", "OTHER" = "OTHER")
