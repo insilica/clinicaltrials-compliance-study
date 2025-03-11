@@ -1,11 +1,13 @@
 library(shiny)
 library(tidyverse)
 library(arrow)
+library(glue)
 library(ggrepel)
 library(DT)
 library(plotly)
 
 min_trials.default <- 9
+min_trials.report_tables <- 9
 
 # UI definition
 ui <- fluidPage(
@@ -43,6 +45,44 @@ ui <- fluidPage(
 
     mainPanel(
       tabsetPanel(
+        tabPanel("Report Tables",
+                 # Navigation links
+                 wellPanel(
+                   h4("Quick Navigation"),
+                   tags$ul(
+                     tags$li(tags$a(href = "#overall_trials", "Top 10 by Number of Trials")),
+                     tags$li(tags$a(href = "#overall_ws_top", "Top 10 by Wilson Score")),
+                     tags$li(tags$a(href = "#overall_ws_bottom", "Bottom 10 by Wilson Score")),
+                     tags$li(tags$a(href = "#nih_ws_top", "NIH Top 10 by Wilson Score")),
+                     tags$li(tags$a(href = "#academic_top", "Academic Top 10")),
+                     tags$li(tags$a(href = "#academic_bottom", "Academic Bottom 10")),
+                     tags$li(tags$a(href = "#nih_grants_top", "Top 10 NIH Grant Awardees"))
+                   )
+                 ),
+                 p(glue("All sponsors below have a minimum of {min_trials.report_tables} trials (inclusive).")),
+                 # Tables
+                 tags$div(id = "overall_trials",
+                          h3("Top 10 by Number of Clinical Trials"),
+                          DTOutput("overall_trials_table")),
+                 tags$div(id = "overall_ws_top",
+                          h3("Top 10 by Wilson Score"),
+                          DTOutput("overall_ws_top_table")),
+                 tags$div(id = "overall_ws_bottom",
+                          h3("Bottom 10 by Wilson Score"),
+                          DTOutput("overall_ws_bottom_table")),
+                 tags$div(id = "nih_ws_top",
+                          h3("NIH Top 10 by Wilson Score"),
+                          DTOutput("nih_ws_top_table")),
+                 tags$div(id = "academic_top",
+                          h3("Academic Top 10"),
+                          DTOutput("academic_top_table")),
+                 tags$div(id = "academic_bottom",
+                          h3("Academic Bottom 10"),
+                          DTOutput("academic_bottom_table")),
+                 tags$div(id = "nih_grants_top",
+                          h3("Top 10 NIH Grant Awardees by Wilson Score"),
+                          DTOutput("nih_grants_top_table"))
+        ),
         tabPanel("Extremes",
                  fluidRow(
                    column(12,
@@ -308,6 +348,94 @@ server <- function(input, output, session) {
     selected_sponsor <- bottom_n_data()[input$bottom_table_rows_selected, ]$schema1.lead_sponsor_name
     show_trial_modal(selected_sponsor)
     dataTableProxy('bottom_table') %>% selectRows(NULL)
+  })
+
+  # Report Tables reactive expressions
+  report_tables.src_data <- (
+    raw_data
+    |> filter(n.total >= min_trials.report_tables)
+  )
+
+  overall_trials_data <- reactive({
+    report_tables.src_data %>%
+      arrange(desc(n.total)) %>%
+      head(10) %>%
+      format_table_cols()
+  })
+
+  overall_ws_top_data <- reactive({
+    report_tables.src_data %>%
+      arrange(desc(wilson.conf.low)) %>%
+      head(10) %>%
+      format_table_cols()
+  })
+
+  overall_ws_bottom_data <- reactive({
+    report_tables.src_data %>%
+      arrange(wilson.conf.low) %>%
+      head(10) %>%
+      format_table_cols()
+  })
+
+  nih_ws_top_data <- reactive({
+    report_tables.src_data %>%
+      filter(schema1.lead_sponsor_funding_source == "NIH") %>%
+      arrange(desc(wilson.conf.low)) %>%
+      head(10) %>%
+      format_table_cols()
+  })
+
+  academic_top_data <- reactive({
+    report_tables.src_data %>%
+      filter(schema1.lead_sponsor_funding_source == "Academic") %>%
+      arrange(desc(wilson.conf.low)) %>%
+      head(10) %>%
+      format_table_cols()
+  })
+
+  academic_bottom_data <- reactive({
+    report_tables.src_data %>%
+      filter(schema1.lead_sponsor_funding_source == "Academic") %>%
+      arrange(wilson.conf.low) %>%
+      head(10) %>%
+      format_table_cols()
+  })
+
+  nih_grants_top_data <- reactive({
+    report_tables.src_data %>%
+      filter(str_detect(schema1.lead_sponsor_name, "NIH GRANT")) %>%
+      arrange(desc(wilson.conf.low)) %>%
+      head(10) %>%
+      format_table_cols()
+  })
+
+  # Report Tables outputs
+  output$overall_trials_table <- renderDT({
+    format_extreme_table(overall_trials_data(), which(names(overall_trials_data()) == "Total Trials"))
+  })
+
+  output$overall_ws_top_table <- renderDT({
+    format_extreme_table(overall_ws_top_data(), which(names(overall_ws_top_data()) == "Wilson LCB"))
+  })
+
+  output$overall_ws_bottom_table <- renderDT({
+    format_extreme_table(overall_ws_bottom_data(), which(names(overall_ws_bottom_data()) == "Wilson LCB"))
+  })
+
+  output$nih_ws_top_table <- renderDT({
+    format_extreme_table(nih_ws_top_data(), which(names(nih_ws_top_data()) == "Wilson LCB"))
+  })
+
+  output$academic_top_table <- renderDT({
+    format_extreme_table(academic_top_data(), which(names(academic_top_data()) == "Wilson LCB"))
+  })
+
+  output$academic_bottom_table <- renderDT({
+    format_extreme_table(academic_bottom_data(), which(names(academic_bottom_data()) == "Wilson LCB"))
+  })
+
+  output$nih_grants_top_table <- renderDT({
+    format_extreme_table(nih_grants_top_data(), which(names(nih_grants_top_data()) == "Wilson LCB"))
   })
 }
 
