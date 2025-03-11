@@ -12,51 +12,51 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       selectInput("funding_source", "Funding Source:",
-		  choices = c("All"),
-		  selected = "All"),
+                  choices = c("All"),
+                  selected = "All"),
 
       sliderInput("trial_threshold", "Minimum Number of Trials:",
-		  min = 1, max = 100, value = 1),
+                  min = 1, max = 100, value = 1),
 
       sliderInput("compliance_range", "Compliance Rate Range:",
-		  min = 0, max = 1, value = c(0, 1), step = 0.1),
+                  min = 0, max = 1, value = c(0, 1), step = 0.1),
 
       selectInput("analysis_type", "Analysis View:",
-		  choices = c(
-		    "All Sponsors" = "summary",
-		    "Perfect Compliance (100%)" = "perfect_compliance",
-		    "High Compliance (>50%)" = "high_compliance",
-		    "Low Compliance (<10%)" = "low_compliance",
-		    "Zero Compliance" = "zero_compliance"
-		  )),
+                  choices = c(
+                    "All Sponsors" = "summary",
+                    "Perfect Compliance (100%)" = "perfect_compliance",
+                    "High Compliance (>50%)" = "high_compliance",
+                    "Low Compliance (<10%)" = "low_compliance",
+                    "Zero Compliance" = "zero_compliance"
+                  )),
 
       numericInput("top_n", "Number of Sponsors in Extremes Tables:",
-		  value = 10,
-		  min = 1,
-		  max = 50,
-		  step = 1),
+                   value = 10,
+                   min = 1,
+                   max = 50,
+                   step = 1),
 
       width = 3
     ),
 
     mainPanel(
       tabsetPanel(
-	tabPanel("Extremes",
-		 fluidRow(
-		   column(12,
-			  uiOutput("top_title"),
-			  DTOutput("top_table"))
-		 ),
-		 br(),
-		 fluidRow(
-		   column(12,
-			  uiOutput("bottom_title"),
-			  DTOutput("bottom_table"))
-		 )),
-	tabPanel("Data Table",
-		 DTOutput("sponsor_table")),
-	tabPanel("Interactive Plot",
-		 plotlyOutput("compliance_plot", height = "90vh"))
+        tabPanel("Extremes",
+                 fluidRow(
+                   column(12,
+                          uiOutput("top_title"),
+                          DTOutput("top_table"))
+                 ),
+                 br(),
+                 fluidRow(
+                   column(12,
+                          uiOutput("bottom_title"),
+                          DTOutput("bottom_table"))
+                 )),
+        tabPanel("Data Table",
+                 DTOutput("sponsor_table")),
+        tabPanel("Interactive Plot",
+                 plotlyOutput("compliance_plot", height = "90vh"))
       ),
       width = 9  # Make main panel wider
     )
@@ -78,16 +78,16 @@ server <- function(input, output, session) {
     # Update funding sources
     funding_sources <- c("All", sort(unique(raw_data$schema1.lead_sponsor_funding_source)))
     updateSelectInput(session, "funding_source",
-		     choices = funding_sources,
-		     selected = "All")
+                      choices = funding_sources,
+                      selected = "All")
 
     # Update trial threshold
     min_trials <- min(raw_data$n.total)
     max_trials <- max(raw_data$n.total)
     updateSliderInput(session, "trial_threshold",
-		     min = min_trials,
-		     max = max_trials,
-		     value = min_trials)
+                      min = min_trials,
+                      max = max_trials,
+                      value = min_trials)
   }, priority = 1000)
 
   sponsor_data <- reactive({
@@ -95,12 +95,12 @@ server <- function(input, output, session) {
     filtered <- raw_data %>%
       arrange(desc(wilson.conf.low), desc(n.total)) %>%
       filter(n.total >= input$trial_threshold,
-	     rr.with_extensions >= input$compliance_range[1],
-	     rr.with_extensions <= input$compliance_range[2])
+             rr.with_extensions >= input$compliance_range[1],
+             rr.with_extensions <= input$compliance_range[2])
 
     if (input$funding_source != "All") {
       filtered <- filtered %>%
-	filter(schema1.lead_sponsor_funding_source == input$funding_source)
+        filter(schema1.lead_sponsor_funding_source == input$funding_source)
     }
 
     # Apply analysis type filters
@@ -124,68 +124,68 @@ server <- function(input, output, session) {
 
     # Create base ggplot
     p <- ggplot(data, aes(x = n.total, y = n.success,
-			 text = paste0(
-			   "Sponsor: ", schema1.lead_sponsor_name,
-			   "<br>Total Trials: ", n.total,
-			   "<br>Compliant Trials: ", n.success,
-			   "<br>Compliance Rate: ", round(rr.with_extensions * 100, 1), "%",
-			   "<br>Wilson LCB: ", round(wilson.conf.low * 100, 1), "%"
-			 ))) +
+                          text = paste0(
+                            "Sponsor: ", schema1.lead_sponsor_name,
+                            "<br>Total Trials: ", n.total,
+                            "<br>Compliant Trials: ", n.success,
+                            "<br>Compliance Rate: ", round(rr.with_extensions * 100, 1), "%",
+                            "<br>Wilson LCB: ", round(wilson.conf.low * 100, 1), "%"
+                          ))) +
       geom_abline(slope = 1, linetype = "dashed", color = "gray50") +
       geom_point(aes(
-	shape = schema1.lead_sponsor_funding_source,
-	color = cut(wilson.conf.low,
-		   breaks = seq(0, 1, by=0.1),
-		   labels = sprintf("%.1f-%.1f", seq(0, 0.9, by=0.1), seq(0.1, 1, by=0.1)))
+        shape = schema1.lead_sponsor_funding_source,
+        color = cut(wilson.conf.low,
+                    breaks = seq(0, 1, by = 0.1),
+                    labels = sprintf("%.1f-%.1f", seq(0, 0.9, by = 0.1), seq(0.1, 1, by = 0.1)))
       ), size = 4) +
       scale_x_log10() +
       scale_y_log10() +
       coord_fixed() + # Force square aspect ratio
       labs(
-	x = "Total Trials (log scale)",
-	y = "Compliant Trials (log scale)",
-	shape = "Funding Source",
-	color = "Wilson LCB Group"
+        x = "Total Trials (log scale)",
+        y = "Compliant Trials (log scale)",
+        shape = "Funding Source",
+        color = "Wilson LCB Group"
       ) +
       theme_minimal() +
       theme(
-	axis.title = element_text(size = 14),
-	axis.text = element_text(size = 12),
-	legend.title = element_text(size = 12),
-	legend.text = element_text(size = 11),
-	legend.position = "bottom"
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 11),
+        legend.position = "bottom"
       )
 
-      plt <- ggplotly(p, tooltip = "text") %>%
-        layout(
-          hoverlabel = list(bgcolor = "white"),
-	  autosize = TRUE
-        ) %>%
+    plt <- ggplotly(p, tooltip = "text") %>%
+      layout(
+        hoverlabel = list(bgcolor = "white"),
+        autosize = TRUE
+      ) %>%
       config(
-	scrollZoom = TRUE,
-	displayModeBar = TRUE,
-	modeBarButtons = list(list(
-	  "zoom2d",
-	  "pan2d",
-	  "zoomIn2d",
-	  "zoomOut2d",
-	  "resetScale2d",
-	  "toImage"
-	))
+        scrollZoom = TRUE,
+        displayModeBar = TRUE,
+        modeBarButtons = list(list(
+          "zoom2d",
+          "pan2d",
+          "zoomIn2d",
+          "zoomOut2d",
+          "resetScale2d",
+          "toImage"
+        ))
       )
   })
 
   # Helper function for table formatting
   format_extreme_table <- function(data, sort_col_idx) {
     datatable(data,
-	      options = list(
-		pageLength = 10,
-		order = list(list(sort_col_idx, 'desc')),
-		#dom = 't',  # Only show table, no controls
-		scrollX = TRUE,
-		scrollY = TRUE
-	      ),
-	      selection = 'single') %>%
+              options = list(
+                pageLength = 10,
+                order = list(list(sort_col_idx, 'desc')),
+                #dom = 't',  # Only show table, no controls
+                scrollX = TRUE,
+                scrollY = TRUE
+              ),
+              selection = 'single') %>%
       formatRound(c("Compliance Rate", "Wilson LCB"), digits = 3)
   }
 
@@ -214,12 +214,12 @@ server <- function(input, output, session) {
   format_table_cols <- function(data) {
     data %>%
       select(
-	Sponsor = schema1.lead_sponsor_name,
-	`Funding Source` = schema1.lead_sponsor_funding_source,
-	`Total Trials` = n.total,
-	`Compliant Trials` = n.success,
-	`Compliance Rate` = rr.with_extensions,
-	`Wilson LCB` = wilson.conf.low
+        Sponsor = schema1.lead_sponsor_name,
+        `Funding Source` = schema1.lead_sponsor_funding_source,
+        `Total Trials` = n.total,
+        `Compliant Trials` = n.success,
+        `Compliance Rate` = rr.with_extensions,
+        `Wilson LCB` = wilson.conf.low
       )
   }
 
@@ -247,13 +247,13 @@ server <- function(input, output, session) {
     wilson_col_idx <- which(names(data) == "Wilson LCB")
 
     datatable(data,
-	      options = list(
-		pageLength = 25,
-		order = list(list(wilson_col_idx, 'desc')),
-		scrollX = TRUE,
-		scrollY = TRUE
-	      ),
-	      selection = 'single') %>%
+              options = list(
+                pageLength = 25,
+                order = list(list(wilson_col_idx, 'desc')),
+                scrollX = TRUE,
+                scrollY = TRUE
+              ),
+              selection = 'single') %>%
       formatRound(c("Compliance Rate", "Wilson LCB"), digits = 3)
   })
 
@@ -261,8 +261,8 @@ server <- function(input, output, session) {
   listify <- function(ncts) {
     if (!all(is.na(ncts)) && length(ncts) > 0) {
       links <- sapply(ncts, function(nct) {
-	sprintf('<li><a href="https://clinicaltrials.gov/study/%s" target="_blank">%s</a></li>',
-	       nct, nct)
+        sprintf('<li><a href="https://clinicaltrials.gov/study/%s" target="_blank">%s</a></li>',
+                nct, nct)
       })
       sprintf('<ol>%s</ol>', paste(links, collapse = ""))
     } else {
@@ -278,12 +278,12 @@ server <- function(input, output, session) {
     showModal(modalDialog(
       title = paste("Trial Details for", selected_data$schema1.lead_sponsor_name),
       div(
-	style = "max-height: 400px; overflow-y: auto;",
-	h4("Compliant Trials"),
-	HTML(listify(selected_data$ncts.compliant[[1]])),
-	hr(),
-	h4("Non-compliant Trials"),
-	HTML(listify(selected_data$ncts.noncompliant[[1]]))
+        style = "max-height: 400px; overflow-y: auto;",
+        h4("Compliant Trials"),
+        HTML(listify(selected_data$ncts.compliant[[1]])),
+        hr(),
+        h4("Non-compliant Trials"),
+        HTML(listify(selected_data$ncts.noncompliant[[1]]))
       ),
       size = "l",
       easyClose = TRUE,
