@@ -113,7 +113,7 @@ server <- function(input, output, session) {
   # Update on initialisation
   observe({
     # Update funding sources
-    funding_sources <- c("All", sort(unique(raw_data$schema1.lead_sponsor_funding_source)))
+    funding_sources <- c("All", sort(levels(raw_data$schema1.lead_sponsor_funding_source)))
     updateSelectInput(session, "funding_source",
                       choices = funding_sources,
                       selected = "All")
@@ -328,114 +328,127 @@ server <- function(input, output, session) {
     ))
   }
 
-  # Modal for displaying NCT details - separate handlers for each table
-  observeEvent(input$sponsor_table_rows_selected, {
-    req(input$sponsor_table_rows_selected)
-    selected_sponsor <- sponsor_data()[input$sponsor_table_rows_selected, ]$schema1.lead_sponsor_name
-    show_trial_modal(selected_sponsor)
-    dataTableProxy('sponsor_table') %>% selectRows(NULL)
-  })
-
-  observeEvent(input$top_table_rows_selected, {
-    req(input$top_table_rows_selected)
-    selected_sponsor <- top_n_data()[input$top_table_rows_selected, ]$schema1.lead_sponsor_name
-    show_trial_modal(selected_sponsor)
-    dataTableProxy('top_table') %>% selectRows(NULL)
-  })
-
-  observeEvent(input$bottom_table_rows_selected, {
-    req(input$bottom_table_rows_selected)
-    selected_sponsor <- bottom_n_data()[input$bottom_table_rows_selected, ]$schema1.lead_sponsor_name
-    show_trial_modal(selected_sponsor)
-    dataTableProxy('bottom_table') %>% selectRows(NULL)
-  })
-
   # Report Tables reactive expressions
   report_tables.src_data <- (
     raw_data
     |> filter(n.total >= min_trials.report_tables)
   )
 
-  overall_trials_data <- reactive({
-    report_tables.src_data %>%
-      arrange(desc(n.total)) %>%
-      head(10) %>%
-      format_table_cols()
+  # Table configurations for all tables
+  # nolint start
+  base_table_configs <- list(
+    sponsor = list(
+      data = sponsor_data,
+      sort_col = "Wilson LCB"),
+    top = list(
+      data = top_n_data,
+      sort_col = "Wilson LCB"),
+    bottom = list(
+      data = bottom_n_data,
+      sort_col = "Wilson LCB")
+  )
+
+  academic_detect <- function(data) {
+    patterns <- c(
+      # Universities and variants
+      "Universit(y|é|at|ad)",
+      "College",
+      #"Institut(e|o)?",
+
+      # Schools
+      "School of",
+      "Medical School",
+
+      # Academic medical centers
+      "Academic Medical Cent(er|re)",
+      "Teaching Hospital",
+      "Research Hospital",
+      "University Hospital",
+      "Cancer Cent(er|re)",
+
+      # Research centers
+      "Research Cent(er|re)",
+      "Research Institut",
+      "Academic Health",
+      #"Medical Cent(er|re)",
+
+      # Other academic institutions
+      "Academy",
+      "Fakultät",
+      "Faculdade",
+      "École",
+      "Escuela"
+    )
+
+    pattern <- paste0("(?i)(", paste(patterns, collapse = "|"), ")")
+    str_detect(data, pattern)
+  }
+
+  # Report tables
+  report_table_configs <- list(
+    # Overall
+    overall_trials = list(
+      sort_col = "Total Trials",
+      data = reactive({ report_tables.src_data %>%
+        arrange(desc(n.total)) %>%
+        head(10) })),
+    overall_ws_top = list(
+      sort_col = "Wilson LCB",
+      data = reactive({ report_tables.src_data %>%
+        arrange(desc(wilson.conf.low), desc(n.total)) %>%
+        head(10) })),
+    overall_ws_bottom = list(
+      sort_col = "Wilson LCB",
+      data = reactive({ report_tables.src_data %>%
+        arrange(desc(wilson.conf.low), desc(n.total)) %>%
+        tail(10) })),
+    # NIH
+    nih_ws_top = list(
+      sort_col = "Wilson LCB",
+      data = reactive({ report_tables.src_data %>%
+        filter(schema1.lead_sponsor_funding_source == "NIH") %>%
+        arrange(desc(wilson.conf.low), desc(n.total)) %>%
+        head(10) })),
+    # Academic
+    academic_top = list(
+      sort_col = "Wilson LCB",
+      data = reactive({ report_tables.src_data %>%
+        filter(academic_detect(schema1.lead_sponsor_name)) %>%
+        arrange(desc(wilson.conf.low), desc(n.total)) %>%
+        head(10) })),
+    academic_bottom = list(
+      sort_col = "Wilson LCB",
+      data = reactive({ report_tables.src_data %>%
+        filter(academic_detect(schema1.lead_sponsor_name)) %>%
+        arrange(desc(wilson.conf.low), desc(n.total)) %>%
+        tail(10) })),
+    # NIH grantees
+    nih_grants_top = list(
+      sort_col = "Wilson LCB",
+      data = reactive({ report_tables.src_data %>%
+        filter(str_detect(schema1.lead_sponsor_name, "NIH GRANT")) %>%
+        arrange(desc(wilson.conf.low), desc(n.total)) %>%
+        head(10) }))
+  )
+  # nolint end
+
+  # Create table outputs for report_table_configs only.
+  iwalk(report_table_configs, function(config, name) {
+    output[[paste0(name, "_table")]] <- renderDT({
+      data <- format_table_cols(config$data())
+      format_extreme_table(data, which(names(data) == config$sort_col))
+    })
   })
 
-  overall_ws_top_data <- reactive({
-    report_tables.src_data %>%
-      arrange(desc(wilson.conf.low)) %>%
-      head(10) %>%
-      format_table_cols()
-  })
-
-  overall_ws_bottom_data <- reactive({
-    report_tables.src_data %>%
-      arrange(wilson.conf.low) %>%
-      head(10) %>%
-      format_table_cols()
-  })
-
-  nih_ws_top_data <- reactive({
-    report_tables.src_data %>%
-      filter(schema1.lead_sponsor_funding_source == "NIH") %>%
-      arrange(desc(wilson.conf.low)) %>%
-      head(10) %>%
-      format_table_cols()
-  })
-
-  academic_top_data <- reactive({
-    report_tables.src_data %>%
-      filter(schema1.lead_sponsor_funding_source == "Academic") %>%
-      arrange(desc(wilson.conf.low)) %>%
-      head(10) %>%
-      format_table_cols()
-  })
-
-  academic_bottom_data <- reactive({
-    report_tables.src_data %>%
-      filter(schema1.lead_sponsor_funding_source == "Academic") %>%
-      arrange(wilson.conf.low) %>%
-      head(10) %>%
-      format_table_cols()
-  })
-
-  nih_grants_top_data <- reactive({
-    report_tables.src_data %>%
-      filter(str_detect(schema1.lead_sponsor_name, "NIH GRANT")) %>%
-      arrange(desc(wilson.conf.low)) %>%
-      head(10) %>%
-      format_table_cols()
-  })
-
-  # Report Tables outputs
-  output$overall_trials_table <- renderDT({
-    format_extreme_table(overall_trials_data(), which(names(overall_trials_data()) == "Total Trials"))
-  })
-
-  output$overall_ws_top_table <- renderDT({
-    format_extreme_table(overall_ws_top_data(), which(names(overall_ws_top_data()) == "Wilson LCB"))
-  })
-
-  output$overall_ws_bottom_table <- renderDT({
-    format_extreme_table(overall_ws_bottom_data(), which(names(overall_ws_bottom_data()) == "Wilson LCB"))
-  })
-
-  output$nih_ws_top_table <- renderDT({
-    format_extreme_table(nih_ws_top_data(), which(names(nih_ws_top_data()) == "Wilson LCB"))
-  })
-
-  output$academic_top_table <- renderDT({
-    format_extreme_table(academic_top_data(), which(names(academic_top_data()) == "Wilson LCB"))
-  })
-
-  output$academic_bottom_table <- renderDT({
-    format_extreme_table(academic_bottom_data(), which(names(academic_bottom_data()) == "Wilson LCB"))
-  })
-
-  output$nih_grants_top_table <- renderDT({
-    format_extreme_table(nih_grants_top_data(), which(names(nih_grants_top_data()) == "Wilson LCB"))
+  # Create click handlers for all tables
+  iwalk(c(base_table_configs, report_table_configs), function(config, name) {
+    observeEvent(input[[paste0(name, "_table_rows_selected")]], {
+      selected_rows <- input[[paste0(name, "_table_rows_selected")]]
+      req(selected_rows)
+      selected_sponsor <- config$data()[selected_rows, ]$schema1.lead_sponsor_name
+      show_trial_modal(selected_sponsor)
+      dataTableProxy(paste0(name, "_table")) %>% selectRows(NULL)
+    })
   })
 }
 
