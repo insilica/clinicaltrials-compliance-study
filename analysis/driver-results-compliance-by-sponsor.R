@@ -1,7 +1,7 @@
 # if(!sys.nframe()) { source('analysis/driver-results-compliance-by-sponsor.R') }
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load( logger, readr, ggrepel, openxlsx ) # nolint
+pacman::p_load( logger, readr, ggrepel, openxlsx, textutils ) # nolint
 
 source('analysis/ctgov.R')
 
@@ -14,6 +14,9 @@ agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed
 
 ( agg.trials.by_sponsor <-
   agg.window.postrule[[1]]$hlact.studies
+  |> mutate(
+            schema1.lead_sponsor_name = textutils::HTMLdecode(schema1.lead_sponsor_name)
+  )
   |> mutate(
     # Which type of intervalue to use for the `dateproc.results_reported.within_inc()`
     # computation below:

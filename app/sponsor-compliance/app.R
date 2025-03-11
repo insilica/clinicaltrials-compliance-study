@@ -3,7 +3,6 @@ library(tidyverse)
 library(arrow)
 library(ggrepel)
 library(DT)
-library(textutils)
 library(plotly)
 
 # UI definition
