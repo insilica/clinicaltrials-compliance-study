@@ -47,7 +47,11 @@ agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed
    !c(starts_with("ncts.")),
    starts_with("ncts.")
  )
+ |> arrange(-wilson.conf.low, -n.total)
 )
+
+agg.trials.by_sponsor |>
+  write_parquet(fs::path(output.path.base, "sponsor_compliance_summary.parquet"))
 
 
 tab.agg.trials.by_sponsor <-
@@ -55,8 +59,7 @@ tab.agg.trials.by_sponsor <-
     mutate(
       ncts.compliant    = sapply(ncts.compliant, paste, collapse = "|"),
       ncts.noncompliant = sapply(ncts.noncompliant, paste, collapse = "|")
-    ) |>
-    arrange(-wilson.conf.low,-n.total)
+    )
 
 tab.agg.trials.by_sponsor |>
   write_csv(fs::path(output.path.base, "sponsor_compliance_summary.csv"))
