@@ -5,6 +5,8 @@ library(ggrepel)
 library(DT)
 library(plotly)
 
+min_trials.default <- 9
+
 # UI definition
 ui <- fluidPage(
   titlePanel("Clinical Trial Sponsor Compliance Analysis"),
@@ -16,7 +18,7 @@ ui <- fluidPage(
                   selected = "All"),
 
       sliderInput("trial_threshold", "Minimum Number of Trials:",
-                  min = 1, max = 100, value = 1),
+                  min = 1, max = 100, value = min_trials.default),
 
       sliderInput("compliance_range", "Compliance Rate Range:",
                   min = 0, max = 1, value = c(0, 1), step = 0.1),
@@ -82,7 +84,7 @@ server <- function(input, output, session) {
     updateSliderInput(session, "trial_threshold",
                       min = min_trials,
                       max = max_trials,
-                      value = min_trials)
+                      value = max(min_trials, min_trials.default))
   }, priority = 1000)
 
   sponsor_data <- reactive({
