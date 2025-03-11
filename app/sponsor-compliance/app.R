@@ -1,6 +1,6 @@
 library(shiny)
 library(tidyverse)
-library(readr)
+library(arrow)
 library(ggrepel)
 library(DT)
 library(textutils)
@@ -67,12 +67,7 @@ ui <- fluidPage(
 # Server logic
 server <- function(input, output, session) {
   # Initial data load
-  raw_data <- read_csv("../../figtab/post-rule-to-20240430-by_sponsor/sponsor_compliance_summary.csv") %>%
-    mutate(
-      schema1.lead_sponsor_name = textutils::HTMLdecode(schema1.lead_sponsor_name),
-      ncts.compliant = strsplit(ncts.compliant, "\\|"),
-      ncts.noncompliant = strsplit(ncts.noncompliant, "\\|")
-    )
+  raw_data <- arrow::read_parquet("../../brick/post-rule-to-20240430-by_sponsor/sponsor_compliance_summary.parquet")
 
   # Update on initialisation
   observe({

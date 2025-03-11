@@ -7,7 +7,7 @@ source('analysis/ctgov.R')
 
 params <- window.params.read()
 
-output.path.base <- 'figtab/post-rule-to-20240430-by_sponsor'
+output.path.base <- 'brick/post-rule-to-20240430-by_sponsor'
 fs::dir_create(output.path.base)
 
 agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed')

@@ -204,4 +204,4 @@ stages:
       - analysis/driver-results-compliance-by-sponsor.R
       - brick/post-rule-to-20240430_processed
     outs:
-      - figtab/post-rule-to-20240430-by_sponsor
+      - brick/post-rule-to-20240430-by_sponsor
