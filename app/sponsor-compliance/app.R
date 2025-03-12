@@ -108,7 +108,9 @@ ui <- fluidPage(
 # Server logic
 server <- function(input, output, session) {
   # Initial data load
-  raw_data <- arrow::read_parquet("../../brick/post-rule-to-20240430-by_sponsor/sponsor_compliance_summary.parquet")
+  #raw_data <- arrow::read_parquet("../../brick/post-rule-to-20240430-by_sponsor/sponsor_compliance_summary.parquet")
+  raw_data <- arrow::read_parquet("../../brick/post-rule-to-20240430-by_sponsor-nih-grantees/sponsors_with_nih_status.parquet")
+
 
   # Update on initialisation
   observe({
@@ -435,7 +437,7 @@ server <- function(input, output, session) {
     nih_grants_top = list(
       sort_col = "Wilson LCB",
       data = reactive({ report_tables.src_data %>%
-        filter(str_detect(schema1.lead_sponsor_name, "NIH GRANT")) %>%
+        filter(is_nih_grantee) %>%
         arrange(desc(wilson.conf.low), desc(n.total)) %>%
         head(10) }))
   )
