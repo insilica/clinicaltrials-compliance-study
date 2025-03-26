@@ -413,12 +413,14 @@ server <- function(input, output, session) {
     academic_top = list(
       sort_col = "Wilson LCB",
       data = reactive({ report_tables.src_data %>%
+        filter( schema1.lead_sponsor_funding_source == 'OTHER' ) %>%
         filter(academic_detect(schema1.lead_sponsor_name)) %>%
         arrange(desc(wilson.conf.low), desc(n.total)) %>%
         head(10) })),
     academic_bottom = list(
       sort_col = "Wilson LCB",
       data = reactive({ report_tables.src_data %>%
+        filter( schema1.lead_sponsor_funding_source == 'OTHER' ) %>%
         filter(academic_detect(schema1.lead_sponsor_name)) %>%
         arrange(desc(wilson.conf.low), desc(n.total)) %>%
         tail(10) })),
