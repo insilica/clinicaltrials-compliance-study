@@ -33,6 +33,8 @@ agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed
     rr.total_results   = mean(!is.na(common.results_received_date)),
     ncts.compliant    = list(schema1.nct_id[cr.results_reported_12mo_with_extensions == TRUE]),
     ncts.noncompliant = list(schema1.nct_id[cr.results_reported_12mo_with_extensions == FALSE]),
+    ncts.with_results    = list(schema1.nct_id[!is.na(common.results_received_date)]),
+    ncts.without_results = list(schema1.nct_id[is.na(common.results_received_date)]),
     n.total   = n(),
     n.success = sapply(ncts.compliant, length),
     n.failure = sapply(ncts.noncompliant, length)

@@ -321,7 +321,13 @@ server <- function(input, output, session) {
         HTML(listify(selected_data$ncts.compliant[[1]])),
         hr(),
         h4("Non-compliant Trials"),
-        HTML(listify(selected_data$ncts.noncompliant[[1]]))
+        HTML(listify(selected_data$ncts.noncompliant[[1]])),
+        hr(),
+        h4("Trials With Results (any time)"),
+        HTML(listify(selected_data$ncts.with_results[[1]])),
+        hr(),
+        h4("Trials Without Results"),
+        HTML(listify(selected_data$ncts.without_results[[1]]))
       ),
       size = "l",
       easyClose = TRUE,
