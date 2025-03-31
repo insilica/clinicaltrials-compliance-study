@@ -113,7 +113,7 @@ server <- function(input, output, session) {
   # Update on initialisation
   observe({
     # Update funding sources
-    funding_sources <- c("All", sort(levels(raw_data$schema1.lead_sponsor_funding_source)))
+    funding_sources <- c("All", sort(levels(as.factor(raw_data$schema1.lead_sponsor_funding_source))))
     updateSelectInput(session, "funding_source",
                       choices = funding_sources,
                       selected = "All")
