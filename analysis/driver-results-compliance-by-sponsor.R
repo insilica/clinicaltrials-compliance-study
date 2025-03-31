@@ -17,7 +17,7 @@ agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed
   |> mutate(
             schema1.lead_sponsor_name = textutils::HTMLdecode(schema1.lead_sponsor_name)
   )
-  |> filter(!map_lgl(schema1.intervention_type, ~identical(.x, "BEHAVIORAL")))
+  |> filter(map_lgl(schema1.intervention_type, ~any(.x %in% c("DRUG", "BIOLOGICAL", "DEVICE"))))
   |> mutate(
     # Which type of intervalue to use for the `dateproc.results_reported.within_inc()`
     # computation below:
