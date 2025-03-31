@@ -223,7 +223,7 @@ server <- function(input, output, session) {
                 scrollY = TRUE
               ),
               selection = 'single') %>%
-      formatRound(c("Compliance Rate", "Wilson LCB"), digits = 3)
+      formatRound(c("All Results Reporting Rate", "Compliance Rate", "Wilson LCB"), digits = 3)
   }
 
   # Dynamic titles for extremes tables
@@ -254,6 +254,7 @@ server <- function(input, output, session) {
         Sponsor = schema1.lead_sponsor_name,
         `Funding Source` = schema1.lead_sponsor_funding_source,
         `Total Trials` = n.total,
+        `All Results Reporting Rate` = rr.total_results,
         `Compliant Trials` = n.success,
         `Compliance Rate` = rr.with_extensions,
         `Wilson LCB` = wilson.conf.low
@@ -291,7 +292,7 @@ server <- function(input, output, session) {
                 scrollY = TRUE
               ),
               selection = 'single') %>%
-      formatRound(c("Compliance Rate", "Wilson LCB"), digits = 3)
+      formatRound(c("All Results Reporting Rate", "Compliance Rate", "Wilson LCB"), digits = 3)
   })
 
   # Helper function to create ordered list of NCT links
