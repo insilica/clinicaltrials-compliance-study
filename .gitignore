@@ -4,6 +4,7 @@
 *.parquet
 /log
 /_build
+/data/source
 
 # Jupyter
 .ipynb_checkpoints/
