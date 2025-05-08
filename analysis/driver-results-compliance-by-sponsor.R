@@ -1,19 +1,23 @@
 # if(!sys.nframe()) { source('analysis/driver-results-compliance-by-sponsor.R') }
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load( logger, readr, ggrepel, openxlsx )
+pacman::p_load( logger, readr, ggrepel, openxlsx, textutils ) # nolint
 
 source('analysis/ctgov.R')
 
 params <- window.params.read()
 
-output.path.base <- 'figtab/post-rule-to-20240430-by_sponsor'
+output.path.base <- 'brick/post-rule-to-20240430-by_sponsor'
 fs::dir_create(output.path.base)
 
 agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed')
 
 ( agg.trials.by_sponsor <-
   agg.window.postrule[[1]]$hlact.studies
+  |> mutate(
+            schema1.lead_sponsor_name = textutils::HTMLdecode(schema1.lead_sponsor_name)
+  )
+  |> filter(map_lgl(schema1.intervention_type, ~any(.x %in% c("DRUG", "BIOLOGICAL", "DEVICE"))))
   |> mutate(
     # Which type of intervalue to use for the `dateproc.results_reported.within_inc()`
     # computation below:
@@ -26,11 +30,14 @@ agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed
   |> summarize(
     rr.with_extensions = mean(cr.results_reported_12mo_with_extensions),
     rr.no_extensions   = mean(cr.results_reported_12mo),
+    rr.total_results   = mean(!is.na(common.results_received_date)),
     ncts.compliant    = list(schema1.nct_id[cr.results_reported_12mo_with_extensions == TRUE]),
     ncts.noncompliant = list(schema1.nct_id[cr.results_reported_12mo_with_extensions == FALSE]),
+    ncts.with_results    = list(schema1.nct_id[!is.na(common.results_received_date)]),
+    ncts.without_results = list(schema1.nct_id[is.na(common.results_received_date)]),
     n.total   = n(),
-    n.success = sapply(ncts.compliant,length),
-    n.failure = sapply(ncts.noncompliant,length)
+    n.success = sapply(ncts.compliant, length),
+    n.failure = sapply(ncts.noncompliant, length)
   )
  |> mutate(
    # Use Wilson score interval from binom.test
@@ -47,7 +54,11 @@ agg.window.postrule <- windows.rdata.read('brick/post-rule-to-20240430_processed
    !c(starts_with("ncts.")),
    starts_with("ncts.")
  )
+ |> arrange(-wilson.conf.low, -n.total)
 )
+
+agg.trials.by_sponsor |>
+  write_parquet(fs::path(output.path.base, "sponsor_compliance_summary.parquet"))
 
 
 tab.agg.trials.by_sponsor <-
@@ -55,8 +66,7 @@ tab.agg.trials.by_sponsor <-
     mutate(
       ncts.compliant    = sapply(ncts.compliant, paste, collapse = "|"),
       ncts.noncompliant = sapply(ncts.noncompliant, paste, collapse = "|")
-    ) |>
-    arrange(-wilson.conf.low,-n.total)
+    )
 
 tab.agg.trials.by_sponsor |>
   write_csv(fs::path(output.path.base, "sponsor_compliance_summary.csv"))
@@ -103,6 +113,7 @@ ggsave(fs::path(output.path.base, 'sponsor_compliance_scatter.png'),
 
 ################################################################################
 # Analysis definitions
+# nolint start: line_length_linter.
 analyses <- list(
   list(
     name = "summary",
@@ -135,6 +146,7 @@ analyses <- list(
     arrange = list(quote(desc(wilson.conf.low)), quote(desc(n.total)))
   )
 )
+# nolint end
 
 # Funding source filters
 funding_sources <- c("ALL" = NA, "INDUSTRY" = "INDUSTRY", "OTHER" = "OTHER")

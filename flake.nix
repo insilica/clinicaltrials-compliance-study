@@ -25,6 +25,7 @@
 
         rPackages = prev.rPackages // {
           arrow = final.callPackage ./maint/nixpkg/r/arrow.nix {};
+          plotly = final.callPackage ./maint/nixpkg/r/plotly.nix {};
         };
       };
     } //
@@ -73,17 +74,17 @@
                   arrow assertthat
                   blandr broom
                   ComplexUpset cowplot cthist
-                  DBI dotenv dplyr
+                  DBI dotenv dplyr DT
                   forcats fs
                   ggplot2 ggpubr ggrepel ggsurvfit ggtext glue gridtext gtsummary
                   here
                   knitr kableExtra
                   listr logger lubridate
                   openxlsx
-                  pacman parsedate patchwork purrr
+                  pacman parsedate patchwork plotly purrr
                   readr rlang RPostgres
-                  scales stringr survival survminer svglite
-                  testthat this_path tidyr tidyverse
+                  scales shiny stringr survival survminer svglite
+                  testthat textutils this_path tidyr tidyverse
                   vroom
                   yaml
                 ];
