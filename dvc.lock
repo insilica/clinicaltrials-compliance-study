@@ -2185,19 +2185,19 @@ stages:
     deps:
     - path: analysis/driver-results-compliance-by-sponsor.R
       hash: md5
-      md5: 10da93bd333e933ded081bff660862ea
-      size: 8968
+      md5: 2d674e500f0576f9805e929c5ed0fa36
+      size: 9589
     - path: brick/post-rule-to-20240430_processed
       hash: md5
       md5: c052612ddd06fa4235e662c529fd019b.dir
       size: 24151229
       nfiles: 2
     outs:
-    - path: figtab/post-rule-to-20240430-by_sponsor
+    - path: brick/post-rule-to-20240430-by_sponsor
       hash: md5
-      md5: 94ae272c2096f22e6844db4c9dc774d0.dir
-      size: 2785487
-      nfiles: 3
+      md5: ac1379a155c906a9692212d10f9edf81.dir
+      size: 2678607
+      nfiles: 4
   process-post-rule-to-20240430:
     cmd: "Rscript analysis/driver-post-rule-to-20240430-process.R\n"
     deps:
