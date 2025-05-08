@@ -131,6 +131,7 @@ run-app-sponsor-compliance: brick/post-rule-to-20240430-by_sponsor-nih-grantees/
 	Rscript -e "$$APP_SPONSOR_COMPLIANCE_R"
 
 brick/post-rule-to-20240430-by_sponsor-nih-grantees/sponsors_with_nih_status.parquet:
+	biobricks pull
 	[ -e data/source ] || ./stages/00_bb_path.sh
 	mkdir -p brick/post-rule-to-20240430-by_sponsor-nih-grantees/
 	duckdb < sql/nih-grantee.sql
