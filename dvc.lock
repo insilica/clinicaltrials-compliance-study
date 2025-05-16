@@ -2174,12 +2174,12 @@ stages:
     outs:
     - path: brick/flowchart-counts/post-rule-to-20240430.csv
       hash: md5
-      md5: be804ba9bc1576ba6cbc5d413fd62db2
+      md5: c4d02fa081cb1fed38734d1c6f074707
       size: 158
     - path: brick/post-rule-to-20240430/ctgov-studies-hlact.parquet
       hash: md5
-      md5: c11282c994aa878ff35ac3aa22310f06
-      size: 2388745
+      md5: 2efd232abd4255a621b26b1aff1eb39b
+      size: 1502375
   analysis-post-rule-to-20240430-by_sponsor:
     cmd: "Rscript analysis/driver-results-compliance-by-sponsor.R\n"
     deps:
@@ -2189,14 +2189,14 @@ stages:
       size: 9589
     - path: brick/post-rule-to-20240430_processed
       hash: md5
-      md5: c052612ddd06fa4235e662c529fd019b.dir
-      size: 24151229
+      md5: dd358a1e4f8f6338895bcffa8819e300.dir
+      size: 22056672
       nfiles: 2
     outs:
     - path: brick/post-rule-to-20240430-by_sponsor
       hash: md5
-      md5: ac1379a155c906a9692212d10f9edf81.dir
-      size: 2678607
+      md5: d6b5348bb1d9cda25eea32f09d57c53f.dir
+      size: 1930029
       nfiles: 4
   process-post-rule-to-20240430:
     cmd: "Rscript analysis/driver-post-rule-to-20240430-process.R\n"
@@ -2207,16 +2207,16 @@ stages:
       size: 668
     - path: brick/post-rule-to-20240430
       hash: md5
-      md5: 49f180f9b638082160d55408f84aaa6e.dir
-      size: 28438863
+      md5: a2eab98c721bc3ddfed871017c5ed5b2.dir
+      size: 27552493
       nfiles: 2
     - path: params.yaml
       hash: md5
-      md5: f3639f0a85510f7af426389ffa3bdc2a
-      size: 11097
+      md5: b50db44d72022a3f03d7998fe137b101
+      size: 11127
     outs:
     - path: brick/post-rule-to-20240430_processed
       hash: md5
-      md5: c052612ddd06fa4235e662c529fd019b.dir
-      size: 24151229
+      md5: dd358a1e4f8f6338895bcffa8819e300.dir
+      size: 22056672
       nfiles: 2
