@@ -12,7 +12,8 @@ process.postrule.agg.window <- function() {
     window.params.filter.by.name('^post-rule-to-20240430$')
   print(names(params.filtered))
   agg.windows <- process.windows.init(params.filtered) |>
-    process.windows.amend.results_reported()
+    process.windows.amend.results_reported() |>
+    process.windows.amend.compliance_extensions()
   return(agg.windows)
 }
 

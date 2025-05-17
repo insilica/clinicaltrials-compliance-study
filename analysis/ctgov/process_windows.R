@@ -81,6 +81,34 @@ process.windows.amend.results_reported <- function(agg.windows) {
   return(agg.windows)
 }
 
+# Add the compliance columns with and without extensions
+process.windows.amend.compliance_extensions <- function(agg.windows) {
+  for(w_name in names(agg.windows)) {
+    agg.windows[[w_name]] <- within(agg.windows[[w_name]], {
+      # Add compliance columns for with and without extensions
+
+      # Compliance with extensions - using cr.interval_to_results_with_extensions_no_censor
+      hlact.studies <- hlact.studies |>
+        mutate(
+          # Set default interval to with extensions
+          cr.interval_to_results_default = cr.interval_to_results_with_extensions_no_censor,
+          # Calculate compliance with extensions (within 12 months)
+          cc.compliant_with_extensions = dateproc.results_reported.within_inc(pick(everything()), months(12))
+        )
+
+      # Compliance without extensions - using cr.interval_to_results_no_extensions_no_censor
+      hlact.studies <- hlact.studies |>
+        mutate(
+          # Reset default interval to no extensions
+          cr.interval_to_results_default = cr.interval_to_results_no_extensions_no_censor,
+          # Calculate compliance without extensions (within 12 months)
+          cc.compliant_no_extensions = dateproc.results_reported.within_inc(pick(everything()), months(12))
+        )
+    })
+  }
+  return(agg.windows)
+}
+
 process.windows.amend.model.logistic <- function(agg.windows) {
   for(w_name in names(agg.windows)) {
     agg.windows[[w_name]] <- within(agg.windows[[w_name]], {
