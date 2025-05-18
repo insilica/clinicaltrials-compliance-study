@@ -23,6 +23,7 @@ param:
       cutoff: '2024-04-30'
       start:  '2017-01-18'
       stop:   '2023-04-01'
+      initiated: '2017-01-18'
     output:
       all:            brick/post-rule-to-20240430/ctgov-studies-all.parquet
       hlact-filtered: brick/post-rule-to-20240430/ctgov-studies-hlact.parquet
